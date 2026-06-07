@@ -58,7 +58,8 @@ export function TiptapEditor({
           setSaveStatus("saved")
           isDirtyRef.current = false
         }
-      } catch {
+      } catch (err) {
+        console.error("[editor] save failed:", err)
         setSaveStatus("error")
       }
     },

@@ -121,10 +121,13 @@ export async function saveChapterContent(
     if (!chapter || chapter.book.authorId !== session.user.id) return { error: "Not found" }
 
     const wordsDelta = wordCount - chapter.wordCount
+    // Deserialize to a plain object — Next.js 15 server action arguments arrive
+    // as restricted proxies and Prisma's serializer fails on Symbol.toStringTag.
+    const plainContent = JSON.parse(JSON.stringify(content))
 
     await prisma.chapter.update({
       where: { id: chapterId },
-      data: { content: content as object, wordCount },
+      data: { content: plainContent, wordCount },
     })
 
     const totalResult = await prisma.chapter.aggregate({
