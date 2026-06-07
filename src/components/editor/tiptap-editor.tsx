@@ -4,10 +4,8 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import TextAlign from "@tiptap/extension-text-align"
-import FontFamily from "@tiptap/extension-font-family"
 import Underline from "@tiptap/extension-underline"
-import { TextStyle } from "@tiptap/extension-text-style"
-import { FontSize } from "./font-size"
+import { TextStyle } from "./font-size"
 import { Toolbar } from "./toolbar"
 import { saveChapterContent } from "@/actions/chapters"
 import { Button } from "@/components/ui/button"
@@ -52,6 +50,7 @@ export function TiptapEditor({
       setSaveStatus("saving")
       try {
         const content = editorInstance.getJSON()
+        console.log("[editor] saving JSON:", JSON.stringify(content))
         const words = countWords(editorInstance.getText())
         const result = await saveChapterContent(chapterId, content, words)
         if (result.error) {
@@ -73,8 +72,6 @@ export function TiptapEditor({
     extensions: [
       StarterKit,
       TextStyle,
-      FontFamily,
-      FontSize,
       Underline,
       TextAlign.configure({
         types: ["heading", "paragraph"],

@@ -85,6 +85,7 @@ export function ChapterList({ bookId, initialChapters }: ChapterListProps) {
         </div>
       ) : (
         <DndContext
+          id="chapter-list-dnd"
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}

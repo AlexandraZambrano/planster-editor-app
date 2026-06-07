@@ -8,7 +8,7 @@ import {
   List, ListOrdered, Minus, Undo, Redo, Maximize2, Minimize2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { FONT_FAMILIES, FONT_SIZES } from "./font-size"
+import { FONT_SIZES } from "./font-size"
 
 // Prevents the editor from losing focus when clicking toolbar items
 function onToolbarPointerDown(e: React.PointerEvent) {
@@ -87,8 +87,8 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps) {
-  // Native <select> steals focus and loses the editor selection before onChange fires.
-  // We save the selection on mouseDown and restore it in the onChange handler.
+  // Native <select> steals focus before onChange fires.
+  // We snapshot the selection on mouseDown so we can restore it in onChange.
   const savedSelection = useRef<{ from: number; to: number } | null>(null)
 
   function saveSelection() {
@@ -96,19 +96,33 @@ export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps
     savedSelection.current = { from, to }
   }
 
-  function withRestoredSelection(fn: () => void) {
+  // Retrieves the saved selection and clears it; falls back to "select all"
+  // so the mark is committed into the document, not left as a stored/pending mark.
+  function popSelection(): { from: number; to: number } | "all" {
     const sel = savedSelection.current
-    if (sel) {
-      editor.chain().focus().setTextSelection(sel).run()
-    } else {
-      editor.commands.focus()
-    }
-    fn()
     savedSelection.current = null
+    if (sel && sel.from !== sel.to) return sel
+    return "all"
   }
 
-  const currentFontFamily =
-    (editor.getAttributes("textStyle").fontFamily as string | undefined) ?? ""
+  // Font family selector is intentionally disabled for v1.
+  // To re-enable: add <ToolbarSelect> for FONT_FAMILIES and call applyFontFamily.
+  // function applyFontFamily(value: string) {
+  //   const sel = popSelection()
+  //   const base = sel === "all"
+  //     ? editor.chain().focus().selectAll()
+  //     : editor.chain().focus().setTextSelection(sel)
+  //   if (value) base.setFontFamily(value).run()
+  //   else base.unsetFontFamily().run()
+  // }
+
+  function applyFontSize(value: string) {
+    const sel = popSelection()
+    const base = sel === "all"
+      ? editor.chain().focus().selectAll()
+      : editor.chain().focus().setTextSelection(sel)
+    base.setFontSize(`${value}px`).run()
+  }
 
   const currentFontSize = (() => {
     const raw = editor.getAttributes("textStyle").fontSize as string | undefined
@@ -153,37 +167,13 @@ export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps
 
       <Separator />
 
-      {/* Font family */}
-      <ToolbarSelect
-        title="Font family"
-        value={currentFontFamily}
-        options={FONT_FAMILIES as unknown as { label: string; value: string }[]}
-        onMouseDown={saveSelection}
-        onChange={(value) => {
-          withRestoredSelection(() => {
-            if (value) {
-              editor.chain().setFontFamily(value).run()
-            } else {
-              editor.chain().unsetFontFamily().run()
-            }
-          })
-        }}
-        className="w-36"
-      />
-
-      <Separator />
-
       {/* Font size */}
       <ToolbarSelect
         title="Font size"
         value={currentFontSize}
         options={FONT_SIZES.map((s) => ({ label: `${s}px`, value: s }))}
         onMouseDown={saveSelection}
-        onChange={(value) => {
-          withRestoredSelection(() => {
-            editor.chain().setFontSize(`${value}px`).run()
-          })
-        }}
+        onChange={applyFontSize}
         className="w-16"
       />
 

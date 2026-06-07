@@ -1,49 +1,100 @@
-import { Extension } from "@tiptap/core"
+import { Mark, mergeAttributes, getMarkAttributes } from "@tiptap/core"
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
-    fontSize: {
-      setFontSize: (size: string) => ReturnType
+    textStyle: {
+      setFontFamily: (fontFamily: string) => ReturnType
+      unsetFontFamily: () => ReturnType
+      setFontSize: (fontSize: string) => ReturnType
       unsetFontSize: () => ReturnType
+      removeEmptyTextStyle: () => ReturnType
     }
   }
 }
 
-export const FontSize = Extension.create({
-  name: "fontSize",
+// Single custom TextStyle mark that owns fontFamily and fontSize directly in
+// addAttributes. Using addGlobalAttributes on a separate extension does NOT
+// register them in the ProseMirror mark schema, so Mark.fromJSON drops them on
+// load. Defining them in addAttributes ensures they survive JSON round-trips.
+export const TextStyle = Mark.create({
+  name: "textStyle",
 
-  addOptions() {
-    return { types: ["textStyle"] }
+  addAttributes() {
+    return {
+      fontFamily: {
+        default: null,
+        parseHTML: (element) => element.style.fontFamily || null,
+        renderHTML: (attributes) => {
+          if (!attributes.fontFamily) return {}
+          return { style: `font-family: ${attributes.fontFamily}` }
+        },
+      },
+      fontSize: {
+        default: null,
+        parseHTML: (element) => element.style.fontSize || null,
+        renderHTML: (attributes) => {
+          if (!attributes.fontSize) return {}
+          return { style: `font-size: ${attributes.fontSize}` }
+        },
+      },
+    }
   },
 
-  addGlobalAttributes() {
+  parseHTML() {
     return [
       {
-        types: this.options.types,
-        attributes: {
-          fontSize: {
-            default: null,
-            parseHTML: (element) => element.style.fontSize || null,
-            renderHTML: (attributes) => {
-              if (!attributes.fontSize) return {}
-              return { style: `font-size: ${attributes.fontSize}` }
-            },
-          },
+        tag: "span",
+        getAttrs: (element) => {
+          const hasStyles = (element as HTMLElement).getAttribute("style")
+          if (!hasStyles) return false
+          return {}
         },
       },
     ]
   },
 
+  renderHTML({ HTMLAttributes }) {
+    return ["span", mergeAttributes(HTMLAttributes), 0]
+  },
+
   addCommands() {
     return {
+      setFontFamily:
+        (fontFamily: string) =>
+        ({ chain }) =>
+          chain().setMark(this.name, { fontFamily }).run(),
+
+      unsetFontFamily:
+        () =>
+        ({ chain }) =>
+          chain()
+            .setMark(this.name, { fontFamily: null })
+            .removeEmptyTextStyle()
+            .run(),
+
       setFontSize:
         (fontSize: string) =>
         ({ chain }) =>
-          chain().setMark("textStyle", { fontSize }).run(),
+          chain().setMark(this.name, { fontSize }).run(),
+
       unsetFontSize:
         () =>
         ({ chain }) =>
-          chain().setMark("textStyle", { fontSize: null }).removeEmptyTextStyle().run(),
+          chain()
+            .setMark(this.name, { fontSize: null })
+            .removeEmptyTextStyle()
+            .run(),
+
+      removeEmptyTextStyle:
+        () =>
+        ({ state, commands }) => {
+          const type = state.schema.marks[this.name]
+          if (!type) return true
+          const attributes = getMarkAttributes(state, type)
+          const hasStyles = Object.entries(attributes).some(([, value]) => !!value)
+          if (hasStyles) return true
+          return commands.unsetMark(this.name)
+        },
     }
   },
 })
