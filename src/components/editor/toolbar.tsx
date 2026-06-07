@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef } from "react"
 import type { Editor } from "@tiptap/react"
 import {
   Bold, Italic, Underline, Strikethrough,
@@ -51,17 +52,19 @@ interface ToolbarSelectProps {
   value: string
   options: readonly { label: string; value: string }[]
   onChange: (value: string) => void
+  onMouseDown?: () => void
   className?: string
   title: string
 }
 
-function ToolbarSelect({ value, options, onChange, className, title }: ToolbarSelectProps) {
+function ToolbarSelect({ value, options, onChange, onMouseDown, className, title }: ToolbarSelectProps) {
   return (
     <select
       title={title}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       onPointerDown={(e) => e.stopPropagation()}
+      onMouseDown={onMouseDown}
       className={cn(
         "h-8 rounded border-none bg-transparent text-xs text-foreground cursor-pointer",
         "hover:bg-accent focus:outline-none focus:ring-1 focus:ring-ring px-1",
@@ -84,6 +87,26 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps) {
+  // Native <select> steals focus and loses the editor selection before onChange fires.
+  // We save the selection on mouseDown and restore it in the onChange handler.
+  const savedSelection = useRef<{ from: number; to: number } | null>(null)
+
+  function saveSelection() {
+    const { from, to } = editor.state.selection
+    savedSelection.current = { from, to }
+  }
+
+  function withRestoredSelection(fn: () => void) {
+    const sel = savedSelection.current
+    if (sel) {
+      editor.chain().focus().setTextSelection(sel).run()
+    } else {
+      editor.commands.focus()
+    }
+    fn()
+    savedSelection.current = null
+  }
+
   const currentFontFamily =
     (editor.getAttributes("textStyle").fontFamily as string | undefined) ?? ""
 
@@ -135,12 +158,15 @@ export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps
         title="Font family"
         value={currentFontFamily}
         options={FONT_FAMILIES as unknown as { label: string; value: string }[]}
+        onMouseDown={saveSelection}
         onChange={(value) => {
-          if (value) {
-            editor.chain().focus().setFontFamily(value).run()
-          } else {
-            editor.chain().focus().unsetFontFamily().run()
-          }
+          withRestoredSelection(() => {
+            if (value) {
+              editor.chain().setFontFamily(value).run()
+            } else {
+              editor.chain().unsetFontFamily().run()
+            }
+          })
         }}
         className="w-36"
       />
@@ -152,8 +178,11 @@ export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps
         title="Font size"
         value={currentFontSize}
         options={FONT_SIZES.map((s) => ({ label: `${s}px`, value: s }))}
+        onMouseDown={saveSelection}
         onChange={(value) => {
-          editor.chain().focus().setFontSize(`${value}px`).run()
+          withRestoredSelection(() => {
+            editor.chain().setFontSize(`${value}px`).run()
+          })
         }}
         className="w-16"
       />

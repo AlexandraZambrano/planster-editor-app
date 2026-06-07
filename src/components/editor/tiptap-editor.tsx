@@ -5,12 +5,15 @@ import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import TextAlign from "@tiptap/extension-text-align"
 import FontFamily from "@tiptap/extension-font-family"
+import Underline from "@tiptap/extension-underline"
 import { TextStyle } from "@tiptap/extension-text-style"
 import { FontSize } from "./font-size"
 import { Toolbar } from "./toolbar"
 import { saveChapterContent } from "@/actions/chapters"
+import { Button } from "@/components/ui/button"
+import { Save } from "lucide-react"
+import { cn } from "@/lib/utils"
 
-const DEBOUNCE_MS = 2000
 const AUTOSAVE_MS = 30_000
 
 type SaveStatus = "saved" | "saving" | "error" | "idle"
@@ -38,15 +41,14 @@ export function TiptapEditor({
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved")
   const [wordCount, setWordCount] = useState(0)
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const isDirtyRef = useRef(false)
-  // Tiptap v3 fires onUpdate during initial content application; ignore it
   const isEditorReadyRef = useRef(false)
 
   const save = useCallback(
-    async (editorInstance: ReturnType<typeof useEditor>) => {
-      if (!editorInstance || !isDirtyRef.current) return
+    async (editorInstance: ReturnType<typeof useEditor>, force = false) => {
+      if (!editorInstance) return
+      if (!force && !isDirtyRef.current) return
       setSaveStatus("saving")
       try {
         const content = editorInstance.getJSON()
@@ -73,6 +75,7 @@ export function TiptapEditor({
       TextStyle,
       FontFamily,
       FontSize,
+      Underline,
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),
@@ -80,30 +83,44 @@ export function TiptapEditor({
     content: initialContent && Object.keys(initialContent).length > 0 ? initialContent : undefined,
     editorProps: {
       attributes: {
-        class:
-          "focus:outline-none min-h-[1054px] cursor-text",
-        style:
-          "padding: 40px 56px;",
+        class: "focus:outline-none min-h-[1054px] cursor-text",
+        style: "padding: 40px 56px;",
+      },
+      handleKeyDown(_view, event) {
+        // Ctrl+S / Cmd+S — manual save
+        if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+          event.preventDefault()
+          return true
+        }
+        return false
       },
     },
     onUpdate({ editor: ed }) {
       if (!isEditorReadyRef.current) return
-      const words = countWords(ed.getText())
-      setWordCount(words)
+      setWordCount(countWords(ed.getText()))
       isDirtyRef.current = true
       setSaveStatus("idle")
-
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-      debounceRef.current = setTimeout(() => save(ed), DEBOUNCE_MS)
     },
     onCreate({ editor: ed }) {
       setWordCount(countWords(ed.getText()))
-      // Mark the editor ready after creation so onUpdate tracks real user changes
       setTimeout(() => { isEditorReadyRef.current = true }, 0)
     },
   })
 
-  // 30-second interval save
+  // Ctrl+S / Cmd+S save — listened at the window level so it works anywhere in the editor
+  useEffect(() => {
+    if (!editor) return
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault()
+        save(editor, true)
+      }
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [editor, save])
+
+  // 30-second interval auto-save
   useEffect(() => {
     if (!editor) return
     intervalRef.current = setInterval(() => save(editor), AUTOSAVE_MS)
@@ -112,10 +129,9 @@ export function TiptapEditor({
     }
   }, [editor, save])
 
-  // Save on unmount if dirty
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
   }, [])
@@ -131,7 +147,7 @@ export function TiptapEditor({
     saved: "text-muted-foreground",
     saving: "text-muted-foreground",
     error: "text-destructive",
-    idle: "text-muted-foreground",
+    idle: "text-amber-600",
   }[saveStatus]
 
   return (
@@ -171,7 +187,20 @@ export function TiptapEditor({
         <span className="text-muted-foreground">
           {wordCount.toLocaleString()} {wordCount === 1 ? "word" : "words"}
         </span>
-        <span className={statusColor}>{statusLabel}</span>
+
+        <div className="flex items-center gap-3">
+          <span className={cn("transition-colors", statusColor)}>{statusLabel}</span>
+          <Button
+            size="sm"
+            variant={saveStatus === "idle" ? "default" : "outline"}
+            className="h-7 gap-1.5 text-xs"
+            disabled={saveStatus === "saving" || !editor}
+            onClick={() => editor && save(editor, true)}
+          >
+            <Save className="h-3 w-3" />
+            Save
+          </Button>
+        </div>
       </div>
     </div>
   )
