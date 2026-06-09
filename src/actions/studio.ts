@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import type { StoryRole, RelationshipType } from "@prisma/client"
+import type { StoryRole, RelationshipType, BoardElementType } from "@prisma/client"
 
 // ── Location helpers ───────────────────────────────────────────────────────────
 
@@ -912,5 +912,416 @@ export async function reorderTimelineEntries(bookId: string, orderedIds: string[
   )
 
   revalidatePath(`/write/${bookId}/studio/timeline`)
+  return { success: true as const }
+}
+
+// ── Board ─────────────────────────────────────────────────────────────────────
+
+async function getBoardForAuthor(boardId: string, userId: string) {
+  return prisma.board.findFirst({
+    where: { id: boardId, book: { authorId: userId } },
+    select: { id: true, bookId: true },
+  })
+}
+
+async function getBoardElementForAuthor(elementId: string, userId: string) {
+  return prisma.boardElement.findFirst({
+    where: { id: elementId, board: { book: { authorId: userId } } },
+    select: { id: true, boardId: true, board: { select: { bookId: true } } },
+  })
+}
+
+export async function getBoards(bookId: string) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const book = await getBookForAuthor(bookId, session.user.id)
+  if (!book) return { error: "Not found" as const }
+
+  const boards = await prisma.board.findMany({
+    where: { bookId },
+    select: { id: true, name: true, createdAt: true },
+    orderBy: { createdAt: "asc" },
+  })
+
+  return { boards }
+}
+
+export async function createBoard(bookId: string, name: string) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const book = await getBookForAuthor(bookId, session.user.id)
+  if (!book) return { error: "Not found" as const }
+
+  if (!name.trim()) return { error: "Name is required" as const }
+
+  const board = await prisma.board.create({
+    data: { bookId, name: name.trim() },
+    select: { id: true, name: true, createdAt: true },
+  })
+
+  revalidatePath(`/write/${bookId}/studio/board`)
+  return { board }
+}
+
+export async function deleteBoard(boardId: string) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const board = await getBoardForAuthor(boardId, session.user.id)
+  if (!board) return { error: "Not found" as const }
+
+  await prisma.board.delete({ where: { id: boardId } })
+
+  revalidatePath(`/write/${board.bookId}/studio/board`)
+  return { success: true as const }
+}
+
+export type BoardElementData = {
+  id: string
+  type: BoardElementType
+  characterId: string | null
+  locationId: string | null
+  posX: number
+  posY: number
+  content: Record<string, unknown>
+  character: { id: string; name: string; mainImageUrl: string | null; storyRole: string } | null
+  location: { id: string; name: string; images: string[] } | null
+}
+
+export type BoardConnectionData = {
+  id: string
+  fromElementId: string
+  toElementId: string
+  label: string | null
+  color: string
+  isAutomatic: boolean
+}
+
+export type CharacterLinkData = {
+  id: string
+  characterAId: string
+  characterBId: string
+  relationshipType: RelationshipType
+  note: string | null
+}
+
+export async function getBoardData(boardId: string, bookId: string) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const book = await getBookForAuthor(bookId, session.user.id)
+  if (!book) return { error: "Not found" as const }
+
+  const board = await prisma.board.findFirst({
+    where: { id: boardId, bookId },
+    select: {
+      id: true,
+      name: true,
+      elements: {
+        select: {
+          id: true,
+          type: true,
+          characterId: true,
+          locationId: true,
+          posX: true,
+          posY: true,
+          content: true,
+          character: {
+            select: { id: true, name: true, mainImageUrl: true, storyRole: true },
+          },
+          location: {
+            select: { id: true, name: true, images: true },
+          },
+        },
+        orderBy: { createdAt: "asc" },
+      },
+      connections: {
+        select: {
+          id: true,
+          fromElementId: true,
+          toElementId: true,
+          label: true,
+          color: true,
+          isAutomatic: true,
+        },
+      },
+    },
+  })
+
+  if (!board) return { error: "Not found" as const }
+
+  const characterLinks = await prisma.characterLink.findMany({
+    where: { characterA: { bookId } },
+    select: {
+      id: true,
+      characterAId: true,
+      characterBId: true,
+      relationshipType: true,
+      note: true,
+    },
+  })
+
+  return {
+    board: { id: board.id, name: board.name },
+    elements: board.elements.map((el) => ({
+      ...el,
+      content: el.content as Record<string, unknown>,
+    })) as BoardElementData[],
+    connections: board.connections as BoardConnectionData[],
+    characterLinks: characterLinks as CharacterLinkData[],
+  }
+}
+
+export async function addBoardElement(
+  boardId: string,
+  type: BoardElementType,
+  referenceId?: string | null,
+  content?: Record<string, unknown>,
+  posX?: number,
+  posY?: number
+) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const board = await getBoardForAuthor(boardId, session.user.id)
+  if (!board) return { error: "Not found" as const }
+
+  const element = await prisma.boardElement.create({
+    data: {
+      boardId,
+      type,
+      characterId: type === "CHARACTER" ? (referenceId ?? null) : null,
+      locationId: type === "LOCATION" ? (referenceId ?? null) : null,
+      content: content ?? {},
+      posX: posX ?? 100,
+      posY: posY ?? 100,
+    },
+    select: {
+      id: true,
+      type: true,
+      characterId: true,
+      locationId: true,
+      posX: true,
+      posY: true,
+      content: true,
+      character: {
+        select: { id: true, name: true, mainImageUrl: true, storyRole: true },
+      },
+      location: {
+        select: { id: true, name: true, images: true },
+      },
+    },
+  })
+
+  return {
+    element: { ...element, content: element.content as Record<string, unknown> } as BoardElementData,
+  }
+}
+
+export async function saveBoardElementPosition(elementId: string, x: number, y: number) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const element = await getBoardElementForAuthor(elementId, session.user.id)
+  if (!element) return { error: "Not found" as const }
+
+  await prisma.boardElement.update({
+    where: { id: elementId },
+    data: { posX: x, posY: y },
+  })
+
+  return { success: true as const }
+}
+
+export async function updateBoardElementContent(
+  elementId: string,
+  content: Record<string, unknown>
+) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const element = await getBoardElementForAuthor(elementId, session.user.id)
+  if (!element) return { error: "Not found" as const }
+
+  await prisma.boardElement.update({
+    where: { id: elementId },
+    data: { content: JSON.parse(JSON.stringify(content)) },
+  })
+
+  return { success: true as const }
+}
+
+export async function deleteBoardElement(elementId: string) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const element = await getBoardElementForAuthor(elementId, session.user.id)
+  if (!element) return { error: "Not found" as const }
+
+  await prisma.boardElement.delete({ where: { id: elementId } })
+
+  revalidatePath(`/write/${element.board.bookId}/studio/board`)
+  return { success: true as const }
+}
+
+export async function addBoardConnection(
+  boardId: string,
+  fromElementId: string,
+  toElementId: string,
+  label?: string,
+  color?: string
+) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const board = await getBoardForAuthor(boardId, session.user.id)
+  if (!board) return { error: "Not found" as const }
+
+  const connection = await prisma.boardConnection.create({
+    data: {
+      boardId,
+      fromElementId,
+      toElementId,
+      label: label ?? null,
+      color: color ?? "#6b3fa0",
+      isAutomatic: false,
+    },
+    select: {
+      id: true,
+      fromElementId: true,
+      toElementId: true,
+      label: true,
+      color: true,
+      isAutomatic: true,
+    },
+  })
+
+  return { connection }
+}
+
+export async function deleteBoardConnection(connectionId: string) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const connection = await prisma.boardConnection.findFirst({
+    where: {
+      id: connectionId,
+      board: { book: { authorId: session.user.id } },
+    },
+    select: { id: true, board: { select: { bookId: true } } },
+  })
+
+  if (!connection) return { error: "Not found" as const }
+
+  await prisma.boardConnection.delete({ where: { id: connectionId } })
+
+  revalidatePath(`/write/${connection.board.bookId}/studio/board`)
+  return { success: true as const }
+}
+
+// ── Book Notes ────────────────────────────────────────────────────────────────
+
+async function getBookNoteForAuthor(noteId: string, userId: string) {
+  return prisma.bookNote.findFirst({
+    where: { id: noteId, book: { authorId: userId } },
+    select: { id: true, bookId: true },
+  })
+}
+
+export type BookNoteData = {
+  id: string
+  title: string
+  content: Record<string, unknown>
+  tags: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+export async function getBookNotes(bookId: string) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const book = await getBookForAuthor(bookId, session.user.id)
+  if (!book) return { error: "Not found" as const }
+
+  const notes = await prisma.bookNote.findMany({
+    where: { bookId },
+    select: {
+      id: true,
+      title: true,
+      content: true,
+      tags: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+    orderBy: { updatedAt: "desc" },
+  })
+
+  return { notes: notes.map((n) => ({ ...n, content: n.content as Record<string, unknown> })) as BookNoteData[] }
+}
+
+export async function createBookNote(bookId: string, title: string) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const book = await getBookForAuthor(bookId, session.user.id)
+  if (!book) return { error: "Not found" as const }
+
+  if (!title.trim()) return { error: "Title is required" as const }
+
+  const note = await prisma.bookNote.create({
+    data: { bookId, title: title.trim(), content: {}, tags: [] },
+    select: {
+      id: true,
+      title: true,
+      content: true,
+      tags: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  })
+
+  revalidatePath(`/write/${bookId}/studio/notes`)
+  return { note: { ...note, content: note.content as Record<string, unknown> } as BookNoteData }
+}
+
+export async function updateBookNote(
+  noteId: string,
+  data: Partial<{ title: string; content: object; tags: string[] }>
+) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const note = await getBookNoteForAuthor(noteId, session.user.id)
+  if (!note) return { error: "Not found" as const }
+
+  if ("title" in data && data.title !== undefined && !data.title.trim()) {
+    return { error: "Title is required" as const }
+  }
+
+  await prisma.bookNote.update({
+    where: { id: noteId },
+    data: {
+      ...(data.title !== undefined && { title: data.title.trim() }),
+      ...(data.content !== undefined && { content: data.content }),
+      ...(data.tags !== undefined && { tags: data.tags }),
+    },
+  })
+
+  return { success: true as const }
+}
+
+export async function deleteBookNote(noteId: string) {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" as const }
+
+  const note = await getBookNoteForAuthor(noteId, session.user.id)
+  if (!note) return { error: "Not found" as const }
+
+  await prisma.bookNote.delete({ where: { id: noteId } })
+
+  revalidatePath(`/write/${note.bookId}/studio/notes`)
   return { success: true as const }
 }

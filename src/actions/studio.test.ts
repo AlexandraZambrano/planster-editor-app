@@ -32,6 +32,20 @@ import {
   updateTimelineEntry,
   deleteTimelineEntry,
   reorderTimelineEntries,
+  getBoards,
+  createBoard,
+  deleteBoard,
+  getBoardData,
+  addBoardElement,
+  saveBoardElementPosition,
+  updateBoardElementContent,
+  deleteBoardElement,
+  addBoardConnection,
+  deleteBoardConnection,
+  getBookNotes,
+  createBookNote,
+  updateBookNote,
+  deleteBookNote,
 } from "./studio"
 
 // ── Auth mock ──────────────────────────────────────────────────────────────
@@ -993,5 +1007,438 @@ describe("reorderTimelineEntries", () => {
     const result = await reorderTimelineEntries("book1", ["entry2", "entry1"])
     expect(result).toEqual({ success: true })
     expect(db.$transaction).toHaveBeenCalled()
+  })
+})
+
+// ── Board fixtures ────────────────────────────────────────────────────────────
+
+const BOARD = { id: "board1", bookId: "book1", name: "Main" }
+const BOARD_ELEMENT = { id: "el1", boardId: "board1", board: { bookId: "book1" } }
+const BOARD_ELEMENT_FULL = {
+  id: "el1",
+  type: "NOTE",
+  characterId: null,
+  locationId: null,
+  posX: 100,
+  posY: 200,
+  content: { text: "hello", color: "#fef3c7" },
+  character: null,
+  location: null,
+}
+const BOARD_CONNECTION = {
+  id: "conn1",
+  fromElementId: "el1",
+  toElementId: "el2",
+  label: null,
+  color: "#6b3fa0",
+  isAutomatic: false,
+}
+
+// ── getBoards ─────────────────────────────────────────────────────────────────
+
+describe("getBoards", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await getBoards("book1")
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found for non-author book", async () => {
+    db.book.findFirst.mockResolvedValueOnce(null)
+    const result = await getBoards("book1")
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("returns boards list", async () => {
+    db.book.findFirst.mockResolvedValueOnce(BOOK)
+    db.board.findMany.mockResolvedValueOnce([BOARD])
+    const result = await getBoards("book1")
+    expect(result).toEqual({ boards: [BOARD] })
+  })
+})
+
+// ── createBoard ───────────────────────────────────────────────────────────────
+
+describe("createBoard", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await createBoard("book1", "My Board")
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found for non-author book", async () => {
+    db.book.findFirst.mockResolvedValueOnce(null)
+    const result = await createBoard("book1", "My Board")
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("returns error for blank name", async () => {
+    db.book.findFirst.mockResolvedValueOnce(BOOK)
+    const result = await createBoard("book1", "  ")
+    expect(result).toEqual({ error: "Name is required" })
+  })
+
+  it("creates board and returns it", async () => {
+    db.book.findFirst.mockResolvedValueOnce(BOOK)
+    db.board.create.mockResolvedValueOnce(BOARD)
+    const result = await createBoard("book1", "Main")
+    expect(result).toEqual({ board: BOARD })
+    expect(db.board.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ name: "Main", bookId: "book1" }) })
+    )
+  })
+})
+
+// ── deleteBoard ───────────────────────────────────────────────────────────────
+
+describe("deleteBoard", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await deleteBoard("board1")
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found if board does not belong to user", async () => {
+    db.board.findFirst.mockResolvedValueOnce(null)
+    const result = await deleteBoard("board1")
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("deletes board and returns success", async () => {
+    db.board.findFirst.mockResolvedValueOnce(BOARD)
+    db.board.delete.mockResolvedValueOnce({})
+    const result = await deleteBoard("board1")
+    expect(result).toEqual({ success: true })
+  })
+})
+
+// ── getBoardData ──────────────────────────────────────────────────────────────
+
+describe("getBoardData", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await getBoardData("board1", "book1")
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found for non-author book", async () => {
+    db.book.findFirst.mockResolvedValueOnce(null)
+    const result = await getBoardData("board1", "book1")
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("returns not found if board missing", async () => {
+    db.book.findFirst.mockResolvedValueOnce(BOOK)
+    db.board.findFirst.mockResolvedValueOnce(null)
+    const result = await getBoardData("board1", "book1")
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("returns full board data", async () => {
+    db.book.findFirst.mockResolvedValueOnce(BOOK)
+    db.board.findFirst.mockResolvedValueOnce({
+      id: "board1",
+      name: "Main",
+      elements: [BOARD_ELEMENT_FULL],
+      connections: [BOARD_CONNECTION],
+    })
+    db.characterLink.findMany.mockResolvedValueOnce([])
+    const result = await getBoardData("board1", "book1")
+    expect(result).toMatchObject({
+      board: { id: "board1" },
+      elements: [expect.objectContaining({ id: "el1" })],
+      connections: [BOARD_CONNECTION],
+      characterLinks: [],
+    })
+  })
+})
+
+// ── addBoardElement ───────────────────────────────────────────────────────────
+
+describe("addBoardElement", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await addBoardElement("board1", "NOTE")
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found if board does not belong to user", async () => {
+    db.board.findFirst.mockResolvedValueOnce(null)
+    const result = await addBoardElement("board1", "NOTE")
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("creates element and returns it", async () => {
+    db.board.findFirst.mockResolvedValueOnce(BOARD_ELEMENT)
+    db.boardElement.create.mockResolvedValueOnce({ ...BOARD_ELEMENT_FULL })
+    const result = await addBoardElement("board1", "NOTE", null, { text: "hello" }, 100, 200)
+    expect(result).toHaveProperty("element")
+  })
+})
+
+// ── saveBoardElementPosition ──────────────────────────────────────────────────
+
+describe("saveBoardElementPosition", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await saveBoardElementPosition("el1", 10, 20)
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found if element not owned", async () => {
+    db.boardElement.findFirst.mockResolvedValueOnce(null)
+    const result = await saveBoardElementPosition("el1", 10, 20)
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("updates position and returns success", async () => {
+    db.boardElement.findFirst.mockResolvedValueOnce(BOARD_ELEMENT)
+    db.boardElement.update.mockResolvedValueOnce({})
+    const result = await saveBoardElementPosition("el1", 10, 20)
+    expect(result).toEqual({ success: true })
+    expect(db.boardElement.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { posX: 10, posY: 20 } })
+    )
+  })
+})
+
+// ── updateBoardElementContent ─────────────────────────────────────────────────
+
+describe("updateBoardElementContent", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await updateBoardElementContent("el1", { text: "hi" })
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found if element not owned", async () => {
+    db.boardElement.findFirst.mockResolvedValueOnce(null)
+    const result = await updateBoardElementContent("el1", { text: "hi" })
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("updates content and returns success", async () => {
+    db.boardElement.findFirst.mockResolvedValueOnce(BOARD_ELEMENT)
+    db.boardElement.update.mockResolvedValueOnce({})
+    const result = await updateBoardElementContent("el1", { text: "hi" })
+    expect(result).toEqual({ success: true })
+  })
+})
+
+// ── deleteBoardElement ────────────────────────────────────────────────────────
+
+describe("deleteBoardElement", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await deleteBoardElement("el1")
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found if element not owned", async () => {
+    db.boardElement.findFirst.mockResolvedValueOnce(null)
+    const result = await deleteBoardElement("el1")
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("deletes element and returns success", async () => {
+    db.boardElement.findFirst.mockResolvedValueOnce(BOARD_ELEMENT)
+    db.boardElement.delete.mockResolvedValueOnce({})
+    const result = await deleteBoardElement("el1")
+    expect(result).toEqual({ success: true })
+  })
+})
+
+// ── addBoardConnection ────────────────────────────────────────────────────────
+
+describe("addBoardConnection", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await addBoardConnection("board1", "el1", "el2")
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found if board not owned", async () => {
+    db.board.findFirst.mockResolvedValueOnce(null)
+    const result = await addBoardConnection("board1", "el1", "el2")
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("creates connection and returns it", async () => {
+    db.board.findFirst.mockResolvedValueOnce(BOARD)
+    db.boardConnection.create.mockResolvedValueOnce(BOARD_CONNECTION)
+    const result = await addBoardConnection("board1", "el1", "el2")
+    expect(result).toEqual({ connection: BOARD_CONNECTION })
+  })
+})
+
+// ── deleteBoardConnection ─────────────────────────────────────────────────────
+
+describe("deleteBoardConnection", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await deleteBoardConnection("conn1")
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found if connection not owned", async () => {
+    db.boardConnection.findFirst.mockResolvedValueOnce(null)
+    const result = await deleteBoardConnection("conn1")
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("deletes connection and returns success", async () => {
+    db.boardConnection.findFirst.mockResolvedValueOnce({ id: "conn1", board: { bookId: "book1" } })
+    db.boardConnection.delete.mockResolvedValueOnce({})
+    const result = await deleteBoardConnection("conn1")
+    expect(result).toEqual({ success: true })
+    expect(db.boardConnection.delete).toHaveBeenCalledWith({ where: { id: "conn1" } })
+  })
+})
+
+// ── BookNote fixtures ─────────────────────────────────────────────────────────
+
+const NOTE = {
+  id: "note1",
+  bookId: "book1",
+  title: "My Note",
+  content: {},
+  tags: ["worldbuilding"],
+  createdAt: new Date("2024-01-01"),
+  updatedAt: new Date("2024-01-01"),
+}
+const NOTE_OWNED = { id: "note1", bookId: "book1" }
+
+// ── getBookNotes ──────────────────────────────────────────────────────────────
+
+describe("getBookNotes", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await getBookNotes("book1")
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found for non-author book", async () => {
+    db.book.findFirst.mockResolvedValueOnce(null)
+    const result = await getBookNotes("book1")
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("returns notes list", async () => {
+    db.book.findFirst.mockResolvedValueOnce(BOOK)
+    db.bookNote.findMany.mockResolvedValueOnce([NOTE])
+    const result = await getBookNotes("book1")
+    expect(result).toHaveProperty("notes")
+    expect((result as { notes: typeof NOTE[] }).notes[0].id).toBe("note1")
+  })
+})
+
+// ── createBookNote ────────────────────────────────────────────────────────────
+
+describe("createBookNote", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await createBookNote("book1", "Title")
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found for non-author book", async () => {
+    db.book.findFirst.mockResolvedValueOnce(null)
+    const result = await createBookNote("book1", "Title")
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("returns error for blank title", async () => {
+    db.book.findFirst.mockResolvedValueOnce(BOOK)
+    const result = await createBookNote("book1", "   ")
+    expect(result).toEqual({ error: "Title is required" })
+  })
+
+  it("creates note and returns it", async () => {
+    db.book.findFirst.mockResolvedValueOnce(BOOK)
+    db.bookNote.create.mockResolvedValueOnce(NOTE)
+    const result = await createBookNote("book1", "My Note")
+    expect(result).toHaveProperty("note")
+    expect((result as { note: typeof NOTE }).note.title).toBe("My Note")
+  })
+})
+
+// ── updateBookNote ────────────────────────────────────────────────────────────
+
+describe("updateBookNote", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await updateBookNote("note1", { title: "New" })
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found if note not owned", async () => {
+    db.bookNote.findFirst.mockResolvedValueOnce(null)
+    const result = await updateBookNote("note1", { title: "New" })
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("returns error for blank title", async () => {
+    db.bookNote.findFirst.mockResolvedValueOnce(NOTE_OWNED)
+    const result = await updateBookNote("note1", { title: "  " })
+    expect(result).toEqual({ error: "Title is required" })
+  })
+
+  it("updates note and returns success", async () => {
+    db.bookNote.findFirst.mockResolvedValueOnce(NOTE_OWNED)
+    db.bookNote.update.mockResolvedValueOnce({})
+    const result = await updateBookNote("note1", { title: "Updated", tags: ["plot"] })
+    expect(result).toEqual({ success: true })
+    expect(db.bookNote.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "note1" },
+        data: expect.objectContaining({ title: "Updated", tags: ["plot"] }),
+      })
+    )
+  })
+
+  it("updates content without title", async () => {
+    db.bookNote.findFirst.mockResolvedValueOnce(NOTE_OWNED)
+    db.bookNote.update.mockResolvedValueOnce({})
+    const content = { type: "doc", content: [] }
+    const result = await updateBookNote("note1", { content })
+    expect(result).toEqual({ success: true })
+  })
+})
+
+// ── deleteBookNote ────────────────────────────────────────────────────────────
+
+describe("deleteBookNote", () => {
+  it("returns unauthorized without session", async () => {
+    const { auth } = await import("@/lib/auth")
+    vi.mocked(auth).mockResolvedValueOnce(null)
+    const result = await deleteBookNote("note1")
+    expect(result).toEqual({ error: "Unauthorized" })
+  })
+
+  it("returns not found if note not owned", async () => {
+    db.bookNote.findFirst.mockResolvedValueOnce(null)
+    const result = await deleteBookNote("note1")
+    expect(result).toEqual({ error: "Not found" })
+  })
+
+  it("deletes note and returns success", async () => {
+    db.bookNote.findFirst.mockResolvedValueOnce(NOTE_OWNED)
+    db.bookNote.delete.mockResolvedValueOnce({})
+    const result = await deleteBookNote("note1")
+    expect(result).toEqual({ success: true })
+    expect(db.bookNote.delete).toHaveBeenCalledWith({ where: { id: "note1" } })
   })
 })

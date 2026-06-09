@@ -311,15 +311,16 @@ model BoardElement {
   id          String           @id @default(cuid())
   boardId     String
   type        BoardElementType
-  referenceId String?
+  characterId String?
+  locationId  String?
   posX        Float            @default(0)
   posY        Float            @default(0)
   content     Json             @default("{}")
   createdAt   DateTime         @default(now())
 
   board           Board             @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  character       Character?        @relation("CharacterBoardElement", fields: [referenceId], references: [id], map: "BoardElement_character_fkey")
-  location        Location?         @relation("LocationBoardElement", fields: [referenceId], references: [id], map: "BoardElement_location_fkey")
+  character       Character?        @relation("CharacterBoardElement", fields: [characterId], references: [id])
+  location        Location?         @relation("LocationBoardElement", fields: [locationId], references: [id])
   connectionsFrom BoardConnection[] @relation("FromElement")
   connectionsTo   BoardConnection[] @relation("ToElement")
 }
