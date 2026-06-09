@@ -87,6 +87,35 @@ body {
   }
 }
 
+/* ── Paged editor ─────────────────────────────────────────────────────────────
+   Each "page" = 1056 px tall (8.5 × 11 in at 96 DPI).
+   The repeating gradient draws white pages + 24 px grey gaps.
+   Content flows continuously; the grey bands are visual guides only.
+   To re-implement hard page breaks in v2, replace this block with a
+   ProseMirror page-break plugin and update the page wrapper layout.
+───────────────────────────────────────────────────────────────────────────── */
+.editor-pages {
+  /* Bottom shadow strip for each page */
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 1051px,
+      rgba(0, 0, 0, 0.04) 1053px,
+      rgba(0, 0, 0, 0.07) 1056px,
+      transparent 1056px,
+      transparent 1080px
+    ),
+    /* White page / grey gap — repeat unit must match: 1056 + 24 = 1080 px */
+    repeating-linear-gradient(
+      to bottom,
+      #ffffff 0px,
+      #ffffff 1056px,
+      #EAECEF 1056px,
+      #EAECEF 1080px
+    );
+}
+
 /* Tiptap editor content styles */
 .ProseMirror ul {
   list-style-type: disc;

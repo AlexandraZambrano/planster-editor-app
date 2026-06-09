@@ -81,7 +81,7 @@ export function TiptapEditor({
     editorProps: {
       attributes: {
         class: "focus:outline-none min-h-[1054px] cursor-text",
-        style: "padding: 40px 56px;",
+        style: "padding: 40px 56px 80px;",
       },
       handleKeyDown(_view, event) {
         // Ctrl+S / Cmd+S — manual save
@@ -172,9 +172,9 @@ export function TiptapEditor({
         />
       )}
 
-      {/* Editor content */}
-      <div className="flex-1 overflow-y-auto px-4 py-8">
-        <div className="mx-auto w-[816px] max-w-full bg-white shadow-sm rounded-sm border border-gray-100 min-h-[1054px]">
+      {/* Editor content — paged */}
+      <div className="flex-1 overflow-y-auto bg-[#EAECEF] py-8">
+        <div className="editor-pages mx-auto w-[816px] max-w-full min-h-[1056px]">
           <EditorContent editor={editor} />
         </div>
       </div>

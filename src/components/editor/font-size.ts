@@ -1,8 +1,10 @@
 import { Mark, mergeAttributes, getMarkAttributes } from "@tiptap/core"
 
+// Use a unique key to avoid conflict with @tiptap/extension-text-style's
+// `textStyle` declaration which only has `removeEmptyTextStyle`.
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
-    textStyle: {
+    customTextStyle: {
       setFontFamily: (fontFamily: string) => ReturnType
       unsetFontFamily: () => ReturnType
       setFontSize: (fontSize: string) => ReturnType

@@ -1,5 +1,5 @@
 import { prisma } from "./prisma"
-import type { NotificationType } from "@prisma/client"
+import type { NotificationType, Prisma } from "@prisma/client"
 
 export async function createNotification(
   userId: string,
@@ -7,7 +7,9 @@ export async function createNotification(
   payload: Record<string, unknown>
 ): Promise<void> {
   try {
-    await prisma.notification.create({ data: { userId, type, payload } })
+    await prisma.notification.create({
+      data: { userId, type, payload: payload as Prisma.InputJsonValue },
+    })
   } catch (err) {
     console.error("[createNotification] failed:", err)
   }

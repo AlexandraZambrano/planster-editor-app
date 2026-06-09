@@ -5,9 +5,7 @@ import Link from "next/link"
 import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import TextAlign from "@tiptap/extension-text-align"
-import FontFamily from "@tiptap/extension-font-family"
-import { TextStyle } from "@tiptap/extension-text-style"
-import { FontSize } from "@/components/editor/font-size"
+import { TextStyle } from "@/components/editor/font-size"
 import { ChevronLeft, ChevronRight, MessageSquarePlus, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -63,8 +61,6 @@ export function ReadingView({
     extensions: [
       StarterKit,
       TextStyle,
-      FontFamily,
-      FontSize,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     content: content && Object.keys(content).length > 0 ? content : undefined,

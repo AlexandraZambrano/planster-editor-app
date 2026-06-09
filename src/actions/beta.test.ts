@@ -66,7 +66,7 @@ describe("requestBeta", () => {
       title: "My Book",
     })
     const result = await requestBeta("book-1", "I want to read this")
-    expect(result.error).toContain("author")
+    expect(result.error).toContain("own book")
   })
 
   it("returns error when book is DRAFT", async () => {
