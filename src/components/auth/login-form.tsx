@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { PasswordInput } from "@/components/ui/password-input"
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -81,9 +82,8 @@ export function LoginForm() {
             Forgot password?
           </Link>
         </div>
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
           autoComplete="current-password"
           {...register("password")}
           data-testid="password-input"

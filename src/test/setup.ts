@@ -78,6 +78,7 @@ vi.mock("@/lib/prisma", () => ({
     },
     wordCountLog: {
       findFirst: vi.fn(),
+      findMany: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
     },
@@ -150,6 +151,13 @@ vi.mock("@/lib/prisma", () => ({
       delete: vi.fn(),
     },
     bookNote: {
+      findMany: vi.fn(),
+      findFirst: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
+    writingGoal: {
       findMany: vi.fn(),
       findFirst: vi.fn(),
       create: vi.fn(),

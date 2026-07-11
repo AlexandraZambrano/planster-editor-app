@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { PasswordInput } from "@/components/ui/password-input"
 import { registerUser } from "@/actions/auth"
 
 const registerSchema = z.object({
@@ -112,9 +113,8 @@ export function RegisterForm() {
 
       <div className="space-y-1.5">
         <Label htmlFor="password">Password</Label>
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
           autoComplete="new-password"
           {...register("password")}
           data-testid="password-input"
