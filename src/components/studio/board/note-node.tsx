@@ -22,7 +22,7 @@ export type NoteNodeData = {
 
 export function NoteNode({ id, data }: { id: string; data: NoteNodeData }) {
   const { updateNodeData } = useReactFlow()
-  const saveTimer = useRef<ReturnType<typeof setTimeout>>()
+  const saveTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const handleTextChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {

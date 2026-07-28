@@ -13,7 +13,7 @@ import {
   type Node,
   type Edge,
   type OnConnect,
-  type NodeDragHandler,
+  type OnNodeDrag,
   type OnNodesDelete,
   type OnEdgesDelete,
   type Connection,
@@ -180,7 +180,7 @@ export function BoardCanvas({
     buildEdges(initialConnections, characterLinks, initialElements)
   )
 
-  const onNodeDragStop: NodeDragHandler = useCallback((_event, node) => {
+  const onNodeDragStop: OnNodeDrag = useCallback((_event, node) => {
     startTransition(() => {
       saveBoardElementPosition(node.id, node.position.x, node.position.y)
     })
