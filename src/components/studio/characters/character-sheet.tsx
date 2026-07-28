@@ -242,7 +242,7 @@ export function CharacterSheet({
         <div>
           <h1 className="text-2xl font-bold">{initial.name}</h1>
           {initial.nickname && (
-            <p className="text-sm text-muted-foreground">"{initial.nickname}"</p>
+            <p className="text-sm text-muted-foreground">&quot;{initial.nickname}&quot;</p>
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0">

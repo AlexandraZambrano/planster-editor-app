@@ -21,7 +21,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { BookForm } from "./book-form"
 import { updateBookPublicationStatus, deleteBook } from "@/actions/books"
-import type { Book } from "@prisma/client"
+import type { Book, PublicationStatus } from "@prisma/client"
 
 interface BookSettingsPanelProps {
   book: Pick<
@@ -47,10 +47,10 @@ export function BookSettingsPanel({ book }: BookSettingsPanelProps) {
   const [isPending, startTransition] = useTransition()
   const [deleteConfirmStep, setDeleteConfirmStep] = useState<"idle" | "betaWarning">("idle")
 
-  function handleStatusChange(newStatus: string) {
+  function handleStatusChange(newStatus: PublicationStatus) {
     setStatusError(null)
     startTransition(async () => {
-      const result = await updateBookPublicationStatus(book.id, newStatus as any)
+      const result = await updateBookPublicationStatus(book.id, newStatus)
       if (result.error) setStatusError(result.error)
     })
   }
@@ -81,8 +81,8 @@ export function BookSettingsPanel({ book }: BookSettingsPanelProps) {
             genres: book.genres,
             tags: book.tags,
             language: book.language,
-            bookStatus: book.bookStatus as any,
-            license: book.license as any,
+            bookStatus: book.bookStatus,
+            license: book.license,
           }}
           onSuccess={() => {}}
         />
