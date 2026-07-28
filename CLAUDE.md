@@ -1,0 +1,71 @@
+# Planster — Project Memory
+
+Planster is a web platform for writers and beta readers. The name comes from **Plotter** + **Pantser**: it serves both writers who plan their stories and those who write without a plan. It is the most complete environment on the market for writers in progress, with the most advanced beta feedback system available.
+
+## Specification documents
+
+Read these files BEFORE writing any code. They are the source of truth for the project.
+
+- Architecture & stack → @.claude/specs/architecture.md
+- Data model (Prisma schema) → @.claude/specs/data-model.md
+- Modules & features → @.claude/specs/modules/
+  - Authentication → @.claude/specs/modules/auth.md
+  - Books & chapters → @.claude/specs/modules/books.md
+  - Text editor → @.claude/specs/modules/editor.md
+  - Writer's Studio → @.claude/specs/modules/writers-studio.md
+  - Writing Goals → @.claude/specs/modules/writing-goals.md
+  - Beta system → @.claude/specs/modules/beta-system.md
+  - Library & shelves → @.claude/specs/modules/library.md
+  - Discovery → @.claude/specs/modules/discovery.md
+  - Notifications → @.claude/specs/modules/notifications.md
+  - Public profile → @.claude/specs/modules/profile.md
+- App routes → @.claude/specs/routes.md
+- Out of scope → @.claude/specs/out-of-scope.md
+- CI/CD, Docker & deploy → @.claude/specs/cicd.md
+
+## Tech stack (quick reference)
+
+- **Framework:** Next.js 15, App Router, TypeScript
+- **Styles:** Tailwind CSS + shadcn/ui
+- **Editor:** Tiptap (already in the repo)
+- **Interactive board:** React Flow
+- **Charts:** Recharts (already in the repo)
+- **Auth:** Supabase Auth (Email + Password, and Google OAuth)
+- **DB:** Supabase (PostgreSQL) + Prisma ORM
+- **Storage:** Cloudinary (images: covers, characters, world building, board)
+- **Email:** Resend (password reset)
+- **Notifications:** Server-Sent Events (SSE)
+- **Base repo:** github.com/AlexandraZambrano/planster-editor-app
+
+## Code conventions
+
+- All components in `src/components/`, organized by feature (`/editor`, `/studio`, `/library`, etc.)
+- Pages live in `src/app/` following the route structure defined in @.claude/specs/routes.md
+- Server Actions in `src/actions/[feature].ts`
+- Prisma types are imported from `@prisma/client`, never redefined manually
+- Use `cn()` from `src/lib/utils.ts` for conditional Tailwind classes
+- Base UI components from `src/components/ui/` (shadcn/ui — already in repo)
+- No client component (`'use client'`) should fetch directly from the DB; use Server Actions or API routes
+- All user-uploaded images go through Cloudinary; never save to the local filesystem
+
+## Testing
+
+- All new code must include tests. The minimum coverage threshold is **80%** across all metrics (statements, branches, functions, lines)
+- Testing stack:
+  - **Vitest** for unit tests and Server Action tests
+  - **React Testing Library** for component tests
+  - **Playwright** for end-to-end tests (critical flows: auth, create book, beta flow, library)
+- Test files live next to the code they test: `component.tsx` → `component.test.tsx`
+- E2E tests live in `e2e/`
+- Run coverage with: `npx vitest run --coverage`
+- No module is considered complete if coverage drops below 80%
+- Flows that **must always** have e2e tests: register/login, create book and chapter, beta request and approval, inline comment, save book to library
+
+## General rules
+
+- Do not implement anything listed in @.claude/specs/out-of-scope.md
+- When adding a Prisma model, run `npx prisma migrate dev` and update @.claude/specs/data-model.md
+- Every new route must be added to @.claude/specs/routes.md
+- Beta reader comments on chapters are ALWAYS private — only the author can see them
+- The entire Writer's Studio (plotting, timeline, characters, world building, board, notes) is ALWAYS private — only the author can see it
+- Before creating a new component, check if it already exists in `src/components/ui/`
