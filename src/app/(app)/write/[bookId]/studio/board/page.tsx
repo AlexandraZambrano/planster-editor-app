@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
+import { getTranslations } from "next-intl/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { getBoards, getBoardData } from "@/actions/studio"
@@ -17,7 +18,7 @@ export default async function BoardPage({ params, searchParams }: Props) {
   const session = await auth()
   if (!session) redirect("/auth/login")
 
-  const boardsResult = await getBoards(bookId)
+  const [boardsResult, t] = await Promise.all([getBoards(bookId), getTranslations("Studio")])
   if ("error" in boardsResult) notFound()
 
   const { boards } = boardsResult
@@ -58,11 +59,11 @@ export default async function BoardPage({ params, searchParams }: Props) {
           href={`/write/${bookId}/studio`}
           className="text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
-          ← Studio
+          {t("backToStudio")}
         </Link>
-        <h1 className="text-2xl font-bold mt-1">Board</h1>
+        <h1 className="text-2xl font-bold mt-1">{t("board")}</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Visualise your story — characters, locations, and their connections.
+          {t("boardHint")}
         </p>
       </div>
 

@@ -20,6 +20,7 @@ import { reorderChapters } from "@/actions/chapters"
 import { ChapterItem, type ChapterData } from "./chapter-item"
 import { NewChapterDialog } from "./new-chapter-dialog"
 import { BookOpen } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 interface ChapterListProps {
   bookId: string
@@ -27,6 +28,7 @@ interface ChapterListProps {
 }
 
 export function ChapterList({ bookId, initialChapters }: ChapterListProps) {
+  const t = useTranslations("Write")
   const [chapters, setChapters] = useState(initialChapters)
   const [, startTransition] = useTransition()
 
@@ -70,18 +72,16 @@ export function ChapterList({ bookId, initialChapters }: ChapterListProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          {chapters.length === 0
-            ? "No chapters yet"
-            : `${chapters.length} chapter${chapters.length !== 1 ? "s" : ""}`}
+        <p className="text-sm text-white/80 font-medium">
+          {chapters.length === 0 ? t("noChaptersYet") : t("chapterCount", { count: chapters.length })}
         </p>
         <NewChapterDialog bookId={bookId} onCreated={handleChapterAdded} />
       </div>
 
       {chapters.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
-          <BookOpen className="h-10 w-10 mb-3 opacity-40" />
-          <p className="text-sm">Add your first chapter to get started</p>
+        <div className="flex flex-col items-center justify-center py-16 text-white/80 border-2 border-dashed border-white/40 rounded-lg">
+          <BookOpen className="h-10 w-10 mb-3 opacity-60" />
+          <p className="text-sm">{t("addFirstChapter")}</p>
         </div>
       ) : (
         <DndContext

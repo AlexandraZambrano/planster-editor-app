@@ -7,9 +7,10 @@
 | `/` | `src/app/(public)/page.tsx` | Home: featured books, recent, genres |
 | `/explore` | `src/app/(public)/explore/page.tsx` | Catalogue with filters and search |
 | `/books/[bookId]` | `src/app/(public)/books/[bookId]/page.tsx` | Public book page |
-| `/@[username]` | `src/app/@[username]/page.tsx` | User public profile |
+| `/@[username]` | `src/app/profile/[username]/page.tsx` (via rewrite — `@folder` is reserved for Next.js parallel routes and can't itself produce a URL) | User public profile |
 | `/auth/login` | `src/app/(auth)/login/page.tsx` | Login |
 | `/auth/register` | `src/app/(auth)/register/page.tsx` | Register |
+| `/privacy` | `src/app/privacy/page.tsx` | Privacy Policy (GDPR-oriented, linked from registration and the home footer) |
 
 ## Authenticated routes (session required)
 
@@ -54,7 +55,7 @@
 
 | Route | Description |
 |---|---|
-| `/api/auth/[...nextauth]` | NextAuth handler |
+| `/auth/callback` | Supabase OAuth redirect handler (Google sign-in) |
 | `/api/notifications/stream` | SSE notification stream |
 | `/api/upload` | Cloudinary image upload endpoint |
 

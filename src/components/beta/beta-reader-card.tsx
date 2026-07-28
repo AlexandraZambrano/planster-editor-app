@@ -1,23 +1,14 @@
 "use client"
 
 import { useState } from "react"
+import { formatDistanceToNow } from "date-fns"
+import { useTranslations } from "next-intl"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { approveBeta, rejectBeta, revokeBeta } from "@/actions/beta"
-
-function timeAgo(date: Date): string {
-  const s = Math.floor((Date.now() - new Date(date).getTime()) / 1000)
-  if (s < 60) return "just now"
-  const m = Math.floor(s / 60)
-  if (m < 60) return `${m}m ago`
-  const h = Math.floor(m / 60)
-  if (h < 24) return `${h}h ago`
-  const d = Math.floor(h / 24)
-  if (d < 30) return `${d}d ago`
-  return new Date(date).toLocaleDateString()
-}
+import { useDateLocale } from "@/lib/date-locale"
 
 type Props = {
   betaReaderId: string
@@ -36,6 +27,8 @@ export function BetaReaderCard({
   status,
   onActionComplete,
 }: Props) {
+  const t = useTranslations("Beta")
+  const dateLocale = useDateLocale()
   const [loading, setLoading] = useState<"approve" | "reject" | "revoke" | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -71,11 +64,11 @@ export function BetaReaderCard({
             <span className="text-xs text-muted-foreground">@{user.username}</span>
             {isDirectInvite && (
               <Badge variant="outline" className="text-xs">
-                Direct invite
+                {t("directInvite")}
               </Badge>
             )}
             <span className="ml-auto text-xs text-muted-foreground shrink-0">
-              {timeAgo(createdAt)}
+              {formatDistanceToNow(new Date(createdAt), { addSuffix: true, locale: dateLocale })}
             </span>
           </div>
           {!isDirectInvite && (
@@ -92,7 +85,7 @@ export function BetaReaderCard({
                 disabled={loading !== null}
                 data-testid="approve-btn"
               >
-                {loading === "approve" ? "…" : "Approve"}
+                {loading === "approve" ? "…" : t("approve")}
               </Button>
               <Button
                 size="sm"
@@ -101,7 +94,7 @@ export function BetaReaderCard({
                 disabled={loading !== null}
                 data-testid="reject-btn"
               >
-                {loading === "reject" ? "…" : "Reject"}
+                {loading === "reject" ? "…" : t("reject")}
               </Button>
             </>
           )}
@@ -114,7 +107,7 @@ export function BetaReaderCard({
               disabled={loading !== null}
               data-testid="revoke-btn"
             >
-              {loading === "revoke" ? "…" : "Revoke"}
+              {loading === "revoke" ? "…" : t("revoke")}
             </Button>
           )}
         </div>

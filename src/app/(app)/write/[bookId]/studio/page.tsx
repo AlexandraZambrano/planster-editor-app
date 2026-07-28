@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
+import { getTranslations } from "next-intl/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { Users, MapPin, GitBranch, Clock, LayoutDashboard, StickyNote } from "lucide-react"
@@ -13,21 +14,24 @@ export default async function StudioHubPage({ params }: Props) {
   const session = await auth()
   if (!session) redirect("/auth/login")
 
-  const book = await prisma.book.findFirst({
-    where: { id: bookId, authorId: session.user.id },
-    select: {
-      id: true,
-      title: true,
-      _count: {
-        select: {
-          characters: true,
-          locations: true,
-          timelineEntries: true,
-          bookNotes: true,
+  const [book, t] = await Promise.all([
+    prisma.book.findFirst({
+      where: { id: bookId, authorId: session.user.id },
+      select: {
+        id: true,
+        title: true,
+        _count: {
+          select: {
+            characters: true,
+            locations: true,
+            timelineEntries: true,
+            bookNotes: true,
+          },
         },
       },
-    },
-  })
+    }),
+    getTranslations("Studio"),
+  ])
 
   if (!book) notFound()
 
@@ -35,26 +39,26 @@ export default async function StudioHubPage({ params }: Props) {
     {
       href: `/write/${bookId}/studio/characters`,
       icon: Users,
-      label: "Characters",
-      description: "Appearance, backstory and relationships",
+      label: t("characters"),
+      description: t("charactersDescription"),
       count: book._count.characters,
-      countLabel: "character",
+      countLabel: t("characterCount", { count: book._count.characters }),
       color: "bg-purple-50 text-purple-600 border-purple-100",
     },
     {
       href: `/write/${bookId}/studio/worldbuilding`,
       icon: MapPin,
-      label: "World Building",
-      description: "Locations and their stories",
+      label: t("worldBuilding"),
+      description: t("worldBuildingDescription"),
       count: book._count.locations,
-      countLabel: "location",
+      countLabel: t("locationCount", { count: book._count.locations }),
       color: "bg-green-50 text-green-600 border-green-100",
     },
     {
       href: `/write/${bookId}/studio/plotting`,
       icon: GitBranch,
-      label: "Plotting",
-      description: "Scenes and chapter plans",
+      label: t("plotting"),
+      description: t("plottingDescription"),
       count: null,
       countLabel: null,
       color: "bg-blue-50 text-blue-600 border-blue-100",
@@ -62,17 +66,17 @@ export default async function StudioHubPage({ params }: Props) {
     {
       href: `/write/${bookId}/studio/timeline`,
       icon: Clock,
-      label: "Timeline",
-      description: "Story events in chronological order",
+      label: t("timeline"),
+      description: t("timelineDescription"),
       count: book._count.timelineEntries,
-      countLabel: "event",
+      countLabel: t("eventCount", { count: book._count.timelineEntries }),
       color: "bg-amber-50 text-amber-600 border-amber-100",
     },
     {
       href: `/write/${bookId}/studio/board`,
       icon: LayoutDashboard,
-      label: "Board",
-      description: "Interactive canvas for characters and locations",
+      label: t("board"),
+      description: t("boardDescription"),
       count: null,
       countLabel: null,
       color: "bg-rose-50 text-rose-600 border-rose-100",
@@ -80,10 +84,10 @@ export default async function StudioHubPage({ params }: Props) {
     {
       href: `/write/${bookId}/studio/notes`,
       icon: StickyNote,
-      label: "Free Notes",
-      description: "Random notes, ideas and reminders",
+      label: t("freeNotes"),
+      description: t("freeNotesDescription"),
       count: book._count.bookNotes,
-      countLabel: "note",
+      countLabel: t("noteCount", { count: book._count.bookNotes }),
       color: "bg-teal-50 text-teal-600 border-teal-100",
     },
   ]
@@ -98,9 +102,9 @@ export default async function StudioHubPage({ params }: Props) {
         >
           ← {book.title}
         </Link>
-        <h1 className="text-2xl font-bold mt-1">Writer's Studio</h1>
+        <h1 className="text-2xl font-bold mt-1">{t("writersStudio")}</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Your private creative workspace — only you can see this.
+          {t("privateWorkspaceHint")}
         </p>
       </div>
 
@@ -124,7 +128,7 @@ export default async function StudioHubPage({ params }: Props) {
                 </div>
                 {m.count !== null && (
                   <p className="text-xs text-muted-foreground">
-                    {m.count} {m.countLabel}{m.count !== 1 ? "s" : ""}
+                    {m.countLabel}
                   </p>
                 )}
               </div>

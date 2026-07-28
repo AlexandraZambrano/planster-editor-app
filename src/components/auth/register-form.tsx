@@ -1,38 +1,51 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { signIn } from "next-auth/react"
+import { useTranslations } from "next-intl"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { PasswordInput } from "@/components/ui/password-input"
+import { GoogleButton } from "@/components/auth/google-button"
 import { registerUser } from "@/actions/auth"
-
-const registerSchema = z.object({
-  email: z.string().email("Enter a valid email"),
-  displayName: z.string().min(1, "Display name is required"),
-  username: z
-    .string()
-    .min(3, "Username must be at least 3 characters")
-    .max(30, "Username cannot exceed 30 characters")
-    .regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, and underscores allowed"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-})
-
-type RegisterFormData = z.infer<typeof registerSchema>
+import { createClient } from "@/lib/supabase/client"
 
 export function RegisterForm() {
   const router = useRouter()
+  const t = useTranslations("Auth")
   const [error, setError] = useState<string | null>(null)
+
+  const registerSchema = useMemo(
+    () =>
+      z.object({
+        email: z.string().email(t("invalidEmail")),
+        displayName: z.string().min(1, t("displayNameRequired")),
+        username: z
+          .string()
+          .min(3, t("usernameTooShort"))
+          .max(30, t("usernameTooLong"))
+          .regex(/^[a-zA-Z0-9_]+$/, t("usernameInvalidChars")),
+        password: z.string().min(8, t("passwordTooShort")),
+        acceptPolicy: z.literal(true, {
+          errorMap: () => ({ message: t("mustAcceptPolicy") }),
+        }),
+      }),
+    [t]
+  )
+
+  type RegisterFormData = z.infer<typeof registerSchema>
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -41,20 +54,25 @@ export function RegisterForm() {
   async function onSubmit(data: RegisterFormData) {
     setError(null)
 
-    const result = await registerUser(data)
+    const result = await registerUser({
+      email: data.email,
+      displayName: data.displayName,
+      username: data.username,
+      password: data.password,
+    })
 
     if (result.error) {
       setError(result.error)
       return
     }
 
-    const signInResult = await signIn("credentials", {
+    const supabase = createClient()
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
-      redirect: false,
     })
 
-    if (signInResult?.error) {
+    if (signInError) {
       router.push("/auth/login")
       return
     }
@@ -72,7 +90,33 @@ export function RegisterForm() {
       )}
 
       <div className="space-y-1.5">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="username">{t("username")}</Label>
+        <Input
+          id="username"
+          autoComplete="username"
+          {...register("username")}
+          data-testid="username-input"
+        />
+        {errors.username && (
+          <p className="text-sm text-destructive">{errors.username.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="displayName">{t("displayName")}</Label>
+        <Input
+          id="displayName"
+          autoComplete="name"
+          {...register("displayName")}
+          data-testid="display-name-input"
+        />
+        {errors.displayName && (
+          <p className="text-sm text-destructive">{errors.displayName.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="email">{t("email")}</Label>
         <Input
           id="email"
           type="email"
@@ -86,33 +130,7 @@ export function RegisterForm() {
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="displayName">Display name</Label>
-        <Input
-          id="displayName"
-          autoComplete="name"
-          {...register("displayName")}
-          data-testid="display-name-input"
-        />
-        {errors.displayName && (
-          <p className="text-sm text-destructive">{errors.displayName.message}</p>
-        )}
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="username">Username</Label>
-        <Input
-          id="username"
-          autoComplete="username"
-          {...register("username")}
-          data-testid="username-input"
-        />
-        {errors.username && (
-          <p className="text-sm text-destructive">{errors.username.message}</p>
-        )}
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{t("password")}</Label>
         <PasswordInput
           id="password"
           autoComplete="new-password"
@@ -124,14 +142,60 @@ export function RegisterForm() {
         )}
       </div>
 
+      <div className="space-y-1.5">
+        <div className="flex items-start gap-2">
+          <Controller
+            name="acceptPolicy"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                id="acceptPolicy"
+                checked={field.value ?? false}
+                onCheckedChange={(checked) => field.onChange(checked === true)}
+                data-testid="accept-policy-checkbox"
+              />
+            )}
+          />
+          <Label htmlFor="acceptPolicy" className="text-sm font-normal cursor-pointer">
+            {t.rich("acceptPolicy", {
+              policyLink: (chunks) => (
+                <Link
+                  href="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-foreground"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </Label>
+        </div>
+        {errors.acceptPolicy && (
+          <p className="text-sm text-destructive">{errors.acceptPolicy.message}</p>
+        )}
+      </div>
+
       <Button
         type="submit"
         className="w-full"
         disabled={isSubmitting}
         data-testid="submit-button"
       >
-        {isSubmitting ? "Creating account…" : "Create account"}
+        {isSubmitting ? t("creatingAccount") : t("register")}
       </Button>
+
+      <div className="relative py-1">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs">
+          <span className="bg-background px-2 text-muted-foreground">{t("or")}</span>
+        </div>
+      </div>
+
+      <GoogleButton label={t("signUpWithGoogle")} />
     </form>
   )
 }

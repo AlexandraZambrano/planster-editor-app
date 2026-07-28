@@ -14,6 +14,9 @@ const bookSchema = z.object({
   tags: z.array(z.string().max(30, "Each tag cannot exceed 30 characters")).max(10, "Maximum 10 tags"),
   language: z.string().default("es"),
   bookStatus: z.enum(["IN_PROGRESS", "COMPLETE", "PAUSED"]).default("IN_PROGRESS"),
+  license: z
+    .enum(["ALL_RIGHTS_RESERVED", "CC_BY", "CC_BY_NC", "CC_BY_NC_ND", "PUBLIC_DOMAIN"])
+    .default("ALL_RIGHTS_RESERVED"),
 })
 
 type BookInput = z.infer<typeof bookSchema>
@@ -37,6 +40,7 @@ export async function createBook(
       tags: parsed.data.tags,
       language: parsed.data.language,
       bookStatus: parsed.data.bookStatus,
+      license: parsed.data.license,
     },
   })
 
@@ -70,6 +74,7 @@ export async function updateBook(
       tags: parsed.data.tags,
       language: parsed.data.language,
       bookStatus: parsed.data.bookStatus,
+      license: parsed.data.license,
     },
   })
 

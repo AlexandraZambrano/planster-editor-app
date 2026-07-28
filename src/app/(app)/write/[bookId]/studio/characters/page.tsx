@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
+import { getTranslations } from "next-intl/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { CharacterCard } from "@/components/studio/characters/character-card"
@@ -20,17 +21,20 @@ export default async function CharactersPage({ params }: Props) {
   })
   if (!book) notFound()
 
-  const characters = await prisma.character.findMany({
-    where: { bookId },
-    select: {
-      id: true,
-      name: true,
-      nickname: true,
-      mainImageUrl: true,
-      storyRole: true,
-    },
-    orderBy: { createdAt: "asc" },
-  })
+  const [characters, t] = await Promise.all([
+    prisma.character.findMany({
+      where: { bookId },
+      select: {
+        id: true,
+        name: true,
+        nickname: true,
+        mainImageUrl: true,
+        storyRole: true,
+      },
+      orderBy: { createdAt: "asc" },
+    }),
+    getTranslations("Studio"),
+  ])
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8 space-y-6">
@@ -41,13 +45,11 @@ export default async function CharactersPage({ params }: Props) {
             href={`/write/${bookId}/studio`}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            ← Studio
+            {t("backToStudio")}
           </Link>
-          <h1 className="text-2xl font-bold mt-1">Characters</h1>
+          <h1 className="text-2xl font-bold mt-1">{t("characters")}</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {characters.length === 0
-              ? "No characters yet."
-              : `${characters.length} character${characters.length !== 1 ? "s" : ""}`}
+            {characters.length === 0 ? t("noCharactersYet") : t("characterCount", { count: characters.length })}
           </p>
         </div>
         <NewCharacterDialog bookId={bookId} />
@@ -62,7 +64,7 @@ export default async function CharactersPage({ params }: Props) {
         </div>
       ) : (
         <div className="text-center py-20 text-muted-foreground">
-          <p className="text-sm">Create your first character to get started.</p>
+          <p className="text-sm">{t("createFirstCharacter")}</p>
         </div>
       )}
     </div>

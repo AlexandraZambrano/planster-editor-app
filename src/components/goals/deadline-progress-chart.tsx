@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts"
+import { useLocale, useTranslations } from "next-intl"
 import type { DeadlineProgress, GoalData } from "@/actions/goals"
 
 interface DeadlineProgressChartProps {
@@ -19,17 +20,20 @@ interface DeadlineProgressChartProps {
   totalWordsBook: number
 }
 
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr + "T00:00:00Z")
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })
-}
-
-function tickFormatter(value: string, index: number, length: number): string {
-  if (length <= 10) return formatDate(value)
-  return index % Math.ceil(length / 8) === 0 ? formatDate(value) : ""
-}
-
 export function DeadlineProgressChart({ data, goal, totalWordsBook }: DeadlineProgressChartProps) {
+  const t = useTranslations("Goals")
+  const locale = useLocale()
+
+  function formatDate(dateStr: string): string {
+    const d = new Date(dateStr + "T00:00:00Z")
+    return d.toLocaleDateString(locale, { month: "short", day: "numeric", timeZone: "UTC" })
+  }
+
+  function tickFormatter(value: string, index: number, length: number): string {
+    if (length <= 10) return formatDate(value)
+    return index % Math.ceil(length / 8) === 0 ? formatDate(value) : ""
+  }
+
   const todayStr = new Date().toISOString().slice(0, 10)
   const wordsRemaining = Math.max(0, goal.targetWords - totalWordsBook)
   const daysRemaining = goal.deadlineDate
@@ -42,31 +46,33 @@ export function DeadlineProgressChart({ data, goal, totalWordsBook }: DeadlinePr
     <div className="rounded-xl border bg-card p-5 space-y-3">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h3 className="font-semibold text-sm">Deadline progress</h3>
+          <h3 className="font-semibold text-sm">{t("deadlineProgressTitle")}</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Goal: {goal.targetWords.toLocaleString()} words by{" "}
-            {goal.deadlineDate
-              ? new Date(goal.deadlineDate).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                  timeZone: "UTC",
-                })
-              : "—"}
+            {t("goalByDate", {
+              target: goal.targetWords.toLocaleString(),
+              date: goal.deadlineDate
+                ? new Date(goal.deadlineDate).toLocaleDateString(locale, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                    timeZone: "UTC",
+                  })
+                : "—",
+            })}
           </p>
         </div>
         <div className="flex gap-4 text-xs">
           <div className="text-center">
             <p className="font-semibold">{wordsRemaining.toLocaleString()}</p>
-            <p className="text-muted-foreground">words left</p>
+            <p className="text-muted-foreground">{t("wordsLeft")}</p>
           </div>
           <div className="text-center">
             <p className="font-semibold">{daysRemaining}</p>
-            <p className="text-muted-foreground">days left</p>
+            <p className="text-muted-foreground">{t("daysLeft")}</p>
           </div>
           <div className="text-center">
             <p className="font-semibold">{wordsPerDay.toLocaleString()}</p>
-            <p className="text-muted-foreground">words/day needed</p>
+            <p className="text-muted-foreground">{t("wordsPerDayNeeded")}</p>
           </div>
         </div>
       </div>
@@ -90,8 +96,8 @@ export function DeadlineProgressChart({ data, goal, totalWordsBook }: DeadlinePr
           />
           <Tooltip
             formatter={(value: number, name: string) => [
-              value.toLocaleString() + " words",
-              name === "ideal" ? "Ideal pace" : "Actual",
+              t("wordsUnit", { count: value }),
+              name === "ideal" ? t("idealPace") : t("actual"),
             ]}
             labelFormatter={(label: string) => formatDate(label)}
             contentStyle={{
@@ -103,7 +109,7 @@ export function DeadlineProgressChart({ data, goal, totalWordsBook }: DeadlinePr
             }}
           />
           <Legend
-            formatter={(value) => (value === "ideal" ? "Ideal pace" : "Actual progress")}
+            formatter={(value) => (value === "ideal" ? t("idealPace") : t("actualProgress"))}
             wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
           />
           <ReferenceLine x={todayStr} stroke="hsl(var(--muted-foreground))" strokeDasharray="4 2" />

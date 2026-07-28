@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
+import { getTranslations } from "next-intl/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { getTimeline } from "@/actions/studio"
@@ -14,13 +15,14 @@ export default async function TimelinePage({ params }: Props) {
   const session = await auth()
   if (!session) redirect("/auth/login")
 
-  const [timelineResult, chapters] = await Promise.all([
+  const [timelineResult, chapters, t] = await Promise.all([
     getTimeline(bookId),
     prisma.chapter.findMany({
       where: { book: { id: bookId, authorId: session.user.id } },
       select: { id: true, title: true, order: true },
       orderBy: { order: "asc" },
     }),
+    getTranslations("Studio"),
   ])
 
   if ("error" in timelineResult) notFound()
@@ -32,13 +34,13 @@ export default async function TimelinePage({ params }: Props) {
           href={`/write/${bookId}/studio`}
           className="text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
-          ← Studio
+          {t("backToStudio")}
         </Link>
-        <h1 className="text-2xl font-bold mt-1">Timeline</h1>
+        <h1 className="text-2xl font-bold mt-1">{t("timeline")}</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           {timelineResult.entries.length === 0
-            ? "Add your first story event to get started."
-            : `${timelineResult.entries.length} event${timelineResult.entries.length !== 1 ? "s" : ""}`}
+            ? t("addFirstEvent")
+            : t("eventCount", { count: timelineResult.entries.length })}
         </p>
       </div>
 

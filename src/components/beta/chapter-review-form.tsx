@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -14,6 +15,7 @@ type Props = {
 }
 
 export function ChapterReviewForm({ chapterId, existingReview }: Props) {
+  const t = useTranslations("Beta")
   const [content, setContent] = useState(existingReview ?? "")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -38,11 +40,11 @@ export function ChapterReviewForm({ chapterId, existingReview }: Props) {
     return (
       <div className="rounded-lg border bg-muted/40 p-4">
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-          Your review
+          {t("yourReview")}
         </p>
         <p className="text-sm whitespace-pre-wrap">{content}</p>
         <p className="text-xs text-muted-foreground mt-2">
-          Your review has been submitted. The author can see it privately.
+          {t("reviewSubmittedHint")}
         </p>
       </div>
     )
@@ -52,12 +54,12 @@ export function ChapterReviewForm({ chapterId, existingReview }: Props) {
     <form onSubmit={handleSubmit} className="space-y-3">
       <div>
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-          Your review of this chapter
+          {t("yourReviewOfChapter")}
         </p>
         <Textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Share your overall thoughts on this chapter…"
+          placeholder={t("reviewPlaceholder")}
           rows={5}
           maxLength={MAX_CHARS}
           data-testid="review-textarea"
@@ -74,7 +76,7 @@ export function ChapterReviewForm({ chapterId, existingReview }: Props) {
       )}
 
       <Button type="submit" size="sm" disabled={loading || !content.trim()}>
-        {loading ? "Submitting…" : "Submit review"}
+        {loading ? t("submitting") : t("submitReview")}
       </Button>
     </form>
   )

@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
+import { getTranslations } from "next-intl/server"
 import { auth } from "@/lib/auth"
 import { getGoalsDashboard } from "@/actions/goals"
 import { GoalsView } from "@/components/goals/goals-view"
@@ -13,7 +14,7 @@ export default async function GoalsPage({ params }: Props) {
   const session = await auth()
   if (!session) redirect("/auth/login")
 
-  const result = await getGoalsDashboard(bookId)
+  const [result, t] = await Promise.all([getGoalsDashboard(bookId), getTranslations("Goals")])
   if ("error" in result) notFound()
 
   return (
@@ -23,12 +24,10 @@ export default async function GoalsPage({ params }: Props) {
           href={`/write/${bookId}`}
           className="text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
-          ← Book panel
+          {t("backToBookPanel")}
         </Link>
-        <h1 className="text-2xl font-bold mt-1">Writing Goals</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Track your progress and stay on target. Streak timezone: UTC.
-        </p>
+        <h1 className="text-2xl font-bold mt-1">{t("title")}</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">{t("subtitle")}</p>
       </div>
 
       <GoalsView bookId={bookId} dashboard={result} />

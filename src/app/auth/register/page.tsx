@@ -1,25 +1,26 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { getTranslations } from "next-intl/server"
 import { RegisterForm } from "@/components/auth/register-form"
 
 export const metadata: Metadata = { title: "Create account" }
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  const t = await getTranslations("Auth")
+
   return (
     <>
       <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Create your account</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Join Planster and start writing your story
-        </p>
+        <h1 className="text-3xl font-extrabold tracking-tight">{t("joinUs")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t("registerSubtitle")}</p>
       </div>
 
       <RegisterForm />
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+        {t("alreadyHaveAccount")}{" "}
         <Link href="/auth/login" className="font-medium text-foreground hover:underline">
-          Sign in
+          {t("loginHere")}
         </Link>
       </p>
     </>

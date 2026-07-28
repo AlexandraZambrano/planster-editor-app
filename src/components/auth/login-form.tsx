@@ -1,28 +1,36 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { signIn } from "next-auth/react"
+import { useTranslations } from "next-intl"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { PasswordInput } from "@/components/ui/password-input"
-
-const loginSchema = z.object({
-  email: z.string().email("Enter a valid email"),
-  password: z.string().min(1, "Password is required"),
-})
-
-type LoginFormData = z.infer<typeof loginSchema>
+import { GoogleButton } from "@/components/auth/google-button"
+import { createClient } from "@/lib/supabase/client"
+import { getEmailForIdentifier } from "@/actions/auth"
 
 export function LoginForm() {
   const router = useRouter()
+  const t = useTranslations("Auth")
   const [error, setError] = useState<string | null>(null)
+
+  const loginSchema = useMemo(
+    () =>
+      z.object({
+        identifier: z.string().min(1, t("identifierRequired")),
+        password: z.string().min(1, t("passwordRequired")),
+      }),
+    [t]
+  )
+
+  type LoginFormData = z.infer<typeof loginSchema>
 
   const {
     register,
@@ -35,14 +43,20 @@ export function LoginForm() {
   async function onSubmit(data: LoginFormData) {
     setError(null)
 
-    const result = await signIn("credentials", {
-      email: data.email,
+    const { email, error: identifierError } = await getEmailForIdentifier(data.identifier)
+    if (identifierError || !email) {
+      setError(t("invalidCredentials"))
+      return
+    }
+
+    const supabase = createClient()
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
       password: data.password,
-      redirect: false,
     })
 
-    if (result?.error) {
-      setError("Invalid email or password")
+    if (signInError) {
+      setError(t("invalidCredentials"))
       return
     }
 
@@ -59,27 +73,26 @@ export function LoginForm() {
       )}
 
       <div className="space-y-1.5">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="identifier">{t("usernameOrEmail")}</Label>
         <Input
-          id="email"
-          type="email"
-          autoComplete="email"
-          {...register("email")}
-          data-testid="email-input"
+          id="identifier"
+          autoComplete="username"
+          {...register("identifier")}
+          data-testid="identifier-input"
         />
-        {errors.email && (
-          <p className="text-sm text-destructive">{errors.email.message}</p>
+        {errors.identifier && (
+          <p className="text-sm text-destructive">{errors.identifier.message}</p>
         )}
       </div>
 
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t("password")}</Label>
           <Link
             href="/auth/forgot-password"
             className="text-xs text-muted-foreground hover:text-foreground"
           >
-            Forgot password?
+            {t("forgotPassword")}
           </Link>
         </div>
         <PasswordInput
@@ -99,8 +112,19 @@ export function LoginForm() {
         disabled={isSubmitting}
         data-testid="submit-button"
       >
-        {isSubmitting ? "Signing in…" : "Sign in"}
+        {isSubmitting ? t("signingIn") : t("login")}
       </Button>
+
+      <div className="relative py-1">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs">
+          <span className="bg-background px-2 text-muted-foreground">{t("or")}</span>
+        </div>
+      </div>
+
+      <GoogleButton label={t("signInWithGoogle")} />
     </form>
   )
 }

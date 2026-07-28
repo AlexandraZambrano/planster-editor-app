@@ -3,15 +3,16 @@
 import { useState, useTransition } from "react"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
-import { GripVertical, Pencil, Trash2, Check, X, ExternalLink } from "lucide-react"
+import { GripVertical, Pencil, Trash2, Check, X, PencilLine } from "lucide-react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
 import { updateChapterTitle, updateChapterVisibility, deleteChapter } from "@/actions/chapters"
 import { cn } from "@/lib/utils"
+import { useDateLocale } from "@/lib/date-locale"
 import type { PublicationStatus } from "@prisma/client"
 
 const VISIBILITY_STYLES: Record<string, string> = {
@@ -36,6 +37,9 @@ interface ChapterItemProps {
 }
 
 export function ChapterItem({ chapter, bookId, onDelete }: ChapterItemProps) {
+  const t = useTranslations("Write")
+  const tCommon = useTranslations("Common")
+  const dateLocale = useDateLocale()
   const [isEditing, setIsEditing] = useState(false)
   const [titleInput, setTitleInput] = useState(chapter.title)
   const [visibility, setVisibility] = useState<PublicationStatus>(chapter.visibility)
@@ -80,7 +84,7 @@ export function ChapterItem({ chapter, bookId, onDelete }: ChapterItemProps) {
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 bg-background border rounded-lg",
+        "flex items-center gap-3 px-3 py-2.5 bg-[#FBF3F6] border border-white/60 rounded-lg",
         isDragging && "opacity-50 shadow-lg z-50"
       )}
     >
@@ -89,7 +93,7 @@ export function ChapterItem({ chapter, bookId, onDelete }: ChapterItemProps) {
         {...attributes}
         {...listeners}
         className="cursor-grab text-muted-foreground hover:text-foreground touch-none"
-        aria-label="Drag to reorder"
+        aria-label={t("dragToReorder")}
       >
         <GripVertical className="h-4 w-4" />
       </button>
@@ -125,15 +129,15 @@ export function ChapterItem({ chapter, bookId, onDelete }: ChapterItemProps) {
               type="button"
               onClick={() => setIsEditing(true)}
               className="text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 shrink-0"
-              aria-label="Rename chapter"
+              aria-label={t("renameChapter")}
             >
               <Pencil className="h-3 w-3" />
             </button>
           </div>
         )}
         <div className="text-xs text-muted-foreground mt-0.5">
-          {chapter.wordCount.toLocaleString()} words ·{" "}
-          {formatDistanceToNow(new Date(chapter.updatedAt), { addSuffix: true })}
+          {tCommon("wordCountShort", { count: chapter.wordCount })} ·{" "}
+          {formatDistanceToNow(new Date(chapter.updatedAt), { addSuffix: true, locale: dateLocale })}
         </div>
       </div>
 
@@ -142,30 +146,29 @@ export function ChapterItem({ chapter, bookId, onDelete }: ChapterItemProps) {
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="DRAFT">Draft</SelectItem>
-          <SelectItem value="BETA">Beta</SelectItem>
-          <SelectItem value="PUBLISHED">Published</SelectItem>
+          <SelectItem value="DRAFT">{tCommon("publicationStatus.DRAFT")}</SelectItem>
+          <SelectItem value="BETA">{tCommon("publicationStatus.BETA")}</SelectItem>
+          <SelectItem value="PUBLISHED">{tCommon("publicationStatus.PUBLISHED")}</SelectItem>
         </SelectContent>
       </Select>
 
       <Link
         href={`/write/${bookId}/editor/${chapter.id}`}
-        className="text-muted-foreground hover:text-foreground"
-        aria-label="Open editor"
+        className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors shrink-0"
       >
-        <ExternalLink className="h-4 w-4" />
+        <PencilLine className="h-3 w-3" />
+        {t("edit")}
       </Link>
 
       <Button
         type="button"
-        size="icon"
-        variant="ghost"
-        className="h-7 w-7 text-muted-foreground hover:text-destructive"
+        size="sm"
+        className="h-auto gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-red-500 hover:bg-red-600 text-white shrink-0"
         onClick={handleDelete}
         disabled={isPending}
-        aria-label="Delete chapter"
       >
-        <Trash2 className="h-3.5 w-3.5" />
+        <Trash2 className="h-3 w-3" />
+        {t("delete")}
       </Button>
     </div>
   )

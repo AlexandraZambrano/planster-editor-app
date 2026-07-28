@@ -3,6 +3,7 @@
 import { useState, useRef } from "react"
 import Image from "next/image"
 import { Upload, X, ImageIcon } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -11,17 +12,25 @@ const MAX_SIZE_MB = 5
 const MIN_WIDTH = 1600
 const MIN_HEIGHT = 2400
 
-async function validateCover(file: File): Promise<string | null> {
+async function validateCover(
+  file: File,
+  t: (key: string, values?: Record<string, string | number>) => string
+): Promise<string | null> {
   if (!ACCEPTED.includes(file.type)) {
-    return "Only JPG, PNG and WEBP files are accepted"
+    return t("onlyImageFiles")
   }
   if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-    return `Image must be smaller than ${MAX_SIZE_MB}MB`
+    return t("imageTooLarge", { maxSize: MAX_SIZE_MB })
   }
   try {
     const bitmap = await createImageBitmap(file)
     if (bitmap.width < MIN_WIDTH || bitmap.height < MIN_HEIGHT) {
-      return `Cover must be at least ${MIN_WIDTH}×${MIN_HEIGHT}px (yours is ${bitmap.width}×${bitmap.height}px)`
+      return t("coverTooSmall", {
+        minWidth: MIN_WIDTH,
+        minHeight: MIN_HEIGHT,
+        width: bitmap.width,
+        height: bitmap.height,
+      })
     }
   } catch {
     // createImageBitmap not supported — skip dimension check
@@ -36,6 +45,7 @@ interface CoverUploadProps {
 }
 
 export function CoverUpload({ value, onChange, className }: CoverUploadProps) {
+  const t = useTranslations("Write")
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -45,7 +55,7 @@ export function CoverUpload({ value, onChange, className }: CoverUploadProps) {
     if (!file) return
 
     setError(null)
-    const validationError = await validateCover(file)
+    const validationError = await validateCover(file, t)
     if (validationError) {
       setError(validationError)
       e.target.value = ""
@@ -62,10 +72,10 @@ export function CoverUpload({ value, onChange, className }: CoverUploadProps) {
       if (data.url) {
         onChange(data.url)
       } else {
-        setError("Upload failed. Please try again.")
+        setError(t("uploadFailed"))
       }
     } catch {
-      setError("Upload failed. Please try again.")
+      setError(t("uploadFailed"))
     } finally {
       setUploading(false)
       e.target.value = ""
@@ -88,11 +98,11 @@ export function CoverUpload({ value, onChange, className }: CoverUploadProps) {
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
             {uploading ? (
-              <div className="text-xs">Uploading…</div>
+              <div className="text-xs">{t("uploading")}</div>
             ) : (
               <>
                 <ImageIcon className="h-8 w-8" />
-                <span className="text-xs text-center px-2">Click to upload cover</span>
+                <span className="text-xs text-center px-2">{t("clickToUploadCover")}</span>
               </>
             )}
           </div>
@@ -100,7 +110,7 @@ export function CoverUpload({ value, onChange, className }: CoverUploadProps) {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        JPG, PNG or WEBP · Min. {MIN_WIDTH}×{MIN_HEIGHT}px · Max {MAX_SIZE_MB}MB
+        {t("coverRequirements", { minWidth: MIN_WIDTH, minHeight: MIN_HEIGHT, maxSize: MAX_SIZE_MB })}
       </p>
 
       {value && (
@@ -112,7 +122,7 @@ export function CoverUpload({ value, onChange, className }: CoverUploadProps) {
           onClick={() => onChange("")}
         >
           <X className="h-3 w-3 mr-1" />
-          Remove
+          {t("remove")}
         </Button>
       )}
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { BookOpen, Calendar, CalendarDays, Target } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 
 interface SummaryCardsProps {
@@ -43,12 +44,6 @@ function StatCard({
   )
 }
 
-function progressLabel(current: number, target: number | null): string | undefined {
-  if (!target) return undefined
-  const pct = Math.min(100, Math.round((current / target) * 100))
-  return `${pct}% of ${target.toLocaleString()} word goal`
-}
-
 export function SummaryCards({
   totalWordsBook,
   wordsThisWeek,
@@ -58,33 +53,41 @@ export function SummaryCards({
   streak,
   longestStreak,
 }: SummaryCardsProps) {
+  const t = useTranslations("Goals")
+
+  function progressLabel(current: number, target: number | null): string | undefined {
+    if (!target) return undefined
+    const pct = Math.min(100, Math.round((current / target) * 100))
+    return t("progressOfGoal", { pct, target: target.toLocaleString() })
+  }
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard
         icon={<BookOpen className="h-4 w-4" />}
-        label="Total words"
+        label={t("totalWords")}
         value={totalWordsBook.toLocaleString()}
-        sub="in this book"
+        sub={t("inThisBook")}
       />
       <StatCard
         icon={<Calendar className="h-4 w-4" />}
-        label="This week"
+        label={t("thisWeek")}
         value={wordsThisWeek.toLocaleString()}
         sub={progressLabel(wordsThisWeek, weeklyGoalTarget)}
         accent={!!weeklyGoalTarget && wordsThisWeek >= weeklyGoalTarget}
       />
       <StatCard
         icon={<CalendarDays className="h-4 w-4" />}
-        label="This month"
+        label={t("thisMonth")}
         value={wordsThisMonth.toLocaleString()}
         sub={progressLabel(wordsThisMonth, monthlyGoalTarget)}
         accent={!!monthlyGoalTarget && wordsThisMonth >= monthlyGoalTarget}
       />
       <StatCard
         icon={<Target className="h-4 w-4" />}
-        label="Streak"
-        value={`🔥 ${streak} day${streak !== 1 ? "s" : ""}`}
-        sub={`Record: ${longestStreak} day${longestStreak !== 1 ? "s" : ""}`}
+        label={t("streak")}
+        value={t("streakValue", { streak })}
+        sub={t("streakRecord", { longestStreak })}
         accent={streak > 0}
       />
     </div>

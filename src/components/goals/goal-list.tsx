@@ -2,6 +2,7 @@
 
 import { useTransition } from "react"
 import { Trash2, Plus } from "lucide-react"
+import { useLocale, useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
@@ -16,14 +17,6 @@ import {
 } from "@/components/ui/alert-dialog"
 import { deleteGoal, type GoalData } from "@/actions/goals"
 import { GoalFormDialog } from "./goal-form-dialog"
-import type { GoalType } from "@prisma/client"
-
-const TYPE_LABELS: Record<GoalType, string> = {
-  DAILY: "Daily",
-  WEEKLY: "Weekly",
-  MONTHLY: "Monthly",
-  DEADLINE: "Deadline",
-}
 
 interface GoalListProps {
   bookId: string
@@ -33,6 +26,8 @@ interface GoalListProps {
 }
 
 function GoalRow({ goal, onDeleted }: { goal: GoalData; onDeleted: (id: string) => void }) {
+  const t = useTranslations("Goals")
+  const locale = useLocale()
   const [, startTransition] = useTransition()
 
   function handleDelete() {
@@ -44,19 +39,21 @@ function GoalRow({ goal, onDeleted }: { goal: GoalData; onDeleted: (id: string) 
 
   const subtitle =
     goal.type === "DEADLINE" && goal.deadlineDate
-      ? `by ${new Date(goal.deadlineDate).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-          timeZone: "UTC",
-        })}`
-      : `per ${goal.type.toLowerCase()}`
+      ? t("byDate", {
+          date: new Date(goal.deadlineDate).toLocaleDateString(locale, {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            timeZone: "UTC",
+          }),
+        })
+      : t(`perGoalType.${goal.type}` as "perGoalType.DAILY")
 
   return (
     <div className="flex items-center justify-between gap-3 py-2.5 px-3 rounded-lg border bg-card">
       <div>
         <p className="text-sm font-medium">
-          {TYPE_LABELS[goal.type]} — {goal.targetWords.toLocaleString()} words
+          {t(`goalType.${goal.type}` as "goalType.DAILY")} — {t("targetWords", { count: goal.targetWords })}
         </p>
         <p className="text-xs text-muted-foreground">{subtitle}</p>
       </div>
@@ -68,15 +65,15 @@ function GoalRow({ goal, onDeleted }: { goal: GoalData; onDeleted: (id: string) 
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove goal?</AlertDialogTitle>
+            <AlertDialogTitle>{t("removeGoalTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              This goal will be permanently removed.
+              {t("removeGoalDescription")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
-              Remove
+              {t("remove")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -86,17 +83,19 @@ function GoalRow({ goal, onDeleted }: { goal: GoalData; onDeleted: (id: string) 
 }
 
 export function GoalList({ bookId, goals, onCreated, onDeleted }: GoalListProps) {
+  const t = useTranslations("Goals")
+
   return (
     <div className="rounded-xl border bg-card p-5 space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-sm">Active goals</h3>
+        <h3 className="font-semibold text-sm">{t("activeGoals")}</h3>
         <GoalFormDialog
           bookId={bookId}
           onCreated={onCreated}
           trigger={
             <Button variant="outline" size="sm" className="h-7 gap-1.5">
               <Plus className="h-3.5 w-3.5" />
-              Add goal
+              {t("addGoal")}
             </Button>
           }
         />
@@ -104,7 +103,7 @@ export function GoalList({ bookId, goals, onCreated, onDeleted }: GoalListProps)
 
       {goals.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-4">
-          No active goals. Add one to track your progress.
+          {t("noActiveGoals")}
         </p>
       ) : (
         <div className="space-y-2">

@@ -24,12 +24,14 @@ datasource db {
 model User {
   id          String   @id @default(cuid())
   email       String   @unique
-  password    String   // bcrypt hashed
-  googleId    String?  @unique
+  authUserId  String?  @unique // Supabase auth.users.id — nullable until the user signs in via Supabase
   username    String   @unique
   displayName String
   bio         String?  @db.VarChar(300)
   avatarUrl   String?
+  avatarPositionY Int @default(50) // vertical focal point of the avatar crop, 0 (top) – 100 (bottom)
+  showLibraryCount Boolean @default(false) // Settings toggle — public profile visibility
+  showRatingsAndReviews Boolean @default(false) // Settings toggle — public profile visibility
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -42,41 +44,9 @@ model User {
   wordCountLogs    WordCountLog[]
   notifications    Notification[]
   commentReplies   CommentReply[]
-  accounts         Account[]      // NextAuth
-  sessions         Session[]      // NextAuth
-}
-
-// NextAuth adapters (required — do not modify)
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-  @@unique([identifier, token])
+  readingProgress  ReadingProgress[]
+  readingActivity  ReadingActivity[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 // ─── BOOKS & CHAPTERS ───────────────────────────────────────────────────────
@@ -93,6 +63,16 @@ enum BookStatus {
   PAUSED
 }
 
+// Preset license badge shown on the public book page — a display-only notice,
+// not a rights-management system (see out-of-scope.md: "Copyright management").
+enum BookLicense {
+  ALL_RIGHTS_RESERVED
+  CC_BY
+  CC_BY_NC
+  CC_BY_NC_ND
+  PUBLIC_DOMAIN
+}
+
 model Book {
   id                String            @id @default(cuid())
   authorId          String
@@ -104,6 +84,8 @@ model Book {
   language          String            @default("es")
   publicationStatus PublicationStatus @default(DRAFT)
   bookStatus        BookStatus        @default(IN_PROGRESS)
+  license           BookLicense       @default(ALL_RIGHTS_RESERVED)
+  featured          Boolean           @default(false) // manually curated for the Discovery home page
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
@@ -136,8 +118,35 @@ model Chapter {
   chapterReviews ChapterReview[]
   wordCountLogs  WordCountLog[]
   timelineEntries TimelineEntry[]
+  readingProgress ReadingProgress[]
 
   @@unique([bookId, order])
+}
+
+// ─── READING STREAK & CONTINUE READING ─────────────────────────────────────
+
+model ReadingProgress {
+  id        String   @id @default(cuid())
+  userId    String
+  bookId    String
+  chapterId String   // last chapter the user opened in this book
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book    Book    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+}
+
+model ReadingActivity {
+  id     String   @id @default(cuid())
+  userId String
+  date   DateTime @db.Date // one row per user per calendar day (UTC) that had any reading
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
 }
 
 // ─── WRITERS STUDIO — PLOTTING ─────────────────────────────────────────────

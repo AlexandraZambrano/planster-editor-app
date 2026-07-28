@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
+import { getTranslations } from "next-intl/server"
 import { auth } from "@/lib/auth"
 import { getBookNotes } from "@/actions/studio"
 import { NotesView } from "@/components/studio/notes/notes-view"
@@ -13,7 +14,7 @@ export default async function NotesPage({ params }: Props) {
   const session = await auth()
   if (!session) redirect("/auth/login")
 
-  const result = await getBookNotes(bookId)
+  const [result, t] = await Promise.all([getBookNotes(bookId), getTranslations("Studio")])
   if ("error" in result) notFound()
 
   return (
@@ -23,13 +24,11 @@ export default async function NotesPage({ params }: Props) {
           href={`/write/${bookId}/studio`}
           className="text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
-          ← Studio
+          {t("backToStudio")}
         </Link>
-        <h1 className="text-2xl font-bold mt-1">Notes</h1>
+        <h1 className="text-2xl font-bold mt-1">{t("freeNotes")}</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          {result.notes.length === 0
-            ? "Your private scratch pad for ideas, research, and anything else."
-            : `${result.notes.length} note${result.notes.length !== 1 ? "s" : ""}`}
+          {result.notes.length === 0 ? t("notesHint") : t("noteCount", { count: result.notes.length })}
         </p>
       </div>
 

@@ -21,6 +21,8 @@ const mockPrisma = prisma as unknown as {
     create: ReturnType<typeof vi.fn>
     update: ReturnType<typeof vi.fn>
   }
+  library: { findMany: ReturnType<typeof vi.fn> }
+  notification: { create: ReturnType<typeof vi.fn> }
   $transaction: ReturnType<typeof vi.fn>
 }
 
@@ -80,16 +82,57 @@ describe("updateChapterVisibility", () => {
   it("updates visibility on success", async () => {
     mockPrisma.chapter.findUnique.mockResolvedValue({
       bookId: "book-1",
+      title: "Chapter 1",
+      visibility: "DRAFT",
       order: 1,
-      book: { authorId: "user-1" },
+      book: { authorId: "user-1", title: "My Book" },
     })
     mockPrisma.chapter.update.mockResolvedValue({})
+    mockPrisma.library.findMany.mockResolvedValue([])
     const result = await updateChapterVisibility("chap-1", "PUBLISHED")
     expect(result.success).toBe(true)
     expect(mockPrisma.chapter.update).toHaveBeenCalledWith({
       where: { id: "chap-1" },
       data: { visibility: "PUBLISHED" },
     })
+  })
+
+  it("notifies readers who have the book in their library when a chapter is published", async () => {
+    mockPrisma.chapter.findUnique.mockResolvedValue({
+      bookId: "book-1",
+      title: "Chapter 1",
+      visibility: "DRAFT",
+      order: 1,
+      book: { authorId: "user-1", title: "My Book" },
+    })
+    mockPrisma.chapter.update.mockResolvedValue({})
+    mockPrisma.library.findMany.mockResolvedValue([{ userId: "reader-1" }, { userId: "reader-2" }])
+    mockPrisma.notification.create.mockResolvedValue({ id: "n1" })
+
+    await updateChapterVisibility("chap-1", "PUBLISHED")
+
+    expect(mockPrisma.notification.create).toHaveBeenCalledTimes(2)
+    expect(mockPrisma.notification.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ userId: "reader-1", type: "NEW_CHAPTER_PUBLISHED" }),
+      })
+    )
+  })
+
+  it("does not re-notify when a chapter is already published", async () => {
+    mockPrisma.chapter.findUnique.mockResolvedValue({
+      bookId: "book-1",
+      title: "Chapter 1",
+      visibility: "PUBLISHED",
+      order: 1,
+      book: { authorId: "user-1", title: "My Book" },
+    })
+    mockPrisma.chapter.update.mockResolvedValue({})
+
+    await updateChapterVisibility("chap-1", "PUBLISHED")
+
+    expect(mockPrisma.library.findMany).not.toHaveBeenCalled()
+    expect(mockPrisma.notification.create).not.toHaveBeenCalled()
   })
 })
 

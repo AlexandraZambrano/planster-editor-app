@@ -5,6 +5,7 @@ import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import TextAlign from "@tiptap/extension-text-align"
 import Underline from "@tiptap/extension-underline"
+import { useTranslations } from "next-intl"
 import { TextStyle } from "./font-size"
 import { Toolbar } from "./toolbar"
 import { saveChapterContent } from "@/actions/chapters"
@@ -13,6 +14,7 @@ import { Save } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const AUTOSAVE_MS = 30_000
+const DEBOUNCE_MS = 2_000
 
 type SaveStatus = "saved" | "saving" | "error" | "idle"
 
@@ -35,11 +37,13 @@ export function TiptapEditor({
   bookTitle,
   initialContent,
 }: TiptapEditorProps) {
+  const t = useTranslations("Editor")
   const [isFocusMode, setIsFocusMode] = useState(false)
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved")
   const [wordCount, setWordCount] = useState(0)
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isDirtyRef = useRef(false)
   const isEditorReadyRef = useRef(false)
 
@@ -50,7 +54,6 @@ export function TiptapEditor({
       setSaveStatus("saving")
       try {
         const content = editorInstance.getJSON()
-        console.log("[editor] saving JSON:", JSON.stringify(content))
         const words = countWords(editorInstance.getText())
         const result = await saveChapterContent(chapterId, content, words)
         if (result.error) {
@@ -97,6 +100,9 @@ export function TiptapEditor({
       setWordCount(countWords(ed.getText()))
       isDirtyRef.current = true
       setSaveStatus("idle")
+
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(() => { save(ed) }, DEBOUNCE_MS)
     },
     onCreate({ editor: ed }) {
       setWordCount(countWords(ed.getText()))
@@ -130,14 +136,15 @@ export function TiptapEditor({
   useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
+      if (debounceRef.current) clearTimeout(debounceRef.current)
     }
   }, [])
 
   const statusLabel = {
-    saved: "Saved ✓",
-    saving: "Saving…",
-    error: "Error saving",
-    idle: "Unsaved changes",
+    saved: t("savedStatus"),
+    saving: t("savingStatus"),
+    error: t("errorStatus"),
+    idle: t("unsavedStatus"),
   }[saveStatus]
 
   const statusColor = {
@@ -148,7 +155,7 @@ export function TiptapEditor({
   }[saveStatus]
 
   return (
-    <div className="flex flex-col h-screen bg-[#F9FBFD]">
+    <div className="flex flex-col h-screen bg-[#FBF3F6]">
       {/* Top bar — hidden in focus mode */}
       {!isFocusMode && (
         <div className="flex items-center gap-2 px-4 py-2.5 bg-background border-b shrink-0">
@@ -173,8 +180,8 @@ export function TiptapEditor({
       )}
 
       {/* Editor content — paged */}
-      <div className="flex-1 overflow-y-auto bg-[#EAECEF] py-8">
-        <div className="editor-pages mx-auto w-[816px] max-w-full min-h-[1056px]">
+      <div className="flex-1 overflow-y-auto bg-[#EEE3E9] py-8">
+        <div className="editor-pages mx-auto w-[816px] max-w-full min-h-[1056px] rounded-md focus-within:ring-2 focus-within:ring-blue-400 transition-shadow">
           <EditorContent editor={editor} />
         </div>
       </div>
@@ -182,7 +189,7 @@ export function TiptapEditor({
       {/* Bottom bar */}
       <div className="flex items-center justify-between px-5 py-2 bg-background border-t text-xs shrink-0">
         <span className="text-muted-foreground">
-          {wordCount.toLocaleString()} {wordCount === 1 ? "word" : "words"}
+          {t("wordCount", { count: wordCount })}
         </span>
 
         <div className="flex items-center gap-3">
@@ -195,7 +202,7 @@ export function TiptapEditor({
             onClick={() => editor && save(editor, true)}
           >
             <Save className="h-3 w-3" />
-            Save
+            {t("save")}
           </Button>
         </div>
       </div>

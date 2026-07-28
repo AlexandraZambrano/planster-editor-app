@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useTranslations } from "next-intl"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,15 +11,20 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { requestPasswordReset } from "@/actions/auth"
 
-const schema = z.object({
-  email: z.string().email("Enter a valid email"),
-})
-
-type FormData = z.infer<typeof schema>
-
 export function ForgotPasswordForm() {
+  const t = useTranslations("Auth")
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const schema = useMemo(
+    () =>
+      z.object({
+        email: z.string().email(t("invalidEmail")),
+      }),
+    [t]
+  )
+
+  type FormData = z.infer<typeof schema>
 
   const {
     register,
@@ -44,10 +50,7 @@ export function ForgotPasswordForm() {
   if (sent) {
     return (
       <Alert>
-        <AlertDescription>
-          If that email is registered, you will receive a password reset link shortly. Check your
-          inbox (and spam folder).
-        </AlertDescription>
+        <AlertDescription>{t("resetLinkSent")}</AlertDescription>
       </Alert>
     )
   }
@@ -61,7 +64,7 @@ export function ForgotPasswordForm() {
       )}
 
       <div className="space-y-1.5">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{t("email")}</Label>
         <Input
           id="email"
           type="email"
@@ -80,7 +83,7 @@ export function ForgotPasswordForm() {
         disabled={isSubmitting}
         data-testid="submit-button"
       >
-        {isSubmitting ? "Sending…" : "Send reset link"}
+        {isSubmitting ? t("sending") : t("sendResetLink")}
       </Button>
     </form>
   )

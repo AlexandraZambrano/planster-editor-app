@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { AlertTriangle } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -20,7 +21,6 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { BookForm } from "./book-form"
 import { updateBookPublicationStatus, deleteBook } from "@/actions/books"
-import { PUBLICATION_STATUS_LABELS } from "@/lib/constants"
 import type { Book } from "@prisma/client"
 
 interface BookSettingsPanelProps {
@@ -35,11 +35,14 @@ interface BookSettingsPanelProps {
     | "language"
     | "bookStatus"
     | "publicationStatus"
+    | "license"
   >
 }
 
 export function BookSettingsPanel({ book }: BookSettingsPanelProps) {
   const router = useRouter()
+  const t = useTranslations("Write")
+  const tCommon = useTranslations("Common")
   const [statusError, setStatusError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [deleteConfirmStep, setDeleteConfirmStep] = useState<"idle" | "betaWarning">("idle")
@@ -68,7 +71,7 @@ export function BookSettingsPanel({ book }: BookSettingsPanelProps) {
     <div className="space-y-10 max-w-2xl">
       {/* Book metadata */}
       <section>
-        <h3 className="text-base font-semibold mb-4">Book details</h3>
+        <h3 className="text-base font-semibold mb-4">{t("bookDetails")}</h3>
         <BookForm
           bookId={book.id}
           defaultValues={{
@@ -79,6 +82,7 @@ export function BookSettingsPanel({ book }: BookSettingsPanelProps) {
             tags: book.tags,
             language: book.language,
             bookStatus: book.bookStatus as any,
+            license: book.license as any,
           }}
           onSuccess={() => {}}
         />
@@ -88,11 +92,11 @@ export function BookSettingsPanel({ book }: BookSettingsPanelProps) {
 
       {/* Publication status */}
       <section>
-        <h3 className="text-base font-semibold mb-1">Publication status</h3>
+        <h3 className="text-base font-semibold mb-1">{t("publicationStatusTitle")}</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          <strong>Draft:</strong> only you can see it.{" "}
-          <strong>Beta:</strong> approved beta readers can access it.{" "}
-          <strong>Published:</strong> visible in the catalogue to all readers.
+          <strong>{tCommon("publicationStatus.DRAFT")}:</strong> {t("draftHint")}{" "}
+          <strong>{tCommon("publicationStatus.BETA")}:</strong> {t("betaHint")}{" "}
+          <strong>{tCommon("publicationStatus.PUBLISHED")}:</strong> {t("publishedHint")}
         </p>
         {statusError && (
           <Alert variant="destructive" className="mb-3">
@@ -108,11 +112,9 @@ export function BookSettingsPanel({ book }: BookSettingsPanelProps) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {Object.entries(PUBLICATION_STATUS_LABELS).map(([value, label]) => (
-              <SelectItem key={value} value={value}>
-                {label}
-              </SelectItem>
-            ))}
+            <SelectItem value="DRAFT">{tCommon("publicationStatus.DRAFT")}</SelectItem>
+            <SelectItem value="BETA">{tCommon("publicationStatus.BETA")}</SelectItem>
+            <SelectItem value="PUBLISHED">{tCommon("publicationStatus.PUBLISHED")}</SelectItem>
           </SelectContent>
         </Select>
       </section>
@@ -121,16 +123,14 @@ export function BookSettingsPanel({ book }: BookSettingsPanelProps) {
 
       {/* Danger zone */}
       <section>
-        <h3 className="text-base font-semibold text-destructive mb-1">Danger zone</h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          Permanently delete this book and all its chapters, comments, and data.
-        </p>
+        <h3 className="text-base font-semibold text-destructive mb-1">{t("dangerZone")}</h3>
+        <p className="text-sm text-muted-foreground mb-4">{t("dangerZoneHint")}</p>
 
         {deleteConfirmStep === "betaWarning" ? (
           <Alert variant="destructive" className="mb-4">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription className="ml-2">
-              This book has approved beta readers. Deleting it will revoke their access. Are you sure?
+              {t("betaWarning")}
               <div className="flex gap-2 mt-3">
                 <Button
                   size="sm"
@@ -138,14 +138,14 @@ export function BookSettingsPanel({ book }: BookSettingsPanelProps) {
                   onClick={() => handleDelete(true)}
                   disabled={isPending}
                 >
-                  Yes, delete anyway
+                  {t("yesDeleteAnyway")}
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => setDeleteConfirmStep("idle")}
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
               </div>
             </AlertDescription>
@@ -154,24 +154,21 @@ export function BookSettingsPanel({ book }: BookSettingsPanelProps) {
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm">
-                Delete book
+                {t("deleteBook")}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete &ldquo;{book.title}&rdquo;?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. All chapters, plot notes, studio content, and beta
-                  reader data will be permanently deleted.
-                </AlertDialogDescription>
+                <AlertDialogTitle>{t("deleteBookConfirmTitle", { title: book.title })}</AlertDialogTitle>
+                <AlertDialogDescription>{t("deleteBookConfirmDescription")}</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
                 <AlertDialogAction
                   className="bg-destructive hover:bg-destructive/90"
                   onClick={() => handleDelete(false)}
                 >
-                  Delete permanently
+                  {t("deletePermanently")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

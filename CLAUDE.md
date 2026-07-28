@@ -30,7 +30,7 @@ Read these files BEFORE writing any code. They are the source of truth for the p
 - **Editor:** Tiptap (already in the repo)
 - **Interactive board:** React Flow
 - **Charts:** Recharts (already in the repo)
-- **Auth:** NextAuth.js (Email + Password only)
+- **Auth:** Supabase Auth (Email + Password, and Google OAuth)
 - **DB:** Supabase (PostgreSQL) + Prisma ORM
 - **Storage:** Cloudinary (images: covers, characters, world building, board)
 - **Email:** Resend (password reset)

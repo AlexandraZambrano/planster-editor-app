@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useTranslations } from "next-intl"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,19 +16,7 @@ import { CoverUpload } from "./cover-upload"
 import { TagInput } from "./tag-input"
 import { GenreSelect } from "./genre-select"
 import { createBook, updateBook } from "@/actions/books"
-import { LANGUAGES, BOOK_STATUS_LABELS } from "@/lib/constants"
-
-const formSchema = z.object({
-  title: z.string().min(1, "Title is required").max(200, "Title cannot exceed 200 characters"),
-  synopsis: z.string().max(2000, "Synopsis cannot exceed 2000 characters").optional(),
-  coverUrl: z.string().optional(),
-  genres: z.array(z.string()),
-  tags: z.array(z.string().max(30)).max(10),
-  language: z.string(),
-  bookStatus: z.enum(["IN_PROGRESS", "COMPLETE", "PAUSED"]),
-})
-
-type FormData = z.infer<typeof formSchema>
+import { LANGUAGES, BOOK_STATUS_LABELS, BOOK_LICENSES } from "@/lib/constants"
 
 interface BookFormProps {
   bookId?: string
@@ -35,10 +24,38 @@ interface BookFormProps {
   onSuccess?: () => void
 }
 
+type FormData = {
+  title: string
+  synopsis?: string
+  coverUrl?: string
+  genres: string[]
+  tags: string[]
+  language: string
+  bookStatus: "IN_PROGRESS" | "COMPLETE" | "PAUSED"
+  license: "ALL_RIGHTS_RESERVED" | "CC_BY" | "CC_BY_NC" | "CC_BY_NC_ND" | "PUBLIC_DOMAIN"
+}
+
 export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
   const router = useRouter()
+  const t = useTranslations("Write")
+  const tCommon = useTranslations("Common")
   const [error, setError] = useState<string | null>(null)
   const isEditing = !!bookId
+
+  const formSchema = useMemo(
+    () =>
+      z.object({
+        title: z.string().min(1, t("titleRequired")).max(200, t("titleTooLong")),
+        synopsis: z.string().max(2000, t("synopsisTooLong")).optional(),
+        coverUrl: z.string().optional(),
+        genres: z.array(z.string()),
+        tags: z.array(z.string().max(30)).max(10),
+        language: z.string(),
+        bookStatus: z.enum(["IN_PROGRESS", "COMPLETE", "PAUSED"]),
+        license: z.enum(["ALL_RIGHTS_RESERVED", "CC_BY", "CC_BY_NC", "CC_BY_NC_ND", "PUBLIC_DOMAIN"]),
+      }),
+    [t]
+  )
 
   const {
     register,
@@ -55,6 +72,7 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
       tags: [],
       language: "es",
       bookStatus: "IN_PROGRESS",
+      license: "ALL_RIGHTS_RESERVED",
       ...defaultValues,
     },
   })
@@ -96,17 +114,17 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
 
         <div className="flex-1 space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="title">Title *</Label>
+            <Label htmlFor="title">{t("titleField")} *</Label>
             <Input id="title" {...register("title")} data-testid="title-input" />
             {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="synopsis">Synopsis</Label>
+            <Label htmlFor="synopsis">{t("synopsis")}</Label>
             <Textarea
               id="synopsis"
               rows={4}
-              placeholder="What is your book about?"
+              placeholder={t("synopsisPlaceholder")}
               {...register("synopsis")}
             />
             {errors.synopsis && (
@@ -117,7 +135,7 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
       </div>
 
       <div className="space-y-1.5">
-        <Label>Genres</Label>
+        <Label>{t("genres")}</Label>
         <Controller
           name="genres"
           control={control}
@@ -128,7 +146,7 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
       </div>
 
       <div className="space-y-1.5">
-        <Label>Tags</Label>
+        <Label>{t("tags")}</Label>
         <Controller
           name="tags"
           control={control}
@@ -136,17 +154,17 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
             <TagInput
               value={field.value}
               onChange={field.onChange}
-              placeholder="Add tags (press Enter)…"
+              placeholder={t("tagsPlaceholder")}
             />
           )}
         />
-        <p className="text-xs text-muted-foreground">Max 10 tags, 30 characters each</p>
+        <p className="text-xs text-muted-foreground">{t("tagsHint")}</p>
         {errors.tags && <p className="text-sm text-destructive">{errors.tags.message}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="language">Language</Label>
+          <Label htmlFor="language">{t("language")}</Label>
           <Controller
             name="language"
             control={control}
@@ -168,7 +186,7 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="bookStatus">Writing status</Label>
+          <Label htmlFor="bookStatus">{t("writingStatus")}</Label>
           <Controller
             name="bookStatus"
             control={control}
@@ -178,9 +196,9 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(BOOK_STATUS_LABELS).map(([value, label]) => (
+                  {Object.keys(BOOK_STATUS_LABELS).map((value) => (
                     <SelectItem key={value} value={value}>
-                      {label}
+                      {tCommon(`bookStatus.${value}` as "bookStatus.IN_PROGRESS")}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -190,12 +208,41 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
         </div>
       </div>
 
+      <div className="space-y-1.5">
+        <Label htmlFor="license">{t("license")}</Label>
+        <Controller
+          name="license"
+          control={control}
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger id="license">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {BOOK_LICENSES.map((l) => (
+                  <SelectItem key={l.code} value={l.code}>
+                    {tCommon(`bookLicense.${l.code}` as "bookLicense.ALL_RIGHTS_RESERVED")}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+        <p className="text-xs text-muted-foreground">{t("licenseHint")}</p>
+      </div>
+
       <div className="flex justify-end gap-3 pt-2">
         <Button type="button" variant="outline" onClick={() => router.back()}>
-          Cancel
+          {t("cancel")}
         </Button>
         <Button type="submit" disabled={isSubmitting} data-testid="submit-button">
-          {isSubmitting ? (isEditing ? "Saving…" : "Creating…") : isEditing ? "Save changes" : "Create book"}
+          {isSubmitting
+            ? isEditing
+              ? t("saving")
+              : t("creating")
+            : isEditing
+              ? t("saveChanges")
+              : t("createBook")}
         </Button>
       </div>
     </form>

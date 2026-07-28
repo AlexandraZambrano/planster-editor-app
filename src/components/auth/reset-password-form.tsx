@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useTranslations } from "next-intl"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,25 +12,30 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { resetPassword } from "@/actions/auth"
 
-const schema = z
-  .object({
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  })
-
-type FormData = z.infer<typeof schema>
-
 interface Props {
   token: string
 }
 
 export function ResetPasswordForm({ token }: Props) {
   const router = useRouter()
+  const t = useTranslations("Auth")
   const [error, setError] = useState<string | null>(null)
+
+  const schema = useMemo(
+    () =>
+      z
+        .object({
+          password: z.string().min(8, t("passwordTooShort")),
+          confirmPassword: z.string().min(1, t("confirmPasswordRequired")),
+        })
+        .refine((data) => data.password === data.confirmPassword, {
+          message: t("passwordsDoNotMatch"),
+          path: ["confirmPassword"],
+        }),
+    [t]
+  )
+
+  type FormData = z.infer<typeof schema>
 
   const {
     register,
@@ -61,7 +67,7 @@ export function ResetPasswordForm({ token }: Props) {
       )}
 
       <div className="space-y-1.5">
-        <Label htmlFor="password">New password</Label>
+        <Label htmlFor="password">{t("newPassword")}</Label>
         <Input
           id="password"
           type="password"
@@ -75,7 +81,7 @@ export function ResetPasswordForm({ token }: Props) {
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="confirmPassword">Confirm new password</Label>
+        <Label htmlFor="confirmPassword">{t("confirmNewPassword")}</Label>
         <Input
           id="confirmPassword"
           type="password"
@@ -94,7 +100,7 @@ export function ResetPasswordForm({ token }: Props) {
         disabled={isSubmitting}
         data-testid="submit-button"
       >
-        {isSubmitting ? "Resetting…" : "Reset password"}
+        {isSubmitting ? t("resetting") : t("resetPassword")}
       </Button>
     </form>
   )

@@ -78,7 +78,13 @@ planster-editor-app/
 │   ├── lib/
 │   │   ├── utils.ts                   ← cn() helper (already exists)
 │   │   ├── prisma.ts                  ← Prisma singleton client
-│   │   ├── auth.ts                    ← NextAuth config
+│   │   ├── auth.ts                    ← auth() shim: Supabase session → app User row
+│   │   ├── user-provisioning.ts       ← username generation + OAuth profile linking
+│   │   ├── supabase/
+│   │   │   ├── client.ts              ← browser client (client components)
+│   │   │   ├── server.ts              ← server client (Server Components/Actions)
+│   │   │   ├── admin.ts               ← service-role client (admin operations)
+│   │   │   └── middleware.ts          ← session cookie refresh helper
 │   │   ├── cloudinary.ts              ← image upload helpers
 │   │   └── notifications.ts           ← SSE helpers
 │   ├── hooks/                         ← use-toast, use-mobile (already exist)
@@ -101,10 +107,18 @@ planster-editor-app/
 - Use React `cache()` to deduplicate queries within the same render
 
 ### Authentication
-- NextAuth.js with JWT session strategy
-- The `session.user` object includes: `id`, `email`, `username`, `avatarUrl`
-- Protect authenticated routes with middleware in `src/middleware.ts`
-- All routes under `(app)/` require an active session
+- Supabase Auth (GoTrue) — email/password and Google OAuth
+- `src/lib/auth.ts` exports `auth()`, a compatibility shim: resolves the Supabase session via
+  `supabase.auth.getUser()`, then looks up the matching Prisma `User` row by `authUserId` and
+  returns `{ user: { id, email, username, avatarUrl, avatarPositionY } }` (or `null`) — the
+  same shape every call site has always used
+- `User.id` (our own cuid) is decoupled from Supabase's `auth.users.id` via the nullable
+  `User.authUserId` column — every existing FK relation keeps using `User.id` unchanged
+- `src/middleware.ts` refreshes the Supabase session cookie on every route (except static
+  assets) via `src/lib/supabase/middleware.ts`, and redirects unauthenticated visitors away
+  from routes under `(app)/`
+- Google OAuth completes at `src/app/auth/callback/route.ts`, which exchanges the code for a
+  session and provisions/links the Prisma profile via `findOrCreateProfileForOAuth()`
 
 ### Images
 - All user-uploaded images (covers, character photos, world building, board) are uploaded to Cloudinary
@@ -129,8 +143,11 @@ planster-editor-app/
 DATABASE_URL=        # Transaction mode pooler (port 6543) — used at runtime
 DIRECT_URL=          # Direct connection (port 5432) — used for Prisma migrations
 
-NEXTAUTH_SECRET=
-NEXTAUTH_URL=
+# Supabase Auth — Project Settings > API
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=   # secret, server-only
+
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
@@ -139,3 +156,7 @@ NEXT_PUBLIC_APP_URL=
 ```
 
 > **Supabase + Prisma note:** Supabase uses a connection pooler (port 6543) for runtime queries and a direct connection (port 5432) for migrations. In `prisma/schema.prisma` use `url = env("DATABASE_URL")` and `directUrl = env("DIRECT_URL")`. The `DATABASE_URL` points to the pooler (Transaction mode), `DIRECT_URL` to the direct connection.
+
+> **Google OAuth note:** the Google Client ID/Secret are configured inside the Supabase
+> dashboard (Authentication → Providers → Google), not in this app's own `.env` — Supabase
+> handles the OAuth exchange with Google directly.

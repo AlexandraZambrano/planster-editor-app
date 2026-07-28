@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { Loader2, Users, UserCheck, UserX } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BetaReaderCard } from "./beta-reader-card"
 import { InviteBetaDialog } from "./invite-beta-dialog"
@@ -19,13 +20,8 @@ const ICONS: Record<TabId, React.ReactNode> = {
   rejected: <UserX className="h-3.5 w-3.5" />,
 }
 
-const EMPTY_MESSAGES: Record<TabId, string> = {
-  pending: "No pending requests",
-  approved: "No approved beta readers yet",
-  rejected: "No rejected requests",
-}
-
 export function BetaManagement({ bookId }: { bookId: string }) {
+  const t = useTranslations("Beta")
   const [data, setData] = useState<State>(EMPTY)
   const [loading, setLoading] = useState(true)
 
@@ -55,12 +51,22 @@ export function BetaManagement({ bookId }: { bookId: string }) {
   }
 
   const tabs: TabId[] = ["pending", "approved", "rejected"]
+  const tabLabels: Record<TabId, string> = {
+    pending: t("pending"),
+    approved: t("approved"),
+    rejected: t("rejected"),
+  }
+  const emptyMessages: Record<TabId, string> = {
+    pending: t("noPendingRequests"),
+    approved: t("noApprovedBetaReaders"),
+    rejected: t("noRejectedRequests"),
+  }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold">
-          Beta readers
+          {t("betaReaders")}
         </p>
         <InviteBetaDialog bookId={bookId} onSuccess={load} />
       </div>
@@ -70,7 +76,7 @@ export function BetaManagement({ bookId }: { bookId: string }) {
           {tabs.map((tab) => (
             <TabsTrigger key={tab} value={tab} className="gap-1.5">
               {ICONS[tab]}
-              {tab.charAt(0).toUpperCase() + tab.slice(1)} ({data[tab].length})
+              {tabLabels[tab]} ({data[tab].length})
             </TabsTrigger>
           ))}
         </TabsList>
@@ -79,7 +85,7 @@ export function BetaManagement({ bookId }: { bookId: string }) {
           <TabsContent key={tab} value={tab}>
             {data[tab].length === 0 ? (
               <div className="flex items-center justify-center py-12 border-2 border-dashed rounded-lg text-muted-foreground">
-                <p className="text-sm">{EMPTY_MESSAGES[tab]}</p>
+                <p className="text-sm">{emptyMessages[tab]}</p>
               </div>
             ) : (
               <div className="space-y-2">

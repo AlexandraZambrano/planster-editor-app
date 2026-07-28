@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useTransition } from "react"
+import { useTranslations } from "next-intl"
 import {
   Dialog,
   DialogContent,
@@ -22,12 +23,7 @@ import { createGoal } from "@/actions/goals"
 import type { GoalData } from "@/actions/goals"
 import type { GoalType } from "@prisma/client"
 
-const GOAL_TYPE_LABELS: Record<GoalType, string> = {
-  DAILY: "Daily",
-  WEEKLY: "Weekly",
-  MONTHLY: "Monthly",
-  DEADLINE: "Deadline (total by date)",
-}
+const GOAL_TYPES: GoalType[] = ["DAILY", "WEEKLY", "MONTHLY", "DEADLINE"]
 
 interface GoalFormDialogProps {
   bookId: string
@@ -36,6 +32,7 @@ interface GoalFormDialogProps {
 }
 
 export function GoalFormDialog({ bookId, trigger, onCreated }: GoalFormDialogProps) {
+  const t = useTranslations("Goals")
   const [open, setOpen] = useState(false)
   const [type, setType] = useState<GoalType>("DAILY")
   const [targetWords, setTargetWords] = useState("")
@@ -53,11 +50,11 @@ export function GoalFormDialog({ bookId, trigger, onCreated }: GoalFormDialogPro
   function handleSubmit() {
     const words = parseInt(targetWords, 10)
     if (!words || words < 1) {
-      setError("Enter a valid word count.")
+      setError(t("enterValidWordCount"))
       return
     }
     if (type === "DEADLINE" && !deadlineDate) {
-      setError("Select a deadline date.")
+      setError(t("selectDeadlineDate"))
       return
     }
 
@@ -86,19 +83,21 @@ export function GoalFormDialog({ bookId, trigger, onCreated }: GoalFormDialogPro
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Add writing goal</DialogTitle>
+          <DialogTitle>{t("addWritingGoal")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
           <div className="space-y-1.5">
-            <Label>Goal type</Label>
+            <Label>{t("goalTypeLabel")}</Label>
             <Select value={type} onValueChange={(v) => setType(v as GoalType)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(Object.entries(GOAL_TYPE_LABELS) as [GoalType, string][]).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v}</SelectItem>
+                {GOAL_TYPES.map((k) => (
+                  <SelectItem key={k} value={k}>
+                    {k === "DEADLINE" ? t("deadlineGoalTypeLabel") : t(`goalType.${k}` as "goalType.DAILY")}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -106,15 +105,15 @@ export function GoalFormDialog({ bookId, trigger, onCreated }: GoalFormDialogPro
 
           <div className="space-y-1.5">
             <Label>
-              {type === "DEADLINE" ? "Total words to write" : "Words"}
-              {type === "DAILY" && " per day"}
-              {type === "WEEKLY" && " per week"}
-              {type === "MONTHLY" && " per month"}
+              {type === "DEADLINE" ? t("totalWordsToWrite") : t("words")}
+              {type === "DAILY" && ` ${t("perDay")}`}
+              {type === "WEEKLY" && ` ${t("perWeek")}`}
+              {type === "MONTHLY" && ` ${t("perMonth")}`}
             </Label>
             <Input
               type="number"
               min={1}
-              placeholder="e.g. 500"
+              placeholder={t("wordsPlaceholder")}
               value={targetWords}
               onChange={(e) => setTargetWords(e.target.value)}
             />
@@ -122,7 +121,7 @@ export function GoalFormDialog({ bookId, trigger, onCreated }: GoalFormDialogPro
 
           {type === "DEADLINE" && (
             <div className="space-y-1.5">
-              <Label>Deadline date</Label>
+              <Label>{t("deadlineDate")}</Label>
               <Input
                 type="date"
                 min={today}
@@ -135,7 +134,7 @@ export function GoalFormDialog({ bookId, trigger, onCreated }: GoalFormDialogPro
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <Button className="w-full" onClick={handleSubmit} disabled={isPending}>
-            {isPending ? "Saving…" : "Add goal"}
+            {isPending ? t("saving") : t("addGoal")}
           </Button>
         </div>
       </DialogContent>

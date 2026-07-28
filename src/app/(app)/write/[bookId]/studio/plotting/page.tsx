@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
+import { getTranslations } from "next-intl/server"
 import { auth } from "@/lib/auth"
 import { getPlottingBoard } from "@/actions/studio"
 import { PlottingBoard } from "@/components/studio/plotting/plotting-board"
@@ -13,7 +14,7 @@ export default async function PlottingPage({ params }: Props) {
   const session = await auth()
   if (!session) redirect("/auth/login")
 
-  const result = await getPlottingBoard(bookId)
+  const [result, t] = await Promise.all([getPlottingBoard(bookId), getTranslations("Studio")])
   if ("error" in result) notFound()
 
   const { chapters, characters, locations } = result
@@ -25,13 +26,11 @@ export default async function PlottingPage({ params }: Props) {
           href={`/write/${bookId}/studio`}
           className="text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
-          ← Studio
+          {t("backToStudio")}
         </Link>
-        <h1 className="text-2xl font-bold mt-1">Plotting</h1>
+        <h1 className="text-2xl font-bold mt-1">{t("plotting")}</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          {chapters.length === 0
-            ? "Add chapters to start plotting."
-            : `${chapters.length} chapter${chapters.length !== 1 ? "s" : ""}`}
+          {chapters.length === 0 ? t("addChaptersToStartPlotting") : t("chapterCount", { count: chapters.length })}
         </p>
       </div>
 

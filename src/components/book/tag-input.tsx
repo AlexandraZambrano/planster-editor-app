@@ -2,6 +2,7 @@
 
 import { useState, type KeyboardEvent } from "react"
 import { X } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -23,6 +24,7 @@ export function TagInput({
   placeholder = "Add tag…",
   className,
 }: TagInputProps) {
+  const t = useTranslations("Write")
   const [input, setInput] = useState("")
 
   function addTag(raw: string) {
@@ -59,7 +61,7 @@ export function TagInput({
             type="button"
             onClick={() => removeTag(tag)}
             className="rounded-full hover:bg-black/10 focus:outline-none"
-            aria-label={`Remove ${tag}`}
+            aria-label={t("removeTag", { tag })}
           >
             <X className="h-3 w-3" />
           </button>

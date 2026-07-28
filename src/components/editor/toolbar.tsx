@@ -7,6 +7,7 @@ import {
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
   List, ListOrdered, Minus, Undo, Redo, Maximize2, Minimize2,
 } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { FONT_SIZES } from "./font-size"
 
@@ -87,6 +88,7 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps) {
+  const t = useTranslations("Editor")
   // Native <select> steals focus before onChange fires.
   // We snapshot the selection on mouseDown so we can restore it in onChange.
   const savedSelection = useRef<{ from: number; to: number } | null>(null)
@@ -137,28 +139,28 @@ export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps
     >
       {/* Text formatting */}
       <ToolbarButton
-        title="Bold"
+        title={t("bold")}
         active={editor.isActive("bold")}
         onClick={() => editor.chain().focus().toggleBold().run()}
       >
         <Bold className="h-3.5 w-3.5" />
       </ToolbarButton>
       <ToolbarButton
-        title="Italic"
+        title={t("italic")}
         active={editor.isActive("italic")}
         onClick={() => editor.chain().focus().toggleItalic().run()}
       >
         <Italic className="h-3.5 w-3.5" />
       </ToolbarButton>
       <ToolbarButton
-        title="Underline"
+        title={t("underline")}
         active={editor.isActive("underline")}
         onClick={() => editor.chain().focus().toggleUnderline().run()}
       >
         <Underline className="h-3.5 w-3.5" />
       </ToolbarButton>
       <ToolbarButton
-        title="Strikethrough"
+        title={t("strikethrough")}
         active={editor.isActive("strike")}
         onClick={() => editor.chain().focus().toggleStrike().run()}
       >
@@ -169,7 +171,7 @@ export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps
 
       {/* Font size */}
       <ToolbarSelect
-        title="Font size"
+        title={t("fontSize")}
         value={currentFontSize}
         options={FONT_SIZES.map((s) => ({ label: `${s}px`, value: s }))}
         onMouseDown={saveSelection}
@@ -181,28 +183,28 @@ export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps
 
       {/* Alignment */}
       <ToolbarButton
-        title="Align left"
+        title={t("alignLeft")}
         active={editor.isActive({ textAlign: "left" })}
         onClick={() => editor.chain().focus().setTextAlign("left").run()}
       >
         <AlignLeft className="h-3.5 w-3.5" />
       </ToolbarButton>
       <ToolbarButton
-        title="Align center"
+        title={t("alignCenter")}
         active={editor.isActive({ textAlign: "center" })}
         onClick={() => editor.chain().focus().setTextAlign("center").run()}
       >
         <AlignCenter className="h-3.5 w-3.5" />
       </ToolbarButton>
       <ToolbarButton
-        title="Align right"
+        title={t("alignRight")}
         active={editor.isActive({ textAlign: "right" })}
         onClick={() => editor.chain().focus().setTextAlign("right").run()}
       >
         <AlignRight className="h-3.5 w-3.5" />
       </ToolbarButton>
       <ToolbarButton
-        title="Justify"
+        title={t("justify")}
         active={editor.isActive({ textAlign: "justify" })}
         onClick={() => editor.chain().focus().setTextAlign("justify").run()}
       >
@@ -213,14 +215,14 @@ export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps
 
       {/* Lists */}
       <ToolbarButton
-        title="Unordered list"
+        title={t("unorderedList")}
         active={editor.isActive("bulletList")}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
       >
         <List className="h-3.5 w-3.5" />
       </ToolbarButton>
       <ToolbarButton
-        title="Ordered list"
+        title={t("orderedList")}
         active={editor.isActive("orderedList")}
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
       >
@@ -231,7 +233,7 @@ export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps
 
       {/* Horizontal rule */}
       <ToolbarButton
-        title="Insert horizontal rule"
+        title={t("insertHorizontalRule")}
         onClick={() => editor.chain().focus().setHorizontalRule().run()}
       >
         <Minus className="h-3.5 w-3.5" />
@@ -241,14 +243,14 @@ export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps
 
       {/* Undo / Redo */}
       <ToolbarButton
-        title="Undo"
+        title={t("undo")}
         disabled={!editor.can().undo()}
         onClick={() => editor.chain().focus().undo().run()}
       >
         <Undo className="h-3.5 w-3.5" />
       </ToolbarButton>
       <ToolbarButton
-        title="Redo"
+        title={t("redo")}
         disabled={!editor.can().redo()}
         onClick={() => editor.chain().focus().redo().run()}
       >
@@ -259,7 +261,7 @@ export function Toolbar({ editor, isFocusMode, onToggleFocusMode }: ToolbarProps
 
       {/* Focus mode */}
       <ToolbarButton
-        title={isFocusMode ? "Exit focus mode" : "Focus mode"}
+        title={isFocusMode ? t("exitFocusMode") : t("focusMode")}
         onClick={onToggleFocusMode}
       >
         {isFocusMode ? (

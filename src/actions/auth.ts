@@ -1,10 +1,11 @@
 "use server"
 
 import crypto from "crypto"
-import bcrypt from "bcryptjs"
 import { Resend } from "resend"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
+import { createAdminClient } from "@/lib/supabase/admin"
+import { SYSTEM_SHELVES } from "@/lib/user-provisioning"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -50,27 +51,46 @@ export async function registerUser(
   if (existingEmail) return { error: "This email is already registered" }
   if (existingUsername) return { error: "This username is already taken" }
 
-  const hashedPassword = await bcrypt.hash(password, 12)
+  const supabaseAdmin = createAdminClient()
+  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+  })
+
+  // Also covers the rare case of an orphaned Supabase user from a previously
+  // failed registration attempt (Supabase succeeded, the Prisma insert below
+  // did not) — Supabase reports the email as taken and we surface the same
+  // generic message rather than silently creating a duplicate profile.
+  if (authError || !authData.user) {
+    return { error: "This email is already registered" }
+  }
 
   await prisma.user.create({
     data: {
+      authUserId: authData.user.id,
       email,
-      password: hashedPassword,
       username,
       displayName,
-      shelves: {
-        createMany: {
-          data: [
-            { name: "Reading now", isSystem: true },
-            { name: "Want to read", isSystem: true },
-            { name: "Read", isSystem: true },
-          ],
-        },
-      },
+      shelves: SYSTEM_SHELVES,
     },
   })
 
   return { success: true }
+}
+
+export async function getEmailForIdentifier(
+  identifier: string
+): Promise<{ email?: string; error?: string }> {
+  if (identifier.includes("@")) return { email: identifier }
+
+  const user = await prisma.user.findUnique({
+    where: { username: identifier },
+    select: { email: true },
+  })
+  if (!user) return { error: "Invalid username/email or password" }
+
+  return { email: user.email }
 }
 
 export async function requestPasswordReset(
@@ -138,24 +158,27 @@ export async function resetPassword(
 
   const resetToken = await prisma.passwordResetToken.findUnique({
     where: { tokenHash },
+    include: { user: { select: { authUserId: true } } },
   })
 
   if (!resetToken) return { error: "Invalid or expired reset link" }
   if (resetToken.usedAt) return { error: "This reset link has already been used" }
   if (resetToken.expiresAt < new Date()) return { error: "This reset link has expired" }
+  if (!resetToken.user.authUserId) {
+    return { error: "This account can no longer be accessed. Please contact support." }
+  }
 
-  const hashedPassword = await bcrypt.hash(password, 12)
+  const supabaseAdmin = createAdminClient()
+  const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+    resetToken.user.authUserId,
+    { password }
+  )
+  if (updateError) return { error: "Something went wrong. Please try again." }
 
-  await prisma.$transaction([
-    prisma.user.update({
-      where: { id: resetToken.userId },
-      data: { password: hashedPassword },
-    }),
-    prisma.passwordResetToken.update({
-      where: { id: resetToken.id },
-      data: { usedAt: new Date() },
-    }),
-  ])
+  await prisma.passwordResetToken.update({
+    where: { id: resetToken.id },
+    data: { usedAt: new Date() },
+  })
 
   return { success: true }
 }

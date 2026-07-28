@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -15,6 +16,7 @@ interface GenreSelectProps {
 }
 
 export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
+  const t = useTranslations("Write")
   const [open, setOpen] = useState(false)
 
   function toggle(genre: string) {
@@ -40,15 +42,15 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
               ))}
             </div>
           ) : (
-            <span className="text-muted-foreground">Select genres…</span>
+            <span className="text-muted-foreground">{t("selectGenres")}</span>
           )}
           <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 ml-2" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[280px] p-0" align="start">
         <Command>
-          <CommandInput placeholder="Search genres…" />
-          <CommandEmpty>No genre found.</CommandEmpty>
+          <CommandInput placeholder={t("searchGenres")} />
+          <CommandEmpty>{t("noGenreFound")}</CommandEmpty>
           <CommandGroup className="max-h-60 overflow-y-auto">
             {BOOK_GENRES.map((genre) => (
               <CommandItem key={genre} value={genre} onSelect={() => toggle(genre)}>

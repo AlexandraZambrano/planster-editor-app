@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { UserPlus } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -18,6 +19,7 @@ import { inviteBeta } from "@/actions/beta"
 type Props = { bookId: string; onSuccess: () => void }
 
 export function InviteBetaDialog({ bookId, onSuccess }: Props) {
+  const t = useTranslations("Beta")
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState("")
   const [loading, setLoading] = useState(false)
@@ -60,21 +62,21 @@ export function InviteBetaDialog({ bookId, onSuccess }: Props) {
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" data-testid="invite-btn">
           <UserPlus className="h-3.5 w-3.5 mr-1.5" />
-          Invite reader
+          {t("inviteReader")}
         </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Invite a beta reader</DialogTitle>
+          <DialogTitle>{t("inviteBetaReader")}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="space-y-1.5">
-            <Label htmlFor="invite-input">Username or email</Label>
+            <Label htmlFor="invite-input">{t("usernameOrEmail")}</Label>
             <Input
               id="invite-input"
-              placeholder="@username or email@example.com"
+              placeholder={t("inviteInputPlaceholder")}
               value={value}
               onChange={(e) => setValue(e.target.value)}
               autoComplete="off"
@@ -91,7 +93,7 @@ export function InviteBetaDialog({ bookId, onSuccess }: Props) {
           {success && (
             <Alert className="py-2 border-green-200 bg-green-50">
               <AlertDescription className="text-xs text-green-700">
-                Beta reader invited successfully!
+                {t("inviteSuccess")}
               </AlertDescription>
             </Alert>
           )}
@@ -103,10 +105,10 @@ export function InviteBetaDialog({ bookId, onSuccess }: Props) {
               size="sm"
               onClick={() => handleOpenChange(false)}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button type="submit" size="sm" disabled={loading || !value.trim()}>
-              {loading ? "Inviting…" : "Send invite"}
+              {loading ? t("inviting") : t("sendInvite")}
             </Button>
           </div>
         </form>

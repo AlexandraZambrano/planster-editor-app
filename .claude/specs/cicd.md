@@ -35,7 +35,7 @@ Push to main (merge)
 | `.github/workflows/cd.yml` | CD pipeline (build, push GHCR, deploy Coolify) |
 | `vitest.config.ts` | Vitest config with 80% coverage thresholds |
 | `playwright.config.ts` | Playwright config pointing to localhost:3000 |
-| `src/test/setup.ts` | Global test setup (Next.js and NextAuth mocks) |
+| `src/test/setup.ts` | Global test setup (Next.js and Supabase client mocks) |
 
 ---
 
@@ -54,7 +54,9 @@ Add at: GitHub repo → Settings → Secrets and variables → Actions
 ### Auth secrets
 | Secret | Description |
 |---|---|
-| `NEXTAUTH_SECRET` | Secure random string (minimum 32 chars) |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase dashboard → Project Settings → API → Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase dashboard → Project Settings → API → anon/public key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase dashboard → Project Settings → API → service_role key (secret) |
 
 ### Cloudinary secrets
 | Secret | Description |
@@ -93,8 +95,9 @@ Add these in the Coolify app panel:
 ```
 DATABASE_URL=
 DIRECT_URL=
-NEXTAUTH_SECRET=
-NEXTAUTH_URL=https://planster.app
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=

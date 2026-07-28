@@ -7,11 +7,13 @@ import StarterKit from "@tiptap/starter-kit"
 import TextAlign from "@tiptap/extension-text-align"
 import { TextStyle } from "@/components/editor/font-size"
 import { ChevronLeft, ChevronRight, MessageSquarePlus, X } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ChapterReviewForm } from "@/components/beta/chapter-review-form"
 import { createInlineComment } from "@/actions/beta"
+import { logReadingActivity } from "@/actions/reading"
 
 interface Props {
   bookId: string
@@ -46,12 +48,17 @@ export function ReadingView({
   nextChapterId,
   existingReview,
 }: Props) {
+  const t = useTranslations("Reading")
   const [selection, setSelection] = useState<SelectionState>(null)
   const [showCommentForm, setShowCommentForm] = useState(false)
   const [commentText, setCommentText] = useState("")
   const [commentLoading, setCommentLoading] = useState(false)
   const [commentError, setCommentError] = useState<string | null>(null)
   const [commentSuccess, setCommentSuccess] = useState(false)
+
+  useEffect(() => {
+    logReadingActivity(bookId, chapterId)
+  }, [bookId, chapterId])
 
   const savedSelectionRef = useRef<SelectionState>(null)
 
@@ -162,7 +169,7 @@ export function ReadingView({
       {/* Top bar */}
       <header className="sticky top-0 z-10 bg-background border-b px-4 py-2.5 flex items-center gap-3 text-sm">
         <Link
-          href={`/write/${bookId}`}
+          href={isAuthor ? `/write/${bookId}` : `/books/${bookId}`}
           className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
         >
           ← {bookTitle}
@@ -175,7 +182,7 @@ export function ReadingView({
             href={`/write/${bookId}/editor/${chapterId}`}
             className="ml-auto text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
           >
-            Edit chapter →
+            {t("editChapter")}
           </Link>
         )}
       </header>
@@ -198,7 +205,7 @@ export function ReadingView({
                 data-testid="comment-btn"
               >
                 <MessageSquarePlus className="h-3.5 w-3.5" />
-                Comment
+                {t("comment")}
               </Button>
             </div>
           )}
@@ -225,7 +232,7 @@ export function ReadingView({
                   type="button"
                   onClick={closeCommentForm}
                   className="text-muted-foreground hover:text-foreground ml-2 shrink-0"
-                  aria-label="Close"
+                  aria-label={t("close")}
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -235,7 +242,7 @@ export function ReadingView({
                 <Textarea
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Add your comment…"
+                  placeholder={t("addCommentPlaceholder")}
                   rows={3}
                   autoFocus
                   data-testid="comment-textarea"
@@ -248,7 +255,7 @@ export function ReadingView({
                 )}
 
                 {commentSuccess && (
-                  <p className="text-xs text-green-600">Comment submitted!</p>
+                  <p className="text-xs text-green-600">{t("commentSubmitted")}</p>
                 )}
 
                 <div className="flex justify-end gap-2">
@@ -259,7 +266,7 @@ export function ReadingView({
                     onClick={closeCommentForm}
                     className="h-7 text-xs"
                   >
-                    Cancel
+                    {t("cancel")}
                   </Button>
                   <Button
                     type="submit"
@@ -267,7 +274,7 @@ export function ReadingView({
                     disabled={commentLoading || !commentText.trim()}
                     className="h-7 text-xs"
                   >
-                    {commentLoading ? "…" : "Submit"}
+                    {commentLoading ? "…" : t("submit")}
                   </Button>
                 </div>
               </form>
@@ -291,7 +298,7 @@ export function ReadingView({
           <Button asChild variant="ghost" size="sm">
             <Link href={`/read/${bookId}/${prevChapterId}`}>
               <ChevronLeft className="h-4 w-4 mr-1" />
-              Previous chapter
+              {t("previousChapter")}
             </Link>
           </Button>
         ) : (
@@ -300,12 +307,12 @@ export function ReadingView({
         {nextChapterId ? (
           <Button asChild variant="ghost" size="sm">
             <Link href={`/read/${bookId}/${nextChapterId}`}>
-              Next chapter
+              {t("nextChapter")}
               <ChevronRight className="h-4 w-4 ml-1" />
             </Link>
           </Button>
         ) : (
-          <span className="text-xs text-muted-foreground">End of chapter</span>
+          <span className="text-xs text-muted-foreground">{t("endOfChapter")}</span>
         )}
       </footer>
     </div>

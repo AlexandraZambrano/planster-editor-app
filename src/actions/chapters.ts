@@ -3,12 +3,19 @@
 import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { createNotification } from "@/lib/notifications"
 import type { PublicationStatus } from "@prisma/client"
 
 async function getChapterWithAuthorCheck(chapterId: string, userId: string) {
   return prisma.chapter.findUnique({
     where: { id: chapterId },
-    select: { bookId: true, book: { select: { authorId: true } }, order: true },
+    select: {
+      bookId: true,
+      title: true,
+      visibility: true,
+      order: true,
+      book: { select: { authorId: true, title: true } },
+    },
   }).then((chapter) => {
     if (!chapter || chapter.book.authorId !== userId) return null
     return chapter
@@ -18,7 +25,7 @@ async function getChapterWithAuthorCheck(chapterId: string, userId: string) {
 export async function createChapter(
   bookId: string,
   title: string
-): Promise<{ error?: string; chapterId?: string }> {
+): Promise<{ error?: string; chapterId?: string; order?: number }> {
   const session = await auth()
   if (!session) return { error: "Unauthorized" }
 
@@ -41,7 +48,7 @@ export async function createChapter(
   })
 
   revalidatePath(`/write/${bookId}`)
-  return { chapterId: chapter.id }
+  return { chapterId: chapter.id, order: chapter.order }
 }
 
 export async function updateChapterTitle(
@@ -73,6 +80,25 @@ export async function updateChapterVisibility(
   if (!chapter) return { error: "Not found" }
 
   await prisma.chapter.update({ where: { id: chapterId }, data: { visibility } })
+
+  if (visibility === "PUBLISHED" && chapter.visibility !== "PUBLISHED") {
+    const readers = await prisma.library.findMany({
+      where: { bookId: chapter.bookId },
+      select: { userId: true },
+    })
+    await Promise.all(
+      readers.map((r) =>
+        createNotification(r.userId, "NEW_CHAPTER_PUBLISHED", {
+          bookId: chapter.bookId,
+          bookTitle: chapter.book.title,
+          chapterId,
+          chapterTitle: chapter.title,
+          actorName: session.user.username,
+          actorAvatarUrl: session.user.avatarUrl ?? null,
+        })
+      )
+    )
+  }
 
   revalidatePath(`/write/${chapter.bookId}`)
   return { success: true }

@@ -1,21 +1,30 @@
-import { auth } from "@/lib/auth"
-import { NextResponse } from "next/server"
+import { NextResponse, type NextRequest } from "next/server"
+import { updateSession } from "@/lib/supabase/middleware"
 
-export default auth((req) => {
-  if (!req.auth) {
-    const loginUrl = new URL("/auth/login", req.url)
-    loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname)
+const PROTECTED_PREFIXES = ["/write", "/library", "/read", "/notifications", "/settings"]
+
+export default async function middleware(request: NextRequest) {
+  const { response, user } = await updateSession(request)
+
+  const isProtected = PROTECTED_PREFIXES.some((prefix) =>
+    request.nextUrl.pathname.startsWith(prefix)
+  )
+
+  if (isProtected && !user) {
+    const loginUrl = new URL("/auth/login", request.url)
+    loginUrl.searchParams.set("callbackUrl", request.nextUrl.pathname)
     return NextResponse.redirect(loginUrl)
   }
-  return NextResponse.next()
-})
+
+  return response
+}
 
 export const config = {
   matcher: [
-    "/write/:path*",
-    "/library/:path*",
-    "/read/:path*",
-    "/notifications/:path*",
-    "/settings/:path*",
+    // Run on every route except static assets, so the session cookie stays
+    // refreshed everywhere (site-nav and the home page read auth() outside
+    // the protected prefixes above, and Supabase's rotating refresh tokens
+    // need proactive refresh to avoid a logged-out flicker).
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 }
