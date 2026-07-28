@@ -53,7 +53,7 @@ export function CharacterCard({ character, bookId }: CharacterCardProps) {
             {character.name}
           </p>
           {character.nickname && (
-            <p className="text-xs text-muted-foreground truncate">"{character.nickname}"</p>
+            <p className="text-xs text-muted-foreground truncate">&quot;{character.nickname}&quot;</p>
           )}
         </div>
 
