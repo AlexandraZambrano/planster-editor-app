@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import type { StoryRole, RelationshipType, BoardElementType } from "@prisma/client"
+import type { StoryRole, RelationshipType, BoardElementType, Prisma } from "@prisma/client"
 
 // ── Location helpers ───────────────────────────────────────────────────────────
 
@@ -644,7 +644,16 @@ export async function getPlottingBoard(bookId: string) {
     }),
   ])
 
-  return { chapters, characters, locations }
+  return {
+    chapters: chapters.map((chapter) => ({
+      ...chapter,
+      plotNote: chapter.plotNote
+        ? { ...chapter.plotNote, notes: chapter.plotNote.notes as object }
+        : null,
+    })),
+    characters,
+    locations,
+  }
 }
 
 export async function savePlotNoteNotes(
@@ -1078,7 +1087,7 @@ export async function addBoardElement(
   boardId: string,
   type: BoardElementType,
   referenceId?: string | null,
-  content?: Record<string, unknown>,
+  content?: Prisma.InputJsonValue,
   posX?: number,
   posY?: number
 ) {

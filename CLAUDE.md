@@ -50,16 +50,19 @@ Read these files BEFORE writing any code. They are the source of truth for the p
 
 ## Testing
 
-- All new code must include tests. The minimum coverage threshold is **80%** across all metrics (statements, branches, functions, lines)
+- All new code must include tests. The project's target coverage threshold is **80%** across all metrics (statements, branches, functions, lines)
+- **Current state (2026-07-28):** the enforced gate in `vitest.config.ts` is temporarily lower than 80% — a batch of components (discovery, library, notifications, settings, most of Writer's Studio) landed without tests, and actual coverage is ~10% lines/statements, ~56% functions, ~74% branches. New code should still be tested per the rule above; the gap should be closed incrementally and the thresholds raised back to 80% as it does — see the comment in `vitest.config.ts`
 - Testing stack:
   - **Vitest** for unit tests and Server Action tests
   - **React Testing Library** for component tests
   - **Playwright** for end-to-end tests (critical flows: auth, create book, beta flow, library)
 - Test files live next to the code they test: `component.tsx` → `component.test.tsx`
-- E2E tests live in `e2e/`
+- **E2E tests are not yet implemented** — there is no `playwright.config.ts` or `e2e/*.spec.ts` in
+  this repo despite the `test:e2e` script, and no e2e job runs in CI (see `.claude/specs/cicd.md`).
+  The intended flows below are the plan for whenever that work happens, not current coverage.
 - Run coverage with: `npx vitest run --coverage`
-- No module is considered complete if coverage drops below 80%
-- Flows that **must always** have e2e tests: register/login, create book and chapter, beta request and approval, inline comment, save book to library
+- No module is considered complete if coverage drops below the project's target (see current gate note above)
+- Flows that **should** eventually have e2e tests: register/login, create book and chapter, beta request and approval, inline comment, save book to library
 
 ## General rules
 
