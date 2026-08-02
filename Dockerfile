@@ -4,7 +4,7 @@ RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 # ─── Stage 2: prisma generate ─────────────────────────────────────────────────
 FROM node:22-alpine AS prisma

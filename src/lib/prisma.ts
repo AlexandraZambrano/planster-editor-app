@@ -12,12 +12,24 @@ function buildUrl(base: string | undefined): string | undefined {
   return base + (base.includes("?") ? "&" : "?") + "pgbouncer=true"
 }
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    datasources: {
-      db: { url: buildUrl(process.env.DATABASE_URL) },
+function createMissingDatabaseUrlProxy(): PrismaClient {
+  return new Proxy({} as PrismaClient, {
+    get() {
+      throw new Error("DATABASE_URL is required before using Prisma client.")
     },
   })
+}
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
+const prismaUrl = buildUrl(process.env.DATABASE_URL)
+
+export const prisma =
+  globalForPrisma.prisma ??
+  (prismaUrl
+    ? new PrismaClient({
+        datasources: {
+          db: { url: prismaUrl },
+        },
+      })
+    : createMissingDatabaseUrlProxy())
+
+if (process.env.NODE_ENV !== "production" && prismaUrl) globalForPrisma.prisma = prisma
