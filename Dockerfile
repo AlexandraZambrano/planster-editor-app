@@ -62,5 +62,6 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Ejecutar migraciones pendientes y arrancar la app
-CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
+# Schema changes are applied manually via `prisma db push` (no prisma/migrations
+# directory exists in this repo), not automatically on container start.
+CMD ["node", "server.js"]

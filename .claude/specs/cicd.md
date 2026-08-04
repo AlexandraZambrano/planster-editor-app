@@ -120,7 +120,13 @@ NEXT_PUBLIC_APP_URL=https://planster.app
    - Pushes to `ghcr.io/YOUR_USERNAME/planster-editor-app:latest` and `...:sha-XXXXXX`
    - Calls the Coolify webhook
 4. Coolify detects the new `latest` image, pulls it, and restarts the container on the VPS
-5. The container runs `npx prisma migrate deploy` before starting Next.js
+5. The container just runs `node server.js` — it does **not** run any Prisma command on
+   startup. Schema changes are applied manually beforehand via `prisma db push` (see below);
+   there is no `prisma/migrations` directory in this repo. (The container's runner stage
+   doesn't even include the `prisma` CLI package, only `@prisma/client` — running `npx prisma
+   migrate deploy` there previously downloaded whatever the latest published Prisma version
+   was at pull time, which broke production once that latest version was Prisma 7 — a breaking
+   schema-format change unrelated to anything in this project's own code)
 
 ---
 
