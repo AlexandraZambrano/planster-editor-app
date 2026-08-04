@@ -2,9 +2,11 @@
 
 Source of truth for the Prisma schema. When this file is modified, run:
 ```bash
-npx prisma migrate dev --name <descripcion>
+npx prisma db push
 npx prisma generate
 ```
+This project has no `prisma/migrations` directory and has never used `prisma migrate` —
+schema changes are applied directly against the database with `db push`.
 
 ## Schema completo (`prisma/schema.prisma`)
 

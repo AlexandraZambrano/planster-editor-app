@@ -67,7 +67,7 @@ Read these files BEFORE writing any code. They are the source of truth for the p
 ## General rules
 
 - Do not implement anything listed in @.claude/specs/out-of-scope.md
-- When adding a Prisma model, run `npx prisma migrate dev` and update @.claude/specs/data-model.md
+- When adding a Prisma model, run `npx prisma db push` and update @.claude/specs/data-model.md — this project has no `prisma/migrations` directory and has never used `prisma migrate`; schema changes are applied directly with `db push`
 - Every new route must be added to @.claude/specs/routes.md
 - Beta reader comments on chapters are ALWAYS private — only the author can see them
 - The entire Writer's Studio (plotting, timeline, characters, world building, board, notes) is ALWAYS private — only the author can see it
