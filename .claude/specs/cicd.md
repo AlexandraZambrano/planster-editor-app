@@ -21,9 +21,9 @@ Push to main (merge)
 |---|---|
 | CI/CD | GitHub Actions |
 | Image registry | GitHub Container Registry (GHCR) |
-| Production server | Personal VPS with Coolify |
+| Production server | Personal VPS with Coolify (**arm64** — the CD workflow builds multi-platform images (`linux/amd64,linux/arm64`) via QEMU so the published image matches whatever it's deployed to) |
 | Containerisation | Docker standalone (no compose) |
-| Runtime | Node.js 20 Alpine |
+| Runtime | Node.js 22 Alpine |
 
 ---
 
