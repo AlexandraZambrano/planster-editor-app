@@ -7,6 +7,11 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code")
   const next = searchParams.get("next") ?? "/write"
 
+  // Behind Coolify's reverse proxy, request.url's origin reflects the
+  // container's internal address, not the public domain — prefer the
+  // configured app URL (same pattern as the password-reset email link).
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? origin
+
   if (code) {
     const supabase = await createClient()
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
@@ -25,9 +30,9 @@ export async function GET(request: NextRequest) {
           null,
       })
 
-      return NextResponse.redirect(`${origin}${next}`)
+      return NextResponse.redirect(`${appUrl}${next}`)
     }
   }
 
-  return NextResponse.redirect(`${origin}/auth/login`)
+  return NextResponse.redirect(`${appUrl}/auth/login`)
 }
