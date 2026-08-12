@@ -15,7 +15,7 @@ export function RecommendationCard({ book, className }: RecommendationCardProps)
     <Link
       href={`/books/${book.id}`}
       className={cn(
-        "flex flex-col items-center text-center bg-white rounded-2xl p-4 w-40 sm:w-48 shrink-0 shadow-sm hover:shadow-md transition-shadow",
+        "relative flex flex-col items-center text-center bg-white rounded-2xl p-4 w-40 sm:w-48 shrink-0 shadow-sm transition-transform duration-200 hover:z-30 hover:-translate-y-3 hover:scale-105 hover:shadow-xl",
         className
       )}
     >
