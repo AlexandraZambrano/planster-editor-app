@@ -7,7 +7,6 @@
     "signIn": "Inicia sessió",
     "signUp": "Registra't",
     "myProfile": "El meu perfil",
-    "settings": "Configuració",
     "signOut": "Tanca sessió",
     "notifications": "Notificacions",
     "accountMenu": "Menú del compte"
@@ -321,7 +320,7 @@
     "endOfChapter": "Final del capítol"
   },
   "Settings": {
-    "title": "Configuració",
+    "title": "Perfil",
     "profile": "Perfil",
     "privacy": "Privadesa",
     "password": "Contrasenya",

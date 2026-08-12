@@ -43,10 +43,10 @@ export default async function LibraryPage({ searchParams }: Props) {
   return (
     <>
       <SiteNav active="library" />
-      <main className="bg-foreground pb-14">
+      <main className="bg-white pb-14">
         <div className="container mx-auto py-10 px-4 max-w-6xl">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white">{t("title")}</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">{t("title")}</h1>
             <Button asChild variant="secondary" size="sm" className="rounded-full">
               <Link href="/library/shelves">
                 <Settings2 className="h-4 w-4 mr-2" />
@@ -55,17 +55,17 @@ export default async function LibraryPage({ searchParams }: Props) {
             </Button>
           </div>
 
-          <div className="bg-white/70 backdrop-blur rounded-xl inline-flex p-2.5 mb-6 [&>div]:mb-0">
+          <div className="bg-muted rounded-xl inline-flex p-2.5 mb-6 [&>div]:mb-0">
             <LibraryFilterBar shelves={shelves} />
           </div>
 
           <LibraryGrid key={JSON.stringify(filters)} initialEntries={entries} shelves={shelves} />
 
-          <div className="border-t border-white/30 my-10" />
+          <div className="border-t my-10" />
 
           {recommended.length > 0 && (
             <section id="recommendations" className="scroll-mt-20">
-              <h2 className="text-2xl font-extrabold text-white mb-6">{t("recommendationsForYou")}</h2>
+              <h2 className="text-2xl font-extrabold text-foreground mb-6">{t("recommendationsForYou")}</h2>
               <div className="flex justify-center items-center py-4">
                 {recommended.slice(0, 3).map((book, i, arr) => {
                   const isCenter = arr.length > 1 && i === Math.floor((arr.length - 1) / 2)

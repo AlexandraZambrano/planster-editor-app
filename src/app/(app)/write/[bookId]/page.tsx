@@ -64,12 +64,12 @@ export default async function BookPanelPage({ params }: Props) {
   return (
     <>
       <SiteNav active="write" />
-      <main className="bg-foreground min-h-[calc(100vh-4rem)]">
+      <main className="bg-white min-h-[calc(100vh-4rem)]">
         <div className="container mx-auto py-8 px-4 max-w-4xl">
           <div className="flex items-center justify-between mb-6">
             <Link
               href="/write"
-              className="inline-flex items-center text-sm text-white/80 hover:text-white"
+              className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
               {t("myBooks")}
@@ -128,7 +128,7 @@ export default async function BookPanelPage({ params }: Props) {
 
           {/* Tabs */}
           <Tabs defaultValue="chapters">
-            <TabsList className="mb-6 bg-white/70">
+            <TabsList className="mb-6 bg-muted">
               <TabsTrigger value="chapters">
                 {t("chaptersTab", { count: book.chapters.length })}
               </TabsTrigger>

@@ -8,7 +8,7 @@ import { ProfileForm } from "@/components/settings/profile-form"
 import { PrivacyToggles } from "@/components/settings/privacy-toggles"
 import { ChangePasswordForm } from "@/components/settings/change-password-form"
 
-export const metadata: Metadata = { title: "Settings" }
+export const metadata: Metadata = { title: "Profile" }
 
 export default async function SettingsPage() {
   const session = await auth()
@@ -20,9 +20,9 @@ export default async function SettingsPage() {
   return (
     <>
       <SiteNav />
-      <main className="bg-foreground min-h-[calc(100vh-4rem)]">
+      <main className="bg-white min-h-[calc(100vh-4rem)]">
         <div className="container mx-auto py-10 px-4 max-w-2xl space-y-8">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">{t("title")}</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">{t("title")}</h1>
 
           <section className="bg-muted rounded-xl p-6">
             <h2 className="text-lg font-semibold mb-4">{t("profile")}</h2>

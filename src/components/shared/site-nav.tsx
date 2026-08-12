@@ -83,10 +83,7 @@ export async function SiteNav({ active }: SiteNavProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href={`/@${session.user.username}`}>{t("myProfile")}</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/settings">{t("settings")}</Link>
+                  <Link href="/settings">{t("myProfile")}</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>

@@ -27,7 +27,7 @@ export default async function ProfilePage({ params }: Props) {
   return (
     <>
       <SiteNav />
-      <main className="bg-foreground min-h-[calc(100vh-4rem)]">
+      <main className="bg-white min-h-[calc(100vh-4rem)]">
         <div className="container mx-auto py-10 px-4 max-w-4xl">
           <div className="flex items-center gap-5 mb-8 bg-muted rounded-xl p-6">
             <div className="relative h-[120px] w-[120px] rounded-full overflow-hidden bg-muted border shrink-0">
@@ -62,7 +62,7 @@ export default async function ProfilePage({ params }: Props) {
 
           {profile.books.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-lg font-bold text-white mb-4">{t("publishedBooks")}</h2>
+              <h2 className="text-lg font-bold text-foreground mb-4">{t("publishedBooks")}</h2>
               <div className="bg-muted rounded-xl p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
                 {profile.books.map((book) => (
                   <Link key={book.id} href={`/books/${book.id}`} className="group block">
@@ -92,7 +92,7 @@ export default async function ProfilePage({ params }: Props) {
 
           {profile.publicShelves.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-lg font-bold text-white mb-4">{t("shelves")}</h2>
+              <h2 className="text-lg font-bold text-foreground mb-4">{t("shelves")}</h2>
               <div className="bg-muted rounded-xl p-6 space-y-2">
                 {profile.publicShelves.map((shelf) => (
                   <div
@@ -111,7 +111,7 @@ export default async function ProfilePage({ params }: Props) {
 
           {profile.ratings && profile.ratings.length > 0 && (
             <section>
-              <h2 className="text-lg font-bold text-white mb-4">{t("ratings")}</h2>
+              <h2 className="text-lg font-bold text-foreground mb-4">{t("ratings")}</h2>
               <div className="bg-muted rounded-xl p-6 space-y-2">
                 {profile.ratings.map((r) => (
                   <Link

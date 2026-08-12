@@ -18,17 +18,17 @@ export default async function NewBookPage() {
   return (
     <>
       <SiteNav active="write" />
-      <main className="bg-foreground min-h-[calc(100vh-4rem)]">
+      <main className="bg-white min-h-[calc(100vh-4rem)]">
         <div className="container mx-auto py-10 px-4 max-w-2xl">
           <Link
             href="/write"
-            className="inline-flex items-center text-sm text-white/80 hover:text-white mb-6"
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
             {t("backToMyBooks")}
           </Link>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-8">{t("createNewBook")}</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground mb-8">{t("createNewBook")}</h1>
 
           <div className="bg-muted rounded-xl p-6">
             <BookForm />
