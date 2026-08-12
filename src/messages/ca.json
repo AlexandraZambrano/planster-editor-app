@@ -9,7 +9,8 @@
     "myProfile": "El meu perfil",
     "signOut": "Tanca sessió",
     "notifications": "Notificacions",
-    "accountMenu": "Menú del compte"
+    "accountMenu": "Menú del compte",
+    "openMenu": "Obre el menú"
   },
   "Language": {
     "label": "Idioma"

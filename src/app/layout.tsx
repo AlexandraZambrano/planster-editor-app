@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { SiteFooter } from "@/components/shared/site-footer";
+import { ServiceWorkerRegistration } from "@/components/shared/service-worker-registration";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -22,6 +23,16 @@ export const metadata: Metadata = {
     default: "Planster — Write your story",
   },
   description: "The most complete writing environment for authors and beta readers.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Planster",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2C2153",
 };
 
 export default async function RootLayout({
@@ -41,6 +52,7 @@ export default async function RootLayout({
           {children}
           <SiteFooter />
         </NextIntlClientProvider>
+        <ServiceWorkerRegistration />
       </body>
     </html>
   );

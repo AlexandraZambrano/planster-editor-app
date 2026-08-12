@@ -9,7 +9,8 @@
     "myProfile": "My profile",
     "signOut": "Sign out",
     "notifications": "Notifications",
-    "accountMenu": "Account menu"
+    "accountMenu": "Account menu",
+    "openMenu": "Open menu"
   },
   "Language": {
     "label": "Language"
