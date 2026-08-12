@@ -18,6 +18,5 @@
 - Comments on the author's profile
 - Public book reviews (only 0–5 star ratings exist)
 - Import from Word, Google Docs, or other formats
-- Offline mode / PWA
 - Automatic book translation
 - Copyright management or external publishing

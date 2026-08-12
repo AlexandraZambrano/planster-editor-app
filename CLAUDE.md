@@ -35,6 +35,7 @@ Read these files BEFORE writing any code. They are the source of truth for the p
 - **Storage:** Cloudinary (images: covers, characters, world building, board)
 - **Email:** Resend (password reset)
 - **Notifications:** Server-Sent Events (SSE)
+- **PWA:** installable on mobile/desktop — `src/app/manifest.ts` (native Next.js manifest route), `public/sw.js` (minimal network-first service worker for page navigations only; never intercepts API/auth/SSE requests), registered from `src/components/shared/service-worker-registration.tsx`. Icons regenerate via `node scripts/generate-icons.mjs` (uses `sharp`) from the SVGs in `scripts/`.
 - **Base repo:** github.com/AlexandraZambrano/planster-editor-app
 
 ## Code conventions
