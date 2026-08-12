@@ -165,7 +165,7 @@ export function ReadingView({
   const activeSel = showCommentForm ? savedSelectionRef.current : selection
 
   return (
-    <div className="min-h-screen bg-[#F9FBFD] flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Top bar */}
       <header className="sticky top-0 z-10 bg-background border-b px-4 py-2.5 flex items-center gap-3 text-sm">
         <Link

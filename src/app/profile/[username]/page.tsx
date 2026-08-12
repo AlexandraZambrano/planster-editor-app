@@ -27,9 +27,9 @@ export default async function ProfilePage({ params }: Props) {
   return (
     <>
       <SiteNav />
-      <main className="bg-[#B6A7C4] min-h-[calc(100vh-4rem)]">
+      <main className="bg-foreground min-h-[calc(100vh-4rem)]">
         <div className="container mx-auto py-10 px-4 max-w-4xl">
-          <div className="flex items-center gap-5 mb-8 bg-[#FBF3F6] rounded-xl p-6">
+          <div className="flex items-center gap-5 mb-8 bg-muted rounded-xl p-6">
             <div className="relative h-[120px] w-[120px] rounded-full overflow-hidden bg-muted border shrink-0">
               {profile.avatarUrl ? (
                 <Image
@@ -41,7 +41,7 @@ export default async function ProfilePage({ params }: Props) {
                   sizes="120px"
                 />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-violet-400 to-violet-700">
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
                   <span className="text-4xl font-bold text-white">
                     {profile.displayName[0]?.toUpperCase()}
                   </span>
@@ -63,7 +63,7 @@ export default async function ProfilePage({ params }: Props) {
           {profile.books.length > 0 && (
             <section className="mb-8">
               <h2 className="text-lg font-bold text-white mb-4">{t("publishedBooks")}</h2>
-              <div className="bg-[#FBF3F6] rounded-xl p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
+              <div className="bg-muted rounded-xl p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
                 {profile.books.map((book) => (
                   <Link key={book.id} href={`/books/${book.id}`} className="group block">
                     <div className="aspect-[2/3] relative overflow-hidden rounded-lg bg-muted border">
@@ -76,7 +76,7 @@ export default async function ProfilePage({ params }: Props) {
                           className="object-cover transition-transform duration-300 group-hover:scale-105"
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-violet-400 to-violet-700">
+                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
                           <span className="text-3xl font-bold text-white select-none">
                             {book.title[0]?.toUpperCase() ?? <BookOpen />}
                           </span>
@@ -93,7 +93,7 @@ export default async function ProfilePage({ params }: Props) {
           {profile.publicShelves.length > 0 && (
             <section className="mb-8">
               <h2 className="text-lg font-bold text-white mb-4">{t("shelves")}</h2>
-              <div className="bg-[#FBF3F6] rounded-xl p-6 space-y-2">
+              <div className="bg-muted rounded-xl p-6 space-y-2">
                 {profile.publicShelves.map((shelf) => (
                   <div
                     key={shelf.id}
@@ -112,7 +112,7 @@ export default async function ProfilePage({ params }: Props) {
           {profile.ratings && profile.ratings.length > 0 && (
             <section>
               <h2 className="text-lg font-bold text-white mb-4">{t("ratings")}</h2>
-              <div className="bg-[#FBF3F6] rounded-xl p-6 space-y-2">
+              <div className="bg-muted rounded-xl p-6 space-y-2">
                 {profile.ratings.map((r) => (
                   <Link
                     key={r.bookId}

@@ -36,7 +36,7 @@ export async function SiteNav({ active }: SiteNavProps) {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-6xl gap-4">
         <Link
           href="/"
-          className="shrink-0 rounded-full bg-[#1E1B29] text-white text-xs font-bold px-4 py-2 hover:opacity-90 transition-opacity"
+          className="shrink-0 rounded-full bg-foreground text-white text-xs font-bold px-4 py-2 hover:opacity-90 transition-opacity"
         >
           Planster
         </Link>
@@ -75,7 +75,7 @@ export async function SiteNav({ active }: SiteNavProps) {
                       alt={session.user.username}
                       style={{ objectPosition: `center ${session.user.avatarPositionY}%` }}
                     />
-                    <AvatarFallback className="bg-violet-300 text-white font-semibold">
+                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
                       {session.user.username?.[0]?.toUpperCase()}
                     </AvatarFallback>
                   </Avatar>

@@ -18,7 +18,7 @@ export default async function NewBookPage() {
   return (
     <>
       <SiteNav active="write" />
-      <main className="bg-[#B6A7C4] min-h-[calc(100vh-4rem)]">
+      <main className="bg-foreground min-h-[calc(100vh-4rem)]">
         <div className="container mx-auto py-10 px-4 max-w-2xl">
           <Link
             href="/write"
@@ -30,7 +30,7 @@ export default async function NewBookPage() {
 
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-8">{t("createNewBook")}</h1>
 
-          <div className="bg-[#FBF3F6] rounded-xl p-6">
+          <div className="bg-muted rounded-xl p-6">
             <BookForm />
           </div>
         </div>

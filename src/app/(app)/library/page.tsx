@@ -43,7 +43,7 @@ export default async function LibraryPage({ searchParams }: Props) {
   return (
     <>
       <SiteNav active="library" />
-      <main className="bg-[#B6A7C4] pb-14">
+      <main className="bg-foreground pb-14">
         <div className="container mx-auto py-10 px-4 max-w-6xl">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white">{t("title")}</h1>

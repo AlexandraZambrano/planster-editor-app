@@ -35,7 +35,7 @@ export default async function WritePage() {
   return (
     <>
       <SiteNav active="write" />
-      <main className="bg-[#B6A7C4] min-h-[calc(100vh-4rem)]">
+      <main className="bg-foreground min-h-[calc(100vh-4rem)]">
         <div className="container mx-auto py-14 px-4 max-w-6xl">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white max-w-xl">
             {t("heroTitle")}
@@ -43,7 +43,7 @@ export default async function WritePage() {
 
           <div className="flex items-center justify-between mt-10 mb-4">
             <h2 className="text-lg font-bold text-white tracking-wide">{t("yourStories")}</h2>
-            <Button asChild size="sm" className="rounded-full bg-lime-400 text-[#1E1B29] hover:bg-lime-300">
+            <Button asChild size="sm" className="rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80">
               <Link href="/write/new">
                 <PlusIcon className="h-4 w-4 mr-1.5" />
                 {t("createNewStory")}
@@ -56,7 +56,7 @@ export default async function WritePage() {
               <BookOpen className="h-12 w-12 mb-4 opacity-50" />
               <p className="text-lg font-medium mb-1">{t("noBooksYet")}</p>
               <p className="text-sm mb-6">{t("noBooksYetHint")}</p>
-              <Button asChild className="rounded-full bg-lime-400 text-[#1E1B29] hover:bg-lime-300">
+              <Button asChild className="rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80">
                 <Link href="/write/new">{t("createFirstBook")}</Link>
               </Button>
             </div>

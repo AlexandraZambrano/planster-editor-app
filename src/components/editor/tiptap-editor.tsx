@@ -155,7 +155,7 @@ export function TiptapEditor({
   }[saveStatus]
 
   return (
-    <div className="flex flex-col h-screen bg-[#FBF3F6]">
+    <div className="flex flex-col h-screen bg-muted">
       {/* Top bar — hidden in focus mode */}
       {!isFocusMode && (
         <div className="flex items-center gap-2 px-4 py-2.5 bg-background border-b shrink-0">
@@ -180,7 +180,7 @@ export function TiptapEditor({
       )}
 
       {/* Editor content — paged */}
-      <div className="flex-1 overflow-y-auto bg-[#EEE3E9] py-8">
+      <div className="flex-1 overflow-y-auto bg-muted py-8">
         <div className="editor-pages mx-auto w-[816px] max-w-full min-h-[1056px] rounded-md focus-within:ring-2 focus-within:ring-blue-400 transition-shadow">
           <EditorContent editor={editor} />
         </div>

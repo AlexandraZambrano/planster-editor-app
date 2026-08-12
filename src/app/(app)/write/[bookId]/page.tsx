@@ -64,7 +64,7 @@ export default async function BookPanelPage({ params }: Props) {
   return (
     <>
       <SiteNav active="write" />
-      <main className="bg-[#B6A7C4] min-h-[calc(100vh-4rem)]">
+      <main className="bg-foreground min-h-[calc(100vh-4rem)]">
         <div className="container mx-auto py-8 px-4 max-w-4xl">
           <div className="flex items-center justify-between mb-6">
             <Link
@@ -83,12 +83,12 @@ export default async function BookPanelPage({ params }: Props) {
           </div>
 
           {/* Book header */}
-          <div className="flex gap-5 items-start mb-6 bg-[#FBF3F6] rounded-xl p-5">
+          <div className="flex gap-5 items-start mb-6 bg-muted rounded-xl p-5">
             <div className="relative w-24 sm:w-32 aspect-[2/3] rounded-md overflow-hidden bg-muted border shrink-0">
               {book.coverUrl ? (
                 <Image src={book.coverUrl} alt={book.title} fill className="object-cover" sizes="128px" />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-violet-400 to-violet-700">
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
                   <span className="text-xl font-bold text-white">{book.title[0]?.toUpperCase()}</span>
                 </div>
               )}
@@ -141,13 +141,13 @@ export default async function BookPanelPage({ params }: Props) {
             </TabsContent>
 
             <TabsContent value="beta">
-              <div className="bg-[#FBF3F6] rounded-xl p-5">
+              <div className="bg-muted rounded-xl p-5">
                 <BetaManagement bookId={book.id} />
               </div>
             </TabsContent>
 
             <TabsContent value="settings">
-              <div className="bg-[#FBF3F6] rounded-xl p-5">
+              <div className="bg-muted rounded-xl p-5">
                 <BookSettingsPanel
                   book={{
                     id: book.id,

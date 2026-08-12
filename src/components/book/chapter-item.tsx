@@ -84,7 +84,7 @@ export function ChapterItem({ chapter, bookId, onDelete }: ChapterItemProps) {
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 bg-[#FBF3F6] border border-white/60 rounded-lg",
+        "flex items-center gap-3 px-3 py-2.5 bg-muted border border-white/60 rounded-lg",
         isDragging && "opacity-50 shadow-lg z-50"
       )}
     >

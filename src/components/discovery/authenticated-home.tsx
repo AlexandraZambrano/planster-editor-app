@@ -14,7 +14,7 @@ export async function AuthenticatedHome({ displayName }: AuthenticatedHomeProps)
   ])
 
   return (
-    <section className="bg-violet-50">
+    <section className="bg-muted">
       <div className="container mx-auto max-w-5xl px-4 py-14">
         <h1 className="text-3xl sm:text-4xl font-extrabold mb-8">
           {t("welcome", { displayName })}

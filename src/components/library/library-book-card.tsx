@@ -41,7 +41,7 @@ export function LibraryBookCard({ entry, shelves, onRemove }: LibraryBookCardPro
   const memberShelves = shelves.filter((s) => shelfIds.includes(s.id))
 
   return (
-    <div className="flex gap-4 p-4 rounded-xl bg-[#F3E9EC] border border-white/60">
+    <div className="flex gap-4 p-4 rounded-xl bg-muted border border-white/60">
       <Link
         href={`/books/${entry.book.id}`}
         className="relative w-20 sm:w-24 aspect-[2/3] shrink-0 rounded-md overflow-hidden bg-muted border"
@@ -55,7 +55,7 @@ export function LibraryBookCard({ entry, shelves, onRemove }: LibraryBookCardPro
             className="object-cover"
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-violet-400 to-violet-700">
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
             <span className="text-2xl font-bold text-white select-none">
               {entry.book.title[0]?.toUpperCase() ?? <BookOpen />}
             </span>

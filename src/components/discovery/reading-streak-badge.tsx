@@ -20,8 +20,8 @@ export function ReadingStreakBadge({ streak, weekDays }: ReadingStreakData) {
             <span
               className={cn(
                 "h-2 w-2 rounded-full",
-                day.read ? "bg-violet-500" : "bg-muted",
-                day.isToday && !day.read && "ring-2 ring-violet-300"
+                day.read ? "bg-primary" : "bg-muted",
+                day.isToday && !day.read && "ring-2 ring-primary/40"
               )}
               aria-hidden
             />

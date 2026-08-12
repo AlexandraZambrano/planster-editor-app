@@ -23,7 +23,7 @@ export function RecommendationCard({ book, className }: RecommendationCardProps)
         {book.coverUrl ? (
           <Image src={book.coverUrl} alt={book.title} fill sizes="96px" className="object-cover" />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-violet-400 to-violet-700">
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
             <span className="text-2xl font-bold text-white select-none">
               {book.title[0]?.toUpperCase() ?? <BookOpen />}
             </span>

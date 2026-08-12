@@ -54,7 +54,7 @@ export default async function Home() {
           <LandingHero />
           <HowItWorks />
 
-          <section className="bg-[#EDE9F0] py-16 text-center">
+          <section className="bg-muted py-16 text-center">
             <h2 className="text-3xl font-extrabold mb-8">{t("mostPopularReads")}</h2>
 
             {popular.length > 0 ? (
