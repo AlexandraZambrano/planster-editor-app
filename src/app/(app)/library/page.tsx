@@ -55,9 +55,7 @@ export default async function LibraryPage({ searchParams }: Props) {
             </Button>
           </div>
 
-          <div className="bg-muted rounded-xl inline-flex p-2.5 mb-6 [&>div]:mb-0">
-            <LibraryFilterBar shelves={shelves} />
-          </div>
+          <LibraryFilterBar shelves={shelves} />
 
           <LibraryGrid key={JSON.stringify(filters)} initialEntries={entries} shelves={shelves} />
 
