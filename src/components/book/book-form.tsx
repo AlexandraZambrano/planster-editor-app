@@ -103,7 +103,7 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
         </Alert>
       )}
 
-      <div className="flex gap-6 items-start">
+      <div className="flex flex-col sm:flex-row gap-6 items-start">
         <Controller
           name="coverUrl"
           control={control}

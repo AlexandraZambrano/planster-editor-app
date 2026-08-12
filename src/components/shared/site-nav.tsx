@@ -13,6 +13,7 @@ import {
 import { NotificationBell } from "@/components/notifications/notification-bell"
 import { LanguageSwitcher } from "./language-switcher"
 import { SignOutButton } from "./sign-out-button"
+import { MobileNav } from "./mobile-nav"
 import { cn } from "@/lib/utils"
 
 export type SiteNavActive = "home" | "explore" | "library" | "write"
@@ -59,7 +60,7 @@ export async function SiteNav({ active }: SiteNavProps) {
         </nav>
 
         {session ? (
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="hidden md:flex items-center gap-1 shrink-0">
             <LanguageSwitcher />
             <NotificationBell />
             <DropdownMenu>
@@ -93,7 +94,7 @@ export async function SiteNav({ active }: SiteNavProps) {
             </DropdownMenu>
           </div>
         ) : (
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="hidden md:flex items-center gap-2 shrink-0">
             <LanguageSwitcher />
             <Button asChild size="sm" variant="ghost">
               <Link href="/auth/login">{t("signIn")}</Link>
@@ -103,6 +104,16 @@ export async function SiteNav({ active }: SiteNavProps) {
             </Button>
           </div>
         )}
+
+        <div className="flex md:hidden items-center gap-1 shrink-0">
+          {session && <NotificationBell />}
+          <MobileNav
+            navLinks={navLinks}
+            active={active}
+            isSignedIn={!!session}
+            username={session?.user.username}
+          />
+        </div>
       </div>
     </header>
   )
