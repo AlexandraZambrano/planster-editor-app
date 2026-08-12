@@ -15,7 +15,7 @@ export function RecommendationCard({ book, className }: RecommendationCardProps)
     <Link
       href={`/books/${book.id}`}
       className={cn(
-        "flex flex-col items-center text-center bg-white rounded-2xl p-4 w-40 sm:w-48 shrink-0 shadow-sm hover:shadow-md transition-shadow",
+        "relative flex flex-col items-center text-center bg-white rounded-2xl p-4 w-40 sm:w-48 shrink-0 shadow-sm transition-transform duration-200 hover:z-30 hover:-translate-y-3 hover:scale-105 hover:shadow-xl",
         className
       )}
     >
@@ -23,7 +23,7 @@ export function RecommendationCard({ book, className }: RecommendationCardProps)
         {book.coverUrl ? (
           <Image src={book.coverUrl} alt={book.title} fill sizes="96px" className="object-cover" />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-violet-400 to-violet-700">
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
             <span className="text-2xl font-bold text-white select-none">
               {book.title[0]?.toUpperCase() ?? <BookOpen />}
             </span>

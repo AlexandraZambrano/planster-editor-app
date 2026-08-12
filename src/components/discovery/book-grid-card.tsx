@@ -26,7 +26,7 @@ export function BookGridCard({ book }: BookGridCardProps) {
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-violet-400 to-violet-700">
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
               <span className="text-5xl font-bold text-white select-none">
                 {book.title[0]?.toUpperCase() ?? <BookOpen />}
               </span>

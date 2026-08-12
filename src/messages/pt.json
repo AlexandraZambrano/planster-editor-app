@@ -7,7 +7,6 @@
     "signIn": "Entrar",
     "signUp": "Cadastrar-se",
     "myProfile": "Meu perfil",
-    "settings": "Configurações",
     "signOut": "Sair",
     "notifications": "Notificações",
     "accountMenu": "Menu da conta"
@@ -321,7 +320,7 @@
     "endOfChapter": "Fim do capítulo"
   },
   "Settings": {
-    "title": "Configurações",
+    "title": "Perfil",
     "profile": "Perfil",
     "privacy": "Privacidade",
     "password": "Senha",

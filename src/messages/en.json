@@ -7,7 +7,6 @@
     "signIn": "Sign in",
     "signUp": "Sign up",
     "myProfile": "My profile",
-    "settings": "Settings",
     "signOut": "Sign out",
     "notifications": "Notifications",
     "accountMenu": "Account menu"
@@ -321,7 +320,7 @@
     "endOfChapter": "End of chapter"
   },
   "Settings": {
-    "title": "Settings",
+    "title": "Profile",
     "profile": "Profile",
     "privacy": "Privacy",
     "password": "Password",

@@ -10,7 +10,6 @@ import { AuthenticatedHome } from "@/components/discovery/authenticated-home"
 import { PopularReadsStack } from "@/components/discovery/popular-reads-stack"
 import { PopularCarousel } from "@/components/discovery/popular-carousel"
 import { BookSection } from "@/components/discovery/book-section"
-import { GenreGrid } from "@/components/discovery/genre-grid"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = { title: "Discover stories" }
@@ -42,11 +41,6 @@ export default async function Home() {
 
             <BookSection title={t("featured")} books={featured} />
             <BookSection title={t("mostRecent")} books={recent} />
-
-            <section>
-              <h2 className="text-lg font-semibold mb-4">{t("browseByGenre")}</h2>
-              <GenreGrid />
-            </section>
           </main>
         </>
       ) : (
@@ -54,7 +48,7 @@ export default async function Home() {
           <LandingHero />
           <HowItWorks />
 
-          <section className="bg-[#EDE9F0] py-16 text-center">
+          <section className="bg-muted py-16 text-center">
             <h2 className="text-3xl font-extrabold mb-8">{t("mostPopularReads")}</h2>
 
             {popular.length > 0 ? (

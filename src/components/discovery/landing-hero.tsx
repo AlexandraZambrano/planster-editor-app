@@ -6,7 +6,7 @@ export async function LandingHero() {
   const t = await getTranslations("Landing")
 
   return (
-    <section className="bg-[#EDE9F0]">
+    <section className="bg-white">
       <div className="container mx-auto max-w-5xl px-4 py-14 sm:py-20">
         <div className="flex justify-end gap-2 mb-8">
           <Button asChild variant="outline" className="rounded-full">

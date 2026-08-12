@@ -19,7 +19,7 @@ export function ContinueReadingCard({ entry, streak }: ContinueReadingCardProps)
         {entry.coverUrl ? (
           <Image src={entry.coverUrl} alt={entry.bookTitle} fill className="object-cover" sizes="80px" />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-violet-400 to-violet-700">
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
             <span className="text-2xl font-bold text-white select-none">
               {entry.bookTitle[0]?.toUpperCase() ?? <BookOpen />}
             </span>

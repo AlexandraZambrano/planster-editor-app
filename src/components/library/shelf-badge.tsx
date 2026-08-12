@@ -11,7 +11,7 @@ export function ShelfBadge({ name, isSystem }: ShelfBadgeProps) {
       className={cn(
         "text-xs px-1.5 py-0.5 rounded-full border",
         isSystem
-          ? "bg-violet-50 text-violet-700 border-violet-200"
+          ? "bg-secondary text-secondary-foreground border-secondary"
           : "bg-muted text-muted-foreground border-muted"
       )}
     >
