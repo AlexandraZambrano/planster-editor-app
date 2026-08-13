@@ -98,6 +98,7 @@ vi.mock("@/lib/prisma", () => ({
     },
     chapterReview: {
       findUnique: vi.fn(),
+      findMany: vi.fn(),
       create: vi.fn(),
     },
     notification: {

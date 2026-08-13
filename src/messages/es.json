@@ -316,7 +316,22 @@
     "undo": "Deshacer",
     "redo": "Rehacer",
     "focusMode": "Modo enfoque",
-    "exitFocusMode": "Salir del modo enfoque"
+    "exitFocusMode": "Salir del modo enfoque",
+    "feedbackButton": "Comentarios beta",
+    "panelTitle": "Comentarios beta",
+    "commentsSection": "Comentarios",
+    "reviewsSection": "Reseñas",
+    "noComments": "Todavía no hay comentarios",
+    "noReviews": "Todavía no hay reseñas",
+    "showResolved": "Mostrar resueltos ({count})",
+    "hideResolved": "Ocultar resueltos",
+    "resolvedBadge": "Resuelto",
+    "markResolved": "Marcar resuelto",
+    "reply": "Responder",
+    "replyPlaceholder": "Escribe una respuesta…",
+    "send": "Enviar",
+    "cancel": "Cancelar",
+    "closePanel": "Cerrar panel"
   },
   "Reading": {
     "editChapter": "Editar capítulo →",

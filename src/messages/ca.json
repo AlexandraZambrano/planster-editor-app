@@ -316,7 +316,22 @@
     "undo": "Desfés",
     "redo": "Refés",
     "focusMode": "Mode enfocament",
-    "exitFocusMode": "Surt del mode enfocament"
+    "exitFocusMode": "Surt del mode enfocament",
+    "feedbackButton": "Comentaris beta",
+    "panelTitle": "Comentaris beta",
+    "commentsSection": "Comentaris",
+    "reviewsSection": "Ressenyes",
+    "noComments": "Encara no hi ha comentaris",
+    "noReviews": "Encara no hi ha ressenyes",
+    "showResolved": "Mostra resolts ({count})",
+    "hideResolved": "Amaga resolts",
+    "resolvedBadge": "Resolt",
+    "markResolved": "Marca com a resolt",
+    "reply": "Respon",
+    "replyPlaceholder": "Escriu una resposta…",
+    "send": "Envia",
+    "cancel": "Cancel·la",
+    "closePanel": "Tanca el panell"
   },
   "Reading": {
     "editChapter": "Edita el capítol →",

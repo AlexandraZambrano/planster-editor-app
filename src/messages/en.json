@@ -316,7 +316,22 @@
     "undo": "Undo",
     "redo": "Redo",
     "focusMode": "Focus mode",
-    "exitFocusMode": "Exit focus mode"
+    "exitFocusMode": "Exit focus mode",
+    "feedbackButton": "Beta feedback",
+    "panelTitle": "Beta feedback",
+    "commentsSection": "Comments",
+    "reviewsSection": "Reviews",
+    "noComments": "No comments yet",
+    "noReviews": "No reviews yet",
+    "showResolved": "Show resolved ({count})",
+    "hideResolved": "Hide resolved",
+    "resolvedBadge": "Resolved",
+    "markResolved": "Mark resolved",
+    "reply": "Reply",
+    "replyPlaceholder": "Write a reply…",
+    "send": "Send",
+    "cancel": "Cancel",
+    "closePanel": "Close panel"
   },
   "Reading": {
     "editChapter": "Edit chapter →",

@@ -8,9 +8,11 @@ import Underline from "@tiptap/extension-underline"
 import { useTranslations } from "next-intl"
 import { TextStyle } from "./font-size"
 import { Toolbar } from "./toolbar"
+import { BetaFeedbackPanel } from "./beta-feedback-panel"
 import { saveChapterContent } from "@/actions/chapters"
+import { getChapterComments, getChapterReviews } from "@/actions/beta"
 import { Button } from "@/components/ui/button"
-import { Save } from "lucide-react"
+import { Save, MessageSquare } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const AUTOSAVE_MS = 30_000
@@ -41,6 +43,23 @@ export function TiptapEditor({
   const [isFocusMode, setIsFocusMode] = useState(false)
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved")
   const [wordCount, setWordCount] = useState(0)
+  const [showFeedback, setShowFeedback] = useState(false)
+  const [feedbackCount, setFeedbackCount] = useState(0)
+
+  const loadFeedbackCount = useCallback(() => {
+    Promise.all([getChapterComments(chapterId), getChapterReviews(chapterId)])
+      .then(([c, r]) => {
+        const unresolved = c.comments?.filter((comment) => !comment.resolved).length ?? 0
+        setFeedbackCount(unresolved + (r.reviews?.length ?? 0))
+      })
+      .catch(() => {
+        // Non-critical — the feedback badge just stays at its last known count.
+      })
+  }, [chapterId])
+
+  useEffect(() => {
+    loadFeedbackCount()
+  }, [loadFeedbackCount])
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -167,6 +186,22 @@ export function TiptapEditor({
           </a>
           <span className="text-muted-foreground">/</span>
           <span className="text-sm font-medium truncate">{chapterTitle}</span>
+
+          <Button
+            type="button"
+            size="sm"
+            variant={showFeedback ? "secondary" : "ghost"}
+            className="ml-auto h-7 gap-1.5 text-xs relative"
+            onClick={() => setShowFeedback((v) => !v)}
+          >
+            <MessageSquare className="h-3.5 w-3.5" />
+            {t("feedbackButton")}
+            {feedbackCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white">
+                {feedbackCount > 99 ? "99+" : feedbackCount}
+              </span>
+            )}
+          </Button>
         </div>
       )}
 
@@ -179,11 +214,21 @@ export function TiptapEditor({
         />
       )}
 
-      {/* Editor content — paged */}
-      <div className="flex-1 overflow-y-auto bg-muted py-8">
-        <div className="editor-pages mx-auto w-[816px] max-w-full min-h-[1056px] rounded-md focus-within:ring-2 focus-within:ring-blue-400 transition-shadow">
-          <EditorContent editor={editor} />
+      {/* Editor content — paged, with an optional beta feedback sidebar */}
+      <div className="flex flex-1 min-h-0">
+        <div className="flex-1 overflow-y-auto bg-muted py-8">
+          <div className="editor-pages mx-auto w-[816px] max-w-full min-h-[1056px] rounded-md focus-within:ring-2 focus-within:ring-blue-400 transition-shadow">
+            <EditorContent editor={editor} />
+          </div>
         </div>
+
+        {showFeedback && !isFocusMode && (
+          <BetaFeedbackPanel
+            chapterId={chapterId}
+            onClose={() => setShowFeedback(false)}
+            onChange={loadFeedbackCount}
+          />
+        )}
       </div>
 
       {/* Bottom bar */}

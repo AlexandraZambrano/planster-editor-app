@@ -450,3 +450,47 @@ export async function getChapterComments(chapterId: string): Promise<{
 
   return { comments }
 }
+
+// ─── CHAPTER REVIEWS (AUTHOR VIEW) ──────────────────────────────────────────
+
+export type ChapterReviewEntry = {
+  id: string
+  content: string
+  createdAt: Date
+  betaReader: {
+    id: string
+    user: { username: string; displayName: string; avatarUrl: string | null }
+  }
+}
+
+export async function getChapterReviews(chapterId: string): Promise<{
+  error?: string
+  reviews?: ChapterReviewEntry[]
+}> {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" }
+
+  const chapter = await prisma.chapter.findUnique({
+    where: { id: chapterId },
+    select: { book: { select: { authorId: true } } },
+  })
+  if (!chapter || chapter.book.authorId !== session.user.id) return { error: "Not found" }
+
+  const reviews = await prisma.chapterReview.findMany({
+    where: { chapterId },
+    select: {
+      id: true,
+      content: true,
+      createdAt: true,
+      betaReader: {
+        select: {
+          id: true,
+          user: { select: { username: true, displayName: true, avatarUrl: true } },
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  })
+
+  return { reviews }
+}
