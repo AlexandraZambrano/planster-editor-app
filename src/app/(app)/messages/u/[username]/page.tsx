@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { SiteNav } from "@/components/shared/site-nav"
 import { MessageThread } from "@/components/messages/message-thread"
+import { MessagesSidebar } from "@/components/messages/messages-sidebar"
 import { findConversationWithUser } from "@/actions/messages"
 
 interface Props {
@@ -29,14 +30,17 @@ export default async function NewConversationPage({ params }: Props) {
   return (
     <>
       <SiteNav />
-      <MessageThread
-        conversationId={null}
-        otherUser={otherUser}
-        viewerId={session.user.id}
-        initialMessages={[]}
-        initialStatus={null}
-        isInitiator={true}
-      />
+      <div className="flex md:h-[calc(100vh-4rem)]">
+        <MessagesSidebar />
+        <MessageThread
+          conversationId={null}
+          otherUser={otherUser}
+          viewerId={session.user.id}
+          initialMessages={[]}
+          initialStatus={null}
+          isInitiator={true}
+        />
+      </div>
     </>
   )
 }

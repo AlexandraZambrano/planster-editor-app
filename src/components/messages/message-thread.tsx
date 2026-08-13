@@ -112,7 +112,7 @@ export function MessageThread({
   const canReply = status !== "DECLINED" && !showAcceptBanner
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex flex-col h-[calc(100vh-4rem)] md:h-full flex-1 min-w-0">
       <header className="border-b px-4 py-3 flex items-center gap-3">
         <div className="relative h-9 w-9 rounded-full overflow-hidden bg-muted shrink-0">
           {otherUser.avatarUrl ? (
