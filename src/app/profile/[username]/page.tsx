@@ -4,9 +4,12 @@ import Image from "next/image"
 import Link from "next/link"
 import { BookOpen } from "lucide-react"
 import { getTranslations } from "next-intl/server"
+import { MessageCircle } from "lucide-react"
 import { getPublicProfile } from "@/actions/profile"
 import { SiteNav } from "@/components/shared/site-nav"
 import { StarRating } from "@/components/library/star-rating"
+import { FollowButton } from "@/components/profile/follow-button"
+import { Button } from "@/components/ui/button"
 
 interface Props {
   params: Promise<{ username: string }>
@@ -20,7 +23,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProfilePage({ params }: Props) {
   const { username } = await params
-  const [{ error, profile }, t] = await Promise.all([getPublicProfile(username), getTranslations("Profile")])
+  const [{ error, profile }, t, tMessages] = await Promise.all([
+    getPublicProfile(username),
+    getTranslations("Profile"),
+    getTranslations("Messages"),
+  ])
 
   if (error || !profile) notFound()
 
@@ -48,10 +55,29 @@ export default async function ProfilePage({ params }: Props) {
                 </div>
               )}
             </div>
-            <div>
-              <h1 className="text-2xl font-bold">{profile.displayName}</h1>
-              <p className="text-sm text-muted-foreground">@{profile.username}</p>
+            <div className="flex-1">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-bold">{profile.displayName}</h1>
+                  <p className="text-sm text-muted-foreground">@{profile.username}</p>
+                </div>
+                {!profile.isOwnProfile && (
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Button asChild variant="outline" size="sm" className="gap-1.5">
+                      <Link href={`/messages/u/${profile.username}`}>
+                        <MessageCircle className="h-4 w-4" />
+                        {tMessages("title")}
+                      </Link>
+                    </Button>
+                    <FollowButton userId={profile.id} initialIsFollowing={profile.isFollowing} />
+                  </div>
+                )}
+              </div>
               {profile.bio && <p className="text-sm mt-2 max-w-md">{profile.bio}</p>}
+              <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                <span>{t("followers", { count: profile.followerCount })}</span>
+                <span>{t("followingCount", { count: profile.followingCount })}</span>
+              </div>
               {profile.libraryCount !== null && (
                 <p className="text-sm text-muted-foreground mt-2">
                   {t("libraryCount", { count: profile.libraryCount })}

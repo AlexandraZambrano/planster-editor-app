@@ -20,6 +20,9 @@
 | `/library/shelves` | `src/app/(app)/library/shelves/page.tsx` | Shelf management |
 | `/notifications` | `src/app/(app)/notifications/page.tsx` | Notification centre |
 | `/settings` | `src/app/(app)/settings/page.tsx` | Profile settings |
+| `/messages` | `src/app/(app)/messages/page.tsx` | Message inbox — conversations + pending requests |
+| `/messages/[conversationId]` | `src/app/(app)/messages/[conversationId]/page.tsx` | Message thread |
+| `/messages/u/[username]` | `src/app/(app)/messages/u/[username]/page.tsx` | Start (or resume) a conversation with a user by username |
 
 ## Writer routes
 
@@ -57,10 +60,14 @@
 |---|---|
 | `/auth/callback` | Supabase OAuth redirect handler (Google sign-in) |
 | `/api/notifications/stream` | SSE notification stream |
+| `/api/messages/stream` | SSE chat message stream (separate channel from notifications) |
 | `/api/upload` | Cloudinary image upload endpoint |
+| `/api/quote-card` | Generates a quote-card PNG (background + quote + caption) and uploads it to Cloudinary |
 
 ## Access notes
 
 - Routes under `/write/[bookId]/**` verify that the authenticated user is the book's author
 - `/read/[bookId]/[chapterId]` verifies chapter visibility based on the user's role
 - The Writer's Studio is only accessible by the author; any other user receives a 403
+- `/messages/**` requires authentication (in `PROTECTED_PREFIXES`); `/messages/[conversationId]`
+  verifies the viewer is one of the two participants

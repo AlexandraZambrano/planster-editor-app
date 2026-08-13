@@ -28,7 +28,11 @@
     "bookSaved": "{actorName} salvou \"{bookTitle}\" na biblioteca dele(a)",
     "newChapterPublished": "Um novo capítulo, \"{chapterTitle}\", foi publicado em \"{bookTitle}\"",
     "commentReply": "{actorName} respondeu ao seu comentário em \"{chapterTitle}\"",
-    "default": "Nova notificação"
+    "default": "Nova notificação",
+    "newFollower": "{actorName} começou a seguir você",
+    "newChapterComment": "{actorName} comentou em \"{chapterTitle}\"",
+    "messageRequestReceived": "{actorName} quer enviar uma mensagem para você",
+    "messageRequestAccepted": "{actorName} aceitou seu pedido de mensagem"
   },
   "Common": {
     "close": "Fechar",
@@ -178,7 +182,13 @@
     "publishedBooks": "Livros publicados",
     "shelves": "Estantes",
     "shelfBookCount": "{count, plural, one {# livro} other {# livros}}",
-    "ratings": "Avaliações"
+    "ratings": "Avaliações",
+    "follow": "Seguir",
+    "unfollow": "Deixar de seguir",
+    "following": "Seguindo",
+    "followers": "{count, plural, one {# seguidor} other {# seguidores}}",
+    "followingCount": "{count, plural, one {# seguindo} other {# seguindo}}",
+    "message": "Mensagem"
   },
   "Library": {
     "title": "Minha Biblioteca",
@@ -497,5 +507,49 @@
     "changesBody": "Podemos atualizar esta política periodicamente conforme o Planster evolui. Se fizermos alterações relevantes, atualizaremos a data de \"última atualização\" acima. Recomendamos que você revise esta página periodicamente.",
     "contactTitle": "13. Contato",
     "contactBody": "Se tiver alguma dúvida sobre esta Política de Privacidade ou sobre como tratamos seus dados, você pode contatar Alexandra Zambrano, responsável pelo Planster, em planster.alexzambrano.com."
+  },
+  "Comments": {
+    "title": "Comentários",
+    "ratingLabel": "Avalie este capítulo",
+    "averageRating": "{rating} ({count, plural, one {# avaliação} other {# avaliações}})",
+    "noRatingsYet": "Ainda não há avaliações",
+    "placeholder": "Compartilhe sua opinião sobre este capítulo…",
+    "post": "Publicar",
+    "empty": "Ainda não há comentários — seja o primeiro a comentar",
+    "delete": "Excluir"
+  },
+  "Messages": {
+    "title": "Mensagens",
+    "ariaLabel": "Mensagens",
+    "requestsTab": "Solicitações",
+    "conversationsTab": "Conversas",
+    "noConversations": "Você ainda não tem conversas",
+    "noRequests": "Nenhuma solicitação de mensagem",
+    "accept": "Aceitar",
+    "decline": "Recusar",
+    "requestFrom": "quer te enviar uma mensagem",
+    "waitingForAccept": "Aguardando {name} aceitar sua solicitação de mensagem",
+    "typePlaceholder": "Escreva uma mensagem…",
+    "send": "Enviar",
+    "emptyThread": "Ainda não há mensagens — diga oi!",
+    "quoteCardLabel": "Compartilhou uma citação de \"{bookTitle}\"",
+    "backToInbox": "Voltar às mensagens"
+  },
+  "Share": {
+    "shareQuote": "Compartilhar citação",
+    "dialogTitle": "Compartilhe esta citação",
+    "chooseBackground": "Escolha um fundo",
+    "inAppTab": "Enviar para um amigo",
+    "externalTab": "Compartilhar fora do Planster",
+    "noFollowing": "Você ainda não segue ninguém",
+    "sentToFriend": "Enviado!",
+    "send": "Enviar",
+    "generate": "Gerar imagem",
+    "generating": "Gerando…",
+    "download": "Baixar",
+    "shareButton": "Compartilhar",
+    "copyLink": "Copiar link da imagem",
+    "linkCopied": "Link copiado",
+    "close": "Fechar"
   }
 }

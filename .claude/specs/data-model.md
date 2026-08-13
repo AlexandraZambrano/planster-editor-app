@@ -17,46 +17,77 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")   // Supabase pooler (Transaction mode, port 6543)
-  directUrl = env("DIRECT_URL")     // direct connection for migrations (port 5432)
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ─── USERS ──────────────────────────────────────────────────────────────────
 
 model User {
-  id          String   @id @default(cuid())
-  email       String   @unique
-  authUserId  String?  @unique // Supabase auth.users.id — nullable until the user signs in via Supabase
-  username    String   @unique
-  displayName String
-  bio         String?  @db.VarChar(300)
-  avatarUrl   String?
-  avatarPositionY Int @default(50) // vertical focal point of the avatar crop, 0 (top) – 100 (bottom)
-  showLibraryCount Boolean @default(false) // Settings toggle — public profile visibility
-  showRatingsAndReviews Boolean @default(false) // Settings toggle — public profile visibility
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  email                 String   @unique
+  authUserId            String?  @unique // Supabase auth.users.id — nullable until the user signs in via Supabase
+  username              String   @unique
+  displayName           String
+  bio                   String?  @db.VarChar(300)
+  avatarUrl             String?
+  avatarPositionY       Int      @default(50) // vertical focal point of the avatar crop, 0 (top) – 100 (bottom)
+  showLibraryCount      Boolean  @default(false)
+  showRatingsAndReviews Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
-  // Relaciones
-  books            Book[]
-  betaReaderships  BetaReader[]
-  library          Library[]
-  shelves          Shelf[]
-  writingGoals     WritingGoal[]
-  wordCountLogs    WordCountLog[]
-  notifications    Notification[]
-  commentReplies   CommentReply[]
-  readingProgress  ReadingProgress[]
-  readingActivity  ReadingActivity[]
+  books               Book[]
+  betaReaderships     BetaReader[]
+  library             Library[]
+  shelves             Shelf[]
+  writingGoals        WritingGoal[]
+  wordCountLogs       WordCountLog[]
+  notifications       Notification[]
+  commentReplies      CommentReply[]
   passwordResetTokens PasswordResetToken[]
+  readingProgress     ReadingProgress[]
+  readingActivity     ReadingActivity[]
+  following           Follow[]             @relation("Following")
+  followers           Follow[]             @relation("Followers")
+  chapterComments     ChapterComment[]
+  chapterRatings      ChapterRating[]
+  sentMessages        Message[]
+  conversationsAsA    Conversation[]       @relation("ConversationsAsA")
+  conversationsAsB    Conversation[]       @relation("ConversationsAsB")
+}
+
+// ─── SOCIAL — FOLLOW ────────────────────────────────────────────────────────
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // ─── BOOKS & CHAPTERS ───────────────────────────────────────────────────────
 
 enum PublicationStatus {
-  DRAFT      // private draft
-  BETA       // closed beta
-  PUBLISHED  // published for all
+  DRAFT
+  BETA
+  PUBLISHED
 }
 
 enum BookStatus {
@@ -87,40 +118,43 @@ model Book {
   publicationStatus PublicationStatus @default(DRAFT)
   bookStatus        BookStatus        @default(IN_PROGRESS)
   license           BookLicense       @default(ALL_RIGHTS_RESERVED)
-  featured          Boolean           @default(false) // manually curated for the Discovery home page
+  featured          Boolean           @default(false)
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
-  author       User          @relation(fields: [authorId], references: [id])
-  chapters     Chapter[]
-  betaReaders  BetaReader[]
-  library      Library[]
-  characters   Character[]
-  locations    Location[]
+  author          User              @relation(fields: [authorId], references: [id])
+  chapters        Chapter[]
+  betaReaders     BetaReader[]
+  library         Library[]
+  characters      Character[]
+  locations       Location[]
   timelineEntries TimelineEntry[]
-  boards       Board[]
-  bookNotes    BookNote[]
-  writingGoals WritingGoal[]
+  boards          Board[]
+  bookNotes       BookNote[]
+  writingGoals    WritingGoal[]
+  readingProgress ReadingProgress[]
 }
 
 model Chapter {
   id         String            @id @default(cuid())
   bookId     String
   title      String
-  content    Json              @default("{}")  // Tiptap JSON format
+  content    Json              @default("{}")
   order      Int
   visibility PublicationStatus @default(DRAFT)
   wordCount  Int               @default(0)
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
 
-  book           Book            @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  plotNote       PlotNote?
-  inlineComments InlineComment[]
-  chapterReviews ChapterReview[]
-  wordCountLogs  WordCountLog[]
+  book            Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  plotNote        PlotNote?
+  inlineComments  InlineComment[]
+  chapterReviews  ChapterReview[]
+  wordCountLogs   WordCountLog[]
   timelineEntries TimelineEntry[]
   readingProgress ReadingProgress[]
+  chapterComments ChapterComment[]
+  chapterRatings  ChapterRating[]
 
   @@unique([bookId, order])
 }
@@ -131,7 +165,7 @@ model ReadingProgress {
   id        String   @id @default(cuid())
   userId    String
   bookId    String
-  chapterId String   // last chapter the user opened in this book
+  chapterId String
   updatedAt DateTime @updatedAt
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -144,7 +178,7 @@ model ReadingProgress {
 model ReadingActivity {
   id     String   @id @default(cuid())
   userId String
-  date   DateTime @db.Date // one row per user per calendar day (UTC) that had any reading
+  date   DateTime @db.Date
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -156,7 +190,7 @@ model ReadingActivity {
 model PlotNote {
   id        String   @id @default(cuid())
   chapterId String   @unique
-  notes     Json     @default("{}")  // Tiptap JSON format
+  notes     Json     @default("{}")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -165,15 +199,15 @@ model PlotNote {
 }
 
 model Scene {
-  id          String   @id @default(cuid())
-  plotNoteId  String
-  title       String
-  description String?
-  order       Int
-  characterIds String[] // IDs de Character
-  locationId  String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  plotNoteId   String
+  title        String
+  description  String?
+  order        Int
+  characterIds String[]
+  locationId   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   plotNote PlotNote  @relation(fields: [plotNoteId], references: [id], onDelete: Cascade)
   location Location? @relation(fields: [locationId], references: [id])
@@ -182,14 +216,14 @@ model Scene {
 // ─── WRITERS STUDIO — TIMELINE ─────────────────────────────────────────────
 
 model TimelineEntry {
-  id        String   @id @default(cuid())
-  bookId    String
-  title     String
+  id          String  @id @default(cuid())
+  bookId      String
+  title       String
   description String?
-  moment    String   // free text: "Day 1", "Year 203 AD", etc.
-  color     String   @default("#6b3fa0")
-  order     Int
-  chapterId String?  // optional link to a chapter
+  moment      String
+  color       String  @default("#6b3fa0")
+  order       Int
+  chapterId   String?
 
   book    Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
   chapter Chapter? @relation(fields: [chapterId], references: [id])
@@ -206,38 +240,35 @@ enum StoryRole {
 }
 
 model Character {
-  id           String    @id @default(cuid())
-  bookId       String
-  name         String
-  nickname     String?
-  age          Int?
-  birthDate    String?
-  mainImageUrl String?
-  gallery      String[]  // URLs de Cloudinary
-  // Descripción física
-  height       String?
-  weight       String?
-  build        String?
-  eyeColor     String?
-  hairColor    String?
-  hairStyle    String?
+  id             String    @id @default(cuid())
+  bookId         String
+  name           String
+  nickname       String?
+  age            Int?
+  birthDate      String?
+  mainImageUrl   String?
+  gallery        String[]
+  height         String?
+  weight         String?
+  build          String?
+  eyeColor       String?
+  hairColor      String?
+  hairStyle      String?
   facialFeatures String?
-  tattoos      String?
+  tattoos        String?
   dressingStyle  String?
   physicalNotes  String?
-  // Story
-  storyRole    StoryRole @default(SECONDARY)
-  storyRoleNote String?
+  storyRole      StoryRole @default(SECONDARY)
+  storyRoleNote  String?
   shortTermGoals String?
   longTermGoals  String?
-  // Backstory
-  backstory    Json      @default("{}")  // Tiptap JSON
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  backstory      Json      @default("{}")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  book  Book  @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  linksFrom CharacterLink[] @relation("CharacterA")
-  linksTo   CharacterLink[] @relation("CharacterB")
+  book               Book                @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  linksFrom          CharacterLink[]     @relation("CharacterA")
+  linksTo            CharacterLink[]     @relation("CharacterB")
   locationCharacters LocationCharacter[]
   boardElements      BoardElement[]      @relation("CharacterBoardElement")
 }
@@ -274,21 +305,21 @@ model Location {
   bookId           String
   parentLocationId String?
   name             String
-  description      Json     @default("{}")  // Tiptap JSON
-  images           String[] // URLs de Cloudinary
+  description      Json     @default("{}")
+  images           String[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  book             Book       @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  parent           Location?  @relation("SubLocations", fields: [parentLocationId], references: [id])
-  subLocations     Location[] @relation("SubLocations")
+  book               Book                @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  parent             Location?           @relation("SubLocations", fields: [parentLocationId], references: [id])
+  subLocations       Location[]          @relation("SubLocations")
   locationCharacters LocationCharacter[]
-  scenes           Scene[]
-  boardElements    BoardElement[] @relation("LocationBoardElement")
+  scenes             Scene[]
+  boardElements      BoardElement[]      @relation("LocationBoardElement")
 }
 
 model LocationCharacter {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   locationId  String
   characterId String
   note        String?
@@ -315,7 +346,7 @@ model Board {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  book        Book           @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  book        Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
   elements    BoardElement[]
   connections BoardConnection[]
 }
@@ -324,27 +355,28 @@ model BoardElement {
   id          String           @id @default(cuid())
   boardId     String
   type        BoardElementType
-  referenceId String?          // ID de Character o Location (si aplica)
+  characterId String?
+  locationId  String?
   posX        Float            @default(0)
   posY        Float            @default(0)
-  content     Json             @default("{}")  // texto, imageUrl, color (para notas e imágenes)
+  content     Json             @default("{}")
   createdAt   DateTime         @default(now())
 
-  board       Board       @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  character   Character?  @relation("CharacterBoardElement", fields: [referenceId], references: [id])
-  location    Location?   @relation("LocationBoardElement", fields: [referenceId], references: [id])
+  board           Board             @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  character       Character?        @relation("CharacterBoardElement", fields: [characterId], references: [id])
+  location        Location?         @relation("LocationBoardElement", fields: [locationId], references: [id])
   connectionsFrom BoardConnection[] @relation("FromElement")
   connectionsTo   BoardConnection[] @relation("ToElement")
 }
 
 model BoardConnection {
-  id            String   @id @default(cuid())
+  id            String  @id @default(cuid())
   boardId       String
   fromElementId String
   toElementId   String
   label         String?
-  color         String   @default("#6b3fa0")
-  isAutomatic   Boolean  @default(false)  // true = auto-generated from CharacterLink
+  color         String  @default("#6b3fa0")
+  isAutomatic   Boolean @default(false)
 
   board       Board        @relation(fields: [boardId], references: [id], onDelete: Cascade)
   fromElement BoardElement @relation("FromElement", fields: [fromElementId], references: [id], onDelete: Cascade)
@@ -357,7 +389,7 @@ model BookNote {
   id        String   @id @default(cuid())
   bookId    String
   title     String
-  content   Json     @default("{}")  // Tiptap JSON
+  content   Json     @default("{}")
   tags      String[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -377,10 +409,10 @@ enum GoalType {
 model WritingGoal {
   id           String    @id @default(cuid())
   userId       String
-  bookId       String?   // null = global writer goal
+  bookId       String?
   type         GoalType
   targetWords  Int
-  deadlineDate DateTime? // only for DEADLINE type
+  deadlineDate DateTime?
   active       Boolean   @default(true)
   createdAt    DateTime  @default(now())
 
@@ -389,14 +421,14 @@ model WritingGoal {
 }
 
 model WordCountLog {
-  id              String   @id @default(cuid())
-  userId          String
-  bookId          String
-  chapterId       String
-  date            DateTime @db.Date
-  wordsDelta      Int      // can be negative (if text was deleted)
-  totalWordsBook  Int      // cumulative total in the book at that point
-  createdAt       DateTime @default(now())
+  id             String   @id @default(cuid())
+  userId         String
+  bookId         String
+  chapterId      String
+  date           DateTime @db.Date
+  wordsDelta     Int
+  totalWordsBook Int
+  createdAt      DateTime @default(now())
 
   user    User    @relation(fields: [userId], references: [id])
   chapter Chapter @relation(fields: [chapterId], references: [id])
@@ -441,8 +473,8 @@ model InlineComment {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  chapter    Chapter      @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-  betaReader BetaReader   @relation(fields: [betaReaderId], references: [id])
+  chapter    Chapter        @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  betaReader BetaReader     @relation(fields: [betaReaderId], references: [id])
   replies    CommentReply[]
 }
 
@@ -470,14 +502,44 @@ model ChapterReview {
   @@unique([chapterId, betaReaderId])
 }
 
+// ─── PUBLIC CHAPTER COMMENTS & RATINGS ─────────────────────────────────────
+// Distinct from InlineComment/ChapterReview above: those are always private,
+// beta-reader-to-author only (see beta-system.md). These are public, visible
+// on any PUBLISHED chapter to any reader — a separate, additive layer.
+
+model ChapterComment {
+  id        String   @id @default(cuid())
+  chapterId String
+  userId    String
+  content   String   @db.VarChar(1000)
+  createdAt DateTime @default(now())
+
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ChapterRating {
+  id        String   @id @default(cuid())
+  chapterId String
+  userId    String
+  rating    Float // 0-5, half-stars — same convention as Library.rating
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chapterId, userId])
+}
+
 // ─── LIBRARY & SHELVES ──────────────────────────────────────────────────────
 
 model Library {
-  id        String   @id @default(cuid())
-  userId    String
-  bookId    String
-  rating    Float?   // 0-5, con medias estrellas
-  addedAt   DateTime @default(now())
+  id      String   @id @default(cuid())
+  userId  String
+  bookId  String
+  rating  Float?
+  addedAt DateTime @default(now())
 
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   book       Book        @relation(fields: [bookId], references: [id], onDelete: Cascade)
@@ -491,7 +553,7 @@ model Shelf {
   userId    String
   name      String
   isPublic  Boolean  @default(false)
-  isSystem  Boolean  @default(false)  // true = "Leyendo ahora", "Quiero leer", "Leídos"
+  isSystem  Boolean  @default(false)
   createdAt DateTime @default(now())
 
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -510,24 +572,68 @@ model ShelfBook {
   @@unique([shelfId, libraryId])
 }
 
+// ─── DIRECT MESSAGES ────────────────────────────────────────────────────────
+// Every new conversation starts PENDING until the recipient accepts, regardless
+// of follow status in either direction (see modules/messages.md).
+
+enum ConversationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model Conversation {
+  id          String             @id @default(cuid())
+  userAId     String // lower user id, lexicographically — normalized in the action, not the DB
+  userBId     String // higher user id
+  initiatorId String
+  status      ConversationStatus @default(PENDING)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  userA    User      @relation("ConversationsAsA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB    User      @relation("ConversationsAsB", fields: [userBId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([userAId, userBId])
+}
+
+model Message {
+  id             String    @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String?   @db.Text
+  imageUrl       String? // set for quote-card messages
+  quoteMeta      Json? // { quote, bookTitle, chapterTitle } — set for quote-card messages
+  readAt         DateTime?
+  createdAt      DateTime  @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id])
+}
+
 // ─── NOTIFICATIONS ──────────────────────────────────────────────────────────
 
 enum NotificationType {
-  BETA_REQUEST_RECEIVED    // escritor: nueva solicitud beta
-  BETA_REQUEST_APPROVED    // lector: solicitud aprobada
-  BETA_REQUEST_REJECTED    // lector: solicitud rechazada
-  NEW_INLINE_COMMENT       // escritor: nuevo comentario inline
-  NEW_CHAPTER_REVIEW       // escritor: nueva reseña de capítulo
-  BOOK_SAVED               // escritor: alguien guardó su libro
-  NEW_CHAPTER_PUBLISHED    // lector: nuevo capítulo en libro de biblioteca
-  COMMENT_REPLY            // beta: el escritor respondió a su comentario
+  BETA_REQUEST_RECEIVED
+  BETA_REQUEST_APPROVED
+  BETA_REQUEST_REJECTED
+  NEW_INLINE_COMMENT
+  NEW_CHAPTER_REVIEW
+  BOOK_SAVED
+  NEW_CHAPTER_PUBLISHED
+  COMMENT_REPLY
+  NEW_FOLLOWER
+  NEW_CHAPTER_COMMENT
+  MESSAGE_REQUEST_RECEIVED
+  MESSAGE_REQUEST_ACCEPTED
 }
 
 model Notification {
   id        String           @id @default(cuid())
   userId    String
   type      NotificationType
-  payload   Json             // datos contextuales (bookId, chapterId, actorName, etc.)
+  payload   Json
   read      Boolean          @default(false)
   createdAt DateTime         @default(now())
 
@@ -536,16 +642,3 @@ model Notification {
   @@index([userId, read])
 }
 ```
-
-// ─── PASSWORD RESET ───────────────────────────────────────────────────────────
-
-model PasswordResetToken {
-  id        String    @id @default(cuid())
-  userId    String
-  tokenHash String    @unique  // store hashed with SHA-256, never plain text
-  expiresAt DateTime
-  usedAt    DateTime?           // set when the token is consumed
-  createdAt DateTime  @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}

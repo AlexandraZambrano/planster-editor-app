@@ -102,6 +102,9 @@ export default async function ReadPage({ params }: Props) {
       prevChapterId={prevChapterId}
       nextChapterId={nextChapterId}
       existingReview={existingReview}
+      showChapterSocial={!isAuthor && chapter.visibility === "PUBLISHED"}
+      canShareQuote={chapter.visibility === "PUBLISHED"}
+      viewerId={session.user.id}
     />
   )
 }

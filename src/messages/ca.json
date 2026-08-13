@@ -28,7 +28,11 @@
     "bookSaved": "{actorName} ha desat \"{bookTitle}\" a la seva biblioteca",
     "newChapterPublished": "S'ha publicat un nou capítol, \"{chapterTitle}\", a \"{bookTitle}\"",
     "commentReply": "{actorName} ha respost al teu comentari a \"{chapterTitle}\"",
-    "default": "Nova notificació"
+    "default": "Nova notificació",
+    "newFollower": "{actorName} ha començat a seguir-te",
+    "newChapterComment": "{actorName} ha comentat a \"{chapterTitle}\"",
+    "messageRequestReceived": "{actorName} vol enviar-te un missatge",
+    "messageRequestAccepted": "{actorName} ha acceptat la teva sol·licitud de missatge"
   },
   "Common": {
     "close": "Tanca",
@@ -178,7 +182,13 @@
     "publishedBooks": "Llibres publicats",
     "shelves": "Prestatgeries",
     "shelfBookCount": "{count, plural, one {# llibre} other {# llibres}}",
-    "ratings": "Valoracions"
+    "ratings": "Valoracions",
+    "follow": "Seguir",
+    "unfollow": "Deixar de seguir",
+    "following": "Seguint",
+    "followers": "{count, plural, one {# seguidor} other {# seguidors}}",
+    "followingCount": "{count, plural, one {# seguit} other {# seguits}}",
+    "message": "Missatge"
   },
   "Library": {
     "title": "La meva Biblioteca",
@@ -497,5 +507,49 @@
     "changesBody": "Podem actualitzar aquesta política de tant en tant a mesura que Planster evolucioni. Si fem canvis importants, actualitzarem la data de \"darrera actualització\" indicada més amunt. T'animem a revisar aquesta pàgina periòdicament.",
     "contactTitle": "13. Contacte",
     "contactBody": "Si tens cap pregunta sobre aquesta Política de privadesa o sobre com tractem les teves dades, pots contactar amb l'Alexandra Zambrano, responsable de Planster, a planster.alexzambrano.com."
+  },
+  "Comments": {
+    "title": "Comentaris",
+    "ratingLabel": "Valora aquest capítol",
+    "averageRating": "{rating} ({count, plural, one {# valoració} other {# valoracions}})",
+    "noRatingsYet": "Encara no hi ha valoracions",
+    "placeholder": "Comparteix la teva opinió sobre aquest capítol…",
+    "post": "Publica",
+    "empty": "Encara no hi ha comentaris — sigues el primer a comentar",
+    "delete": "Elimina"
+  },
+  "Messages": {
+    "title": "Missatges",
+    "ariaLabel": "Missatges",
+    "requestsTab": "Sol·licituds",
+    "conversationsTab": "Converses",
+    "noConversations": "Encara no tens converses",
+    "noRequests": "No hi ha sol·licituds de missatge",
+    "accept": "Acceptar",
+    "decline": "Rebutjar",
+    "requestFrom": "vol escriure't",
+    "waitingForAccept": "Esperant que {name} accepti la teva sol·licitud de missatge",
+    "typePlaceholder": "Escriu un missatge…",
+    "send": "Enviar",
+    "emptyThread": "Encara no hi ha missatges — saluda!",
+    "quoteCardLabel": "Ha compartit una cita de \"{bookTitle}\"",
+    "backToInbox": "Tornar als missatges"
+  },
+  "Share": {
+    "shareQuote": "Comparteix la cita",
+    "dialogTitle": "Comparteix aquesta cita",
+    "chooseBackground": "Tria un fons",
+    "inAppTab": "Envia a un amic",
+    "externalTab": "Comparteix fora de Planster",
+    "noFollowing": "Encara no segueixes ningú",
+    "sentToFriend": "Enviat!",
+    "send": "Enviar",
+    "generate": "Genera la imatge",
+    "generating": "Generant…",
+    "download": "Descarrega",
+    "shareButton": "Comparteix",
+    "copyLink": "Copia l'enllaç de la imatge",
+    "linkCopied": "Enllaç copiat",
+    "close": "Tanca"
   }
 }

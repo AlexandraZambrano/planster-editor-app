@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { updateSession } from "@/lib/supabase/middleware"
 
-const PROTECTED_PREFIXES = ["/write", "/library", "/read", "/notifications", "/settings"]
+const PROTECTED_PREFIXES = ["/write", "/library", "/read", "/notifications", "/settings", "/messages"]
 
 export default async function middleware(request: NextRequest) {
   const { response, user } = await updateSession(request)

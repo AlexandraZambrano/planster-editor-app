@@ -1,16 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { getPublicProfile } from "./profile"
 import { prisma } from "@/lib/prisma"
+import { auth } from "@/lib/auth"
+
+vi.mock("@/lib/auth", () => ({ auth: vi.fn() }))
 
 const mockPrisma = prisma as unknown as {
   user: Record<string, ReturnType<typeof vi.fn>>
   book: Record<string, ReturnType<typeof vi.fn>>
   shelf: Record<string, ReturnType<typeof vi.fn>>
   library: Record<string, ReturnType<typeof vi.fn>>
+  follow: Record<string, ReturnType<typeof vi.fn>>
 }
 
 beforeEach(() => {
   vi.clearAllMocks()
+  vi.mocked(auth).mockResolvedValue(null)
+  mockPrisma.follow.count.mockResolvedValue(0)
+  mockPrisma.follow.findUnique.mockResolvedValue(null)
 })
 
 describe("getPublicProfile", () => {

@@ -6,12 +6,14 @@ import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import TextAlign from "@tiptap/extension-text-align"
 import { TextStyle } from "@/components/editor/font-size"
-import { ChevronLeft, ChevronRight, MessageSquarePlus, X } from "lucide-react"
+import { ChevronLeft, ChevronRight, MessageSquarePlus, Share2, X } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ChapterReviewForm } from "@/components/beta/chapter-review-form"
+import { ChapterSocial } from "@/components/reading/chapter-social"
+import { QuoteShareDialog } from "@/components/reading/quote-share-dialog"
 import { createInlineComment } from "@/actions/beta"
 import { logReadingActivity } from "@/actions/reading"
 
@@ -27,6 +29,9 @@ interface Props {
   prevChapterId: string | null
   nextChapterId: string | null
   existingReview: string | null
+  showChapterSocial: boolean
+  canShareQuote: boolean
+  viewerId: string
 }
 
 type SelectionState = {
@@ -47,14 +52,19 @@ export function ReadingView({
   prevChapterId,
   nextChapterId,
   existingReview,
+  showChapterSocial,
+  canShareQuote,
+  viewerId,
 }: Props) {
   const t = useTranslations("Reading")
+  const tShare = useTranslations("Share")
   const [selection, setSelection] = useState<SelectionState>(null)
   const [showCommentForm, setShowCommentForm] = useState(false)
   const [commentText, setCommentText] = useState("")
   const [commentLoading, setCommentLoading] = useState(false)
   const [commentError, setCommentError] = useState<string | null>(null)
   const [commentSuccess, setCommentSuccess] = useState(false)
+  const [showShareDialog, setShowShareDialog] = useState(false)
 
   useEffect(() => {
     logReadingActivity(bookId, chapterId)
@@ -78,7 +88,7 @@ export function ReadingView({
       },
     },
     onSelectionUpdate({ editor: ed }) {
-      if (!isBeta) return
+      if (!isBeta && !canShareQuote) return
       const { from, to } = ed.state.selection
       if (from === to) {
         if (!showCommentForm) setSelection(null)
@@ -107,6 +117,14 @@ export function ReadingView({
       savedSelectionRef.current = newSel
     },
   })
+
+  const [shareQuoteText, setShareQuoteText] = useState("")
+
+  function openShareDialog() {
+    if (!selection) return
+    setShareQuoteText(selection.text)
+    setShowShareDialog(true)
+  }
 
   function openCommentForm() {
     if (!selection) return
@@ -192,21 +210,35 @@ export function ReadingView({
         <div className="mx-auto w-[816px] max-w-full bg-white shadow-sm rounded-sm border border-gray-100 relative">
           <EditorContent editor={editor} />
 
-          {/* Floating comment button */}
-          {isBeta && activeSel && !showCommentForm && (
+          {/* Floating selection toolbar: comment (beta only) + share quote (any reader on a PUBLISHED chapter) */}
+          {selection && !showCommentForm && !showShareDialog && (isBeta || canShareQuote) && (
             <div
-              className="fixed z-20 -translate-x-1/2"
-              style={{ top: activeSel.rect.top - 44, left: activeSel.rect.left }}
+              className="fixed z-20 -translate-x-1/2 flex gap-1.5"
+              style={{ top: selection.rect.top - 44, left: selection.rect.left }}
             >
-              <Button
-                size="sm"
-                onClick={openCommentForm}
-                className="shadow-md gap-1.5"
-                data-testid="comment-btn"
-              >
-                <MessageSquarePlus className="h-3.5 w-3.5" />
-                {t("comment")}
-              </Button>
+              {isBeta && (
+                <Button
+                  size="sm"
+                  onClick={openCommentForm}
+                  className="shadow-md gap-1.5"
+                  data-testid="comment-btn"
+                >
+                  <MessageSquarePlus className="h-3.5 w-3.5" />
+                  {t("comment")}
+                </Button>
+              )}
+              {canShareQuote && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={openShareDialog}
+                  className="shadow-md gap-1.5"
+                  data-testid="share-quote-btn"
+                >
+                  <Share2 className="h-3.5 w-3.5" />
+                  {tShare("shareQuote")}
+                </Button>
+              )}
             </div>
           )}
 
@@ -290,7 +322,21 @@ export function ReadingView({
             </div>
           </div>
         )}
+
+        {/* Public comments + rating (any reader, PUBLISHED chapters only — distinct
+            from the private beta review section above) */}
+        {showChapterSocial && <ChapterSocial chapterId={chapterId} viewerId={viewerId} />}
       </main>
+
+      {canShareQuote && (
+        <QuoteShareDialog
+          open={showShareDialog}
+          onOpenChange={setShowShareDialog}
+          quote={shareQuoteText}
+          bookTitle={bookTitle}
+          chapterTitle={chapterTitle}
+        />
+      )}
 
       {/* Prev / Next navigation */}
       <footer className="sticky bottom-0 bg-background border-t px-4 py-2 flex items-center justify-between text-sm">

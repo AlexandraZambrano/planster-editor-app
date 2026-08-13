@@ -19,6 +19,8 @@ Read these files BEFORE writing any code. They are the source of truth for the p
   - Discovery → @.claude/specs/modules/discovery.md
   - Notifications → @.claude/specs/modules/notifications.md
   - Public profile → @.claude/specs/modules/profile.md
+  - Social (follow, public chapter comments/ratings) → @.claude/specs/modules/social.md
+  - Direct messages & quote sharing → @.claude/specs/modules/messages.md
 - App routes → @.claude/specs/routes.md
 - Out of scope → @.claude/specs/out-of-scope.md
 - CI/CD, Docker & deploy → @.claude/specs/cicd.md
@@ -35,6 +37,10 @@ Read these files BEFORE writing any code. They are the source of truth for the p
 - **Storage:** Cloudinary (images: covers, characters, world building, board)
 - **Email:** Resend (password reset)
 - **Notifications:** Server-Sent Events (SSE)
+- **Chat messages:** a second, separate SSE channel from notifications (`src/lib/message-events.ts`
+  + `/api/messages/stream`) — kept independent so chat volume never floods the notification bell
+- **Image generation:** `sharp` (real `dependencies` entry) generates quote-share PNGs
+  (`src/lib/quote-card.ts`) and the PWA icons (`scripts/generate-icons.mjs`)
 - **PWA:** installable on mobile/desktop — `src/app/manifest.ts` (native Next.js manifest route), `public/sw.js` (minimal network-first service worker for page navigations only; never intercepts API/auth/SSE requests), registered from `src/components/shared/service-worker-registration.tsx`. Icons regenerate via `node scripts/generate-icons.mjs` (uses `sharp`) from the SVGs in `scripts/`.
 - **Base repo:** github.com/AlexandraZambrano/planster-editor-app
 
@@ -70,6 +76,8 @@ Read these files BEFORE writing any code. They are the source of truth for the p
 - Do not implement anything listed in @.claude/specs/out-of-scope.md
 - When adding a Prisma model, run `npx prisma db push` and update @.claude/specs/data-model.md — this project has no `prisma/migrations` directory and has never used `prisma migrate`; schema changes are applied directly with `db push`
 - Every new route must be added to @.claude/specs/routes.md
-- Beta reader comments on chapters are ALWAYS private — only the author can see them
+- Beta reader comments on chapters (`InlineComment`/`ChapterReview`) are ALWAYS private —
+  only the author can see them. This is separate from the public `ChapterComment`/
+  `ChapterRating` system (see @.claude/specs/modules/social.md) — do not conflate the two
 - The entire Writer's Studio (plotting, timeline, characters, world building, board, notes) is ALWAYS private — only the author can see it
 - Before creating a new component, check if it already exists in `src/components/ui/`

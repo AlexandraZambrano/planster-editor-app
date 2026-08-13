@@ -11,30 +11,51 @@ datasource db {
 // ─── USERS ──────────────────────────────────────────────────────────────────
 
 model User {
-  id          String   @id @default(cuid())
-  email       String   @unique
-  authUserId  String?  @unique // Supabase auth.users.id — nullable until the user signs in via Supabase
-  username    String   @unique
-  displayName String
-  bio         String?  @db.VarChar(300)
-  avatarUrl   String?
-  avatarPositionY Int @default(50) // vertical focal point of the avatar crop, 0 (top) – 100 (bottom)
-  showLibraryCount Boolean @default(false)
-  showRatingsAndReviews Boolean @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  email                 String   @unique
+  authUserId            String?  @unique // Supabase auth.users.id — nullable until the user signs in via Supabase
+  username              String   @unique
+  displayName           String
+  bio                   String?  @db.VarChar(300)
+  avatarUrl             String?
+  avatarPositionY       Int      @default(50) // vertical focal point of the avatar crop, 0 (top) – 100 (bottom)
+  showLibraryCount      Boolean  @default(false)
+  showRatingsAndReviews Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
-  books            Book[]
-  betaReaderships  BetaReader[]
-  library          Library[]
-  shelves          Shelf[]
-  writingGoals     WritingGoal[]
-  wordCountLogs    WordCountLog[]
-  notifications    Notification[]
-  commentReplies   CommentReply[]
+  books               Book[]
+  betaReaderships     BetaReader[]
+  library             Library[]
+  shelves             Shelf[]
+  writingGoals        WritingGoal[]
+  wordCountLogs       WordCountLog[]
+  notifications       Notification[]
+  commentReplies      CommentReply[]
   passwordResetTokens PasswordResetToken[]
-  readingProgress  ReadingProgress[]
-  readingActivity  ReadingActivity[]
+  readingProgress     ReadingProgress[]
+  readingActivity     ReadingActivity[]
+  following           Follow[]             @relation("Following")
+  followers           Follow[]             @relation("Followers")
+  chapterComments     ChapterComment[]
+  chapterRatings      ChapterRating[]
+  sentMessages        Message[]
+  conversationsAsA    Conversation[]       @relation("ConversationsAsA")
+  conversationsAsB    Conversation[]       @relation("ConversationsAsB")
+}
+
+// ─── SOCIAL — FOLLOW ────────────────────────────────────────────────────────
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
 }
 
 model PasswordResetToken {
@@ -88,7 +109,7 @@ model Book {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
-  author          User            @relation(fields: [authorId], references: [id])
+  author          User              @relation(fields: [authorId], references: [id])
   chapters        Chapter[]
   betaReaders     BetaReader[]
   library         Library[]
@@ -112,13 +133,15 @@ model Chapter {
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
 
-  book            Book            @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  book            Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
   plotNote        PlotNote?
   inlineComments  InlineComment[]
   chapterReviews  ChapterReview[]
   wordCountLogs   WordCountLog[]
   timelineEntries TimelineEntry[]
   readingProgress ReadingProgress[]
+  chapterComments ChapterComment[]
+  chapterRatings  ChapterRating[]
 
   @@unique([bookId, order])
 }
@@ -437,8 +460,8 @@ model InlineComment {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  chapter    Chapter      @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-  betaReader BetaReader   @relation(fields: [betaReaderId], references: [id])
+  chapter    Chapter        @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  betaReader BetaReader     @relation(fields: [betaReaderId], references: [id])
   replies    CommentReply[]
 }
 
@@ -464,6 +487,36 @@ model ChapterReview {
   betaReader BetaReader @relation(fields: [betaReaderId], references: [id])
 
   @@unique([chapterId, betaReaderId])
+}
+
+// ─── PUBLIC CHAPTER COMMENTS & RATINGS ─────────────────────────────────────
+// Distinct from InlineComment/ChapterReview above: those are always private,
+// beta-reader-to-author only (see beta-system.md). These are public, visible
+// on any PUBLISHED chapter to any reader — a separate, additive layer.
+
+model ChapterComment {
+  id        String   @id @default(cuid())
+  chapterId String
+  userId    String
+  content   String   @db.VarChar(1000)
+  createdAt DateTime @default(now())
+
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ChapterRating {
+  id        String   @id @default(cuid())
+  chapterId String
+  userId    String
+  rating    Float // 0-5, half-stars — same convention as Library.rating
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chapterId, userId])
 }
 
 // ─── LIBRARY & SHELVES ──────────────────────────────────────────────────────
@@ -506,6 +559,46 @@ model ShelfBook {
   @@unique([shelfId, libraryId])
 }
 
+// ─── DIRECT MESSAGES ────────────────────────────────────────────────────────
+// Every new conversation starts PENDING until the recipient accepts, regardless
+// of follow status in either direction (see modules/messages.md).
+
+enum ConversationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model Conversation {
+  id          String             @id @default(cuid())
+  userAId     String // lower user id, lexicographically — normalized in the action, not the DB
+  userBId     String // higher user id
+  initiatorId String
+  status      ConversationStatus @default(PENDING)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  userA    User      @relation("ConversationsAsA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB    User      @relation("ConversationsAsB", fields: [userBId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([userAId, userBId])
+}
+
+model Message {
+  id             String    @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String?   @db.Text
+  imageUrl       String? // set for quote-card messages
+  quoteMeta      Json? // { quote, bookTitle, chapterTitle } — set for quote-card messages
+  readAt         DateTime?
+  createdAt      DateTime  @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id])
+}
+
 // ─── NOTIFICATIONS ──────────────────────────────────────────────────────────
 
 enum NotificationType {
@@ -517,6 +610,10 @@ enum NotificationType {
   BOOK_SAVED
   NEW_CHAPTER_PUBLISHED
   COMMENT_REPLY
+  NEW_FOLLOWER
+  NEW_CHAPTER_COMMENT
+  MESSAGE_REQUEST_RECEIVED
+  MESSAGE_REQUEST_ACCEPTED
 }
 
 model Notification {

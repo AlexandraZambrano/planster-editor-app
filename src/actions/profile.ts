@@ -1,6 +1,7 @@
 "use server"
 
 import { prisma } from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 export type PublicProfileData = {
   id: string
@@ -13,11 +14,17 @@ export type PublicProfileData = {
   publicShelves: { id: string; name: string; bookCount: number }[]
   libraryCount: number | null
   ratings: { bookId: string; bookTitle: string; rating: number }[] | null
+  followerCount: number
+  followingCount: number
+  isOwnProfile: boolean
+  isFollowing: boolean
 }
 
 export async function getPublicProfile(
   username: string
 ): Promise<{ error?: string; profile?: PublicProfileData }> {
+  const session = await auth()
+
   const user = await prisma.user.findUnique({
     where: { username },
     select: {
@@ -33,28 +40,36 @@ export async function getPublicProfile(
   })
   if (!user) return { error: "Profile not found" }
 
-  const [books, shelves, libraryCount, ratedBooks] = await Promise.all([
-    prisma.book.findMany({
-      where: { authorId: user.id, publicationStatus: "PUBLISHED" },
-      select: { id: true, title: true, coverUrl: true },
-      orderBy: { updatedAt: "desc" },
-    }),
-    prisma.shelf.findMany({
-      where: { userId: user.id, isPublic: true },
-      select: { id: true, name: true, _count: { select: { shelfBooks: true } } },
-      orderBy: { createdAt: "asc" },
-    }),
-    user.showLibraryCount
-      ? prisma.library.count({ where: { userId: user.id } })
-      : Promise.resolve(null),
-    user.showRatingsAndReviews
-      ? prisma.library.findMany({
-          where: { userId: user.id, rating: { not: null } },
-          select: { rating: true, book: { select: { id: true, title: true } } },
-          orderBy: { addedAt: "desc" },
-        })
-      : Promise.resolve(null),
-  ])
+  const [books, shelves, libraryCount, ratedBooks, followerCount, followingCount, viewerFollow] =
+    await Promise.all([
+      prisma.book.findMany({
+        where: { authorId: user.id, publicationStatus: "PUBLISHED" },
+        select: { id: true, title: true, coverUrl: true },
+        orderBy: { updatedAt: "desc" },
+      }),
+      prisma.shelf.findMany({
+        where: { userId: user.id, isPublic: true },
+        select: { id: true, name: true, _count: { select: { shelfBooks: true } } },
+        orderBy: { createdAt: "asc" },
+      }),
+      user.showLibraryCount
+        ? prisma.library.count({ where: { userId: user.id } })
+        : Promise.resolve(null),
+      user.showRatingsAndReviews
+        ? prisma.library.findMany({
+            where: { userId: user.id, rating: { not: null } },
+            select: { rating: true, book: { select: { id: true, title: true } } },
+            orderBy: { addedAt: "desc" },
+          })
+        : Promise.resolve(null),
+      prisma.follow.count({ where: { followingId: user.id } }),
+      prisma.follow.count({ where: { followerId: user.id } }),
+      session
+        ? prisma.follow.findUnique({
+            where: { followerId_followingId: { followerId: session.user.id, followingId: user.id } },
+          })
+        : Promise.resolve(null),
+    ])
 
   return {
     profile: {
@@ -78,6 +93,10 @@ export async function getPublicProfile(
             rating: r.rating!,
           }))
         : null,
+      followerCount,
+      followingCount,
+      isOwnProfile: session?.user.id === user.id,
+      isFollowing: !!viewerFollow,
     },
   }
 }

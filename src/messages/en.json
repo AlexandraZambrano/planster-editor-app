@@ -28,7 +28,11 @@
     "bookSaved": "{actorName} saved \"{bookTitle}\" to their library",
     "newChapterPublished": "A new chapter, \"{chapterTitle}\", was published in \"{bookTitle}\"",
     "commentReply": "{actorName} replied to your comment on \"{chapterTitle}\"",
-    "default": "New notification"
+    "default": "New notification",
+    "newFollower": "{actorName} started following you",
+    "newChapterComment": "{actorName} commented on \"{chapterTitle}\"",
+    "messageRequestReceived": "{actorName} wants to send you a message",
+    "messageRequestAccepted": "{actorName} accepted your message request"
   },
   "Common": {
     "close": "Close",
@@ -178,7 +182,13 @@
     "publishedBooks": "Published books",
     "shelves": "Shelves",
     "shelfBookCount": "{count, plural, one {# book} other {# books}}",
-    "ratings": "Ratings"
+    "ratings": "Ratings",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "following": "Following",
+    "followers": "{count, plural, one {# follower} other {# followers}}",
+    "followingCount": "{count, plural, one {# following} other {# following}}",
+    "message": "Message"
   },
   "Library": {
     "title": "My Library",
@@ -497,5 +507,49 @@
     "changesBody": "We may update this policy from time to time as Planster evolves. If we make material changes, we'll update the \"last updated\" date above. We encourage you to review this page periodically.",
     "contactTitle": "13. Contact us",
     "contactBody": "If you have any questions about this Privacy Policy or how we handle your data, you can reach Alexandra Zambrano, who operates Planster, at planster.alexzambrano.com."
+  },
+  "Comments": {
+    "title": "Comments",
+    "ratingLabel": "Rate this chapter",
+    "averageRating": "{rating} ({count, plural, one {# rating} other {# ratings}})",
+    "noRatingsYet": "No ratings yet",
+    "placeholder": "Share your thoughts on this chapter…",
+    "post": "Post",
+    "empty": "No comments yet — be the first to comment",
+    "delete": "Delete"
+  },
+  "Messages": {
+    "title": "Messages",
+    "ariaLabel": "Messages",
+    "requestsTab": "Requests",
+    "conversationsTab": "Conversations",
+    "noConversations": "No conversations yet",
+    "noRequests": "No message requests",
+    "accept": "Accept",
+    "decline": "Decline",
+    "requestFrom": "wants to message you",
+    "waitingForAccept": "Waiting for {name} to accept your message request",
+    "typePlaceholder": "Write a message…",
+    "send": "Send",
+    "emptyThread": "No messages yet — say hi!",
+    "quoteCardLabel": "Shared a quote from \"{bookTitle}\"",
+    "backToInbox": "Back to messages"
+  },
+  "Share": {
+    "shareQuote": "Share quote",
+    "dialogTitle": "Share this quote",
+    "chooseBackground": "Choose a background",
+    "inAppTab": "Send to a friend",
+    "externalTab": "Share outside Planster",
+    "noFollowing": "You're not following anyone yet",
+    "sentToFriend": "Sent!",
+    "send": "Send",
+    "generate": "Generate image",
+    "generating": "Generating…",
+    "download": "Download",
+    "shareButton": "Share",
+    "copyLink": "Copy image link",
+    "linkCopied": "Link copied",
+    "close": "Close"
   }
 }
