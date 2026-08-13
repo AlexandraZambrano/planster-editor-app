@@ -6,11 +6,13 @@
 |---|---|---|
 | `/` | `src/app/(public)/page.tsx` | Home: featured books, recent, genres |
 | `/explore` | `src/app/(public)/explore/page.tsx` | Catalogue with filters and search |
+| `/explore/people` | `src/app/explore/people/page.tsx` | Search for users by name/username, and follow suggestions ("people you may know") |
 | `/books/[bookId]` | `src/app/(public)/books/[bookId]/page.tsx` | Public book page |
 | `/@[username]` | `src/app/profile/[username]/page.tsx` (via rewrite — `@folder` is reserved for Next.js parallel routes and can't itself produce a URL) | User public profile |
 | `/auth/login` | `src/app/(auth)/login/page.tsx` | Login |
 | `/auth/register` | `src/app/(auth)/register/page.tsx` | Register |
 | `/privacy` | `src/app/privacy/page.tsx` | Privacy Policy (GDPR-oriented, linked from registration and the home footer) |
+| `/share/[shareId]` | `src/app/share/[shareId]/page.tsx` | Public landing page for an externally-shared quote card — real OG image for link previews, "read this book" / "join Planster" CTAs |
 
 ## Authenticated routes (session required)
 

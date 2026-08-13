@@ -548,8 +548,23 @@
     "generating": "Génération…",
     "download": "Télécharger",
     "shareButton": "Partager",
-    "copyLink": "Copier le lien de l'image",
+    "copyLink": "Copier le lien",
     "linkCopied": "Lien copié",
     "close": "Fermer"
+  },
+  "ShareLanding": {
+    "readBook": "Lire ce livre sur Planster",
+    "joinPrompt": "Pas encore de compte ?",
+    "joinCta": "Créer un compte gratuit"
+  },
+  "People": {
+    "tabBooks": "Livres",
+    "tabPeople": "Personnes",
+    "searchPlaceholder": "Rechercher par nom ou pseudo…",
+    "searchPrompt": "Recherchez des personnes par nom ou pseudo",
+    "noResults": "Aucune personne trouvée",
+    "suggestionsTitle": "Personnes que vous connaissez peut-être",
+    "noSuggestions": "Pas encore de suggestions — suivez quelqu'un pour commencer",
+    "connectedThrough": "Suivi par {name}"
   }
 }

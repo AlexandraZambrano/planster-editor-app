@@ -333,7 +333,9 @@ export function ReadingView({
           open={showShareDialog}
           onOpenChange={setShowShareDialog}
           quote={shareQuoteText}
+          bookId={bookId}
           bookTitle={bookTitle}
+          chapterId={chapterId}
           chapterTitle={chapterTitle}
         />
       )}

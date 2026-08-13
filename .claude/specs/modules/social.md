@@ -30,6 +30,21 @@
   `src/app/(app)/read/[bookId]/[chapterId]/reading-view.tsx`, visually separate from the
   beta-only review section above it
 
+## Discovering people (`/explore/people`)
+
+- A "Personas"/"People" tab next to the book catalogue (`ExploreTabs`, shared between
+  `/explore` and `/explore/people`)
+- **Search**: by username or display name (case-insensitive substring match), same
+  URL-param + 300ms-debounce pattern as book search (`src/actions/people.ts`
+  `searchUsers()`) — excludes the viewer from their own results
+- **Follow suggestions ("people you may know")**: shown when the search box is empty.
+  Ranked by second-degree connections — users followed by people the viewer already
+  follows, excluding the viewer and anyone already followed (`getFollowSuggestions()`,
+  a `Follow` self-join grouped by candidate and ordered by connection count). Each
+  suggestion shows which of the viewer's follows connects them ("Followed by X")
+- Both use the same `PersonCard` component and the existing `FollowButton`
+  (`src/components/profile/follow-button.tsx`)
+
 ## Critical rule
 
 Public comments/ratings are gated server-side on `chapter.visibility === "PUBLISHED"` and

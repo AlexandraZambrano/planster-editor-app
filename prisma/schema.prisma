@@ -120,6 +120,7 @@ model Book {
   bookNotes       BookNote[]
   writingGoals    WritingGoal[]
   readingProgress ReadingProgress[]
+  quoteShares     QuoteShare[]
 }
 
 model Chapter {
@@ -142,6 +143,7 @@ model Chapter {
   readingProgress ReadingProgress[]
   chapterComments ChapterComment[]
   chapterRatings  ChapterRating[]
+  quoteShares     QuoteShare[]
 
   @@unique([bookId, order])
 }
@@ -597,6 +599,22 @@ model Message {
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender       User         @relation(fields: [senderId], references: [id])
+}
+
+// A persisted, publicly-viewable landing page for an externally-shared quote
+// card (see modules/messages.md) — the image URL alone can't carry a
+// "read this book" / "join Planster" call to action, so the share link
+// points at /share/[id] instead of the raw Cloudinary URL.
+model QuoteShare {
+  id        String   @id @default(cuid())
+  bookId    String
+  chapterId String
+  quote     String   @db.Text
+  imageUrl  String
+  createdAt DateTime @default(now())
+
+  book    Book    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 }
 
 // ─── NOTIFICATIONS ──────────────────────────────────────────────────────────
