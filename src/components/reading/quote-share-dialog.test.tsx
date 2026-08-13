@@ -8,6 +8,16 @@ import { sendMessage } from "@/actions/messages"
 vi.mock("@/actions/follow", () => ({ getFollowing: vi.fn() }))
 vi.mock("@/actions/messages", () => ({ sendMessage: vi.fn() }))
 
+const BASE_PROPS = {
+  open: true,
+  onOpenChange: () => {},
+  quote: "Hello world",
+  bookId: "book-1",
+  bookTitle: "Book",
+  chapterId: "chapter-1",
+  chapterTitle: "Chapter",
+}
+
 beforeEach(() => {
   vi.clearAllMocks()
   vi.mocked(getFollowing).mockResolvedValue({ users: [] })
@@ -15,30 +25,14 @@ beforeEach(() => {
 
 describe("QuoteShareDialog", () => {
   it("renders the selected quote and caption when open", () => {
-    render(
-      <QuoteShareDialog
-        open
-        onOpenChange={() => {}}
-        quote="A quote worth sharing"
-        bookTitle="My Book"
-        chapterTitle="Chapter One"
-      />
-    )
+    render(<QuoteShareDialog {...BASE_PROPS} quote="A quote worth sharing" />)
     expect(screen.getByText(/A quote worth sharing/)).toBeInTheDocument()
-    expect(screen.getByText(/Chapter One/)).toBeInTheDocument()
-    expect(screen.getByText(/My Book/)).toBeInTheDocument()
+    expect(screen.getByText(/Chapter/)).toBeInTheDocument()
+    expect(screen.getByText(/Book/)).toBeInTheDocument()
   })
 
   it("shows a message when the viewer follows nobody yet", async () => {
-    render(
-      <QuoteShareDialog
-        open
-        onOpenChange={() => {}}
-        quote="Hello"
-        bookTitle="Book"
-        chapterTitle="Chapter"
-      />
-    )
+    render(<QuoteShareDialog {...BASE_PROPS} />)
     await waitFor(() => {
       expect(screen.getByText("You're not following anyone yet")).toBeInTheDocument()
     })
@@ -50,15 +44,7 @@ describe("QuoteShareDialog", () => {
     })
     vi.mocked(sendMessage).mockResolvedValue({ success: true, conversationId: "conv-1" })
 
-    render(
-      <QuoteShareDialog
-        open
-        onOpenChange={() => {}}
-        quote="Hello world"
-        bookTitle="Book"
-        chapterTitle="Chapter"
-      />
-    )
+    render(<QuoteShareDialog {...BASE_PROPS} />)
 
     const sendButton = await screen.findByRole("button", { name: "Send" })
     await userEvent.click(sendButton)
@@ -73,21 +59,16 @@ describe("QuoteShareDialog", () => {
     })
   })
 
-  it("switches to the external tab and generates a shareable image", async () => {
+  it("generates a shareable image and page link on the external tab", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ url: "https://cdn.example.com/quote-card.png" }),
+      json: async () => ({
+        url: "https://res.cloudinary.com/demo/quote-card.png",
+        shareUrl: "https://planster.app/share/share-1",
+      }),
     }) as unknown as typeof fetch
 
-    render(
-      <QuoteShareDialog
-        open
-        onOpenChange={() => {}}
-        quote="Hello"
-        bookTitle="Book"
-        chapterTitle="Chapter"
-      />
-    )
+    render(<QuoteShareDialog {...BASE_PROPS} />)
 
     await userEvent.click(screen.getByRole("tab", { name: "Share outside Planster" }))
     await userEvent.click(screen.getByRole("button", { name: "Generate image" }))
@@ -95,9 +76,51 @@ describe("QuoteShareDialog", () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
         "/api/quote-card",
-        expect.objectContaining({ method: "POST" })
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            quote: "Hello world",
+            bookId: "book-1",
+            chapterId: "chapter-1",
+            backgroundId: "bg-1",
+          }),
+        })
       )
     })
-    expect(await screen.findByRole("link", { name: "Download" })).toBeInTheDocument()
+
+    expect(await screen.findByRole("button", { name: "Download" })).toBeInTheDocument()
+  })
+
+  it("downloads the generated image as a real file instead of opening a new tab", async () => {
+    const blob = new Blob(["fake-png-bytes"], { type: "image/png" })
+    global.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          url: "https://res.cloudinary.com/demo/quote-card.png",
+          shareUrl: "https://planster.app/share/share-1",
+        }),
+      })
+      .mockResolvedValueOnce({ blob: async () => blob }) as unknown as typeof fetch
+
+    const createObjectURL = vi.fn(() => "blob:mock-url")
+    const revokeObjectURL = vi.fn()
+    URL.createObjectURL = createObjectURL as unknown as typeof URL.createObjectURL
+    URL.revokeObjectURL = revokeObjectURL
+
+    render(<QuoteShareDialog {...BASE_PROPS} />)
+
+    await userEvent.click(screen.getByRole("tab", { name: "Share outside Planster" }))
+    await userEvent.click(screen.getByRole("button", { name: "Generate image" }))
+    const downloadButton = await screen.findByRole("button", { name: "Download" })
+
+    await userEvent.click(downloadButton)
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenLastCalledWith("https://res.cloudinary.com/demo/quote-card.png")
+      expect(createObjectURL).toHaveBeenCalledWith(blob)
+      expect(revokeObjectURL).toHaveBeenCalledWith("blob:mock-url")
+    })
   })
 })

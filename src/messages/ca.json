@@ -548,8 +548,13 @@
     "generating": "Generant…",
     "download": "Descarrega",
     "shareButton": "Comparteix",
-    "copyLink": "Copia l'enllaç de la imatge",
+    "copyLink": "Copia l'enllaç",
     "linkCopied": "Enllaç copiat",
     "close": "Tanca"
+  },
+  "ShareLanding": {
+    "readBook": "Llegeix aquest llibre a Planster",
+    "joinPrompt": "Encara no tens compte?",
+    "joinCta": "Crea un compte gratis"
   }
 }

@@ -11,6 +11,7 @@
 | `/auth/login` | `src/app/(auth)/login/page.tsx` | Login |
 | `/auth/register` | `src/app/(auth)/register/page.tsx` | Register |
 | `/privacy` | `src/app/privacy/page.tsx` | Privacy Policy (GDPR-oriented, linked from registration and the home footer) |
+| `/share/[shareId]` | `src/app/share/[shareId]/page.tsx` | Public landing page for an externally-shared quote card — real OG image for link previews, "read this book" / "join Planster" CTAs |
 
 ## Authenticated routes (session required)
 

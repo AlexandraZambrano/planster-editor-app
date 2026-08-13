@@ -21,7 +21,9 @@ interface QuoteShareDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   quote: string
+  bookId: string
   bookTitle: string
+  chapterId: string
   chapterTitle: string
 }
 
@@ -29,7 +31,9 @@ export function QuoteShareDialog({
   open,
   onOpenChange,
   quote,
+  bookId,
   bookTitle,
+  chapterId,
   chapterTitle,
 }: QuoteShareDialogProps) {
   const t = useTranslations("Share")
@@ -98,8 +102,9 @@ export function QuoteShareDialog({
           <TabsContent value="external" className="mt-3">
             <ExternalShareTab
               quote={quote}
+              bookId={bookId}
               bookTitle={bookTitle}
-              chapterTitle={chapterTitle}
+              chapterId={chapterId}
               backgroundId={backgroundId}
             />
           </TabsContent>
@@ -172,18 +177,22 @@ function InAppShareTab({
 
 function ExternalShareTab({
   quote,
+  bookId,
   bookTitle,
-  chapterTitle,
+  chapterId,
   backgroundId,
 }: {
   quote: string
+  bookId: string
   bookTitle: string
-  chapterTitle: string
+  chapterId: string
   backgroundId: string
 }) {
   const t = useTranslations("Share")
   const [generating, setGenerating] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
   async function handleGenerate() {
@@ -192,20 +201,46 @@ function ExternalShareTab({
       const res = await fetch("/api/quote-card", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quote, bookTitle, chapterTitle, backgroundId }),
+        body: JSON.stringify({ quote, bookId, chapterId, backgroundId }),
       })
       const data = await res.json()
-      if (res.ok) setImageUrl(data.url)
+      if (res.ok) {
+        setImageUrl(data.url)
+        setShareUrl(data.shareUrl)
+      }
     } finally {
       setGenerating(false)
     }
   }
 
+  async function handleDownload() {
+    if (!imageUrl || downloading) return
+    setDownloading(true)
+    try {
+      // The image lives on Cloudinary (cross-origin), so a plain <a download>
+      // just opens it in a new tab instead of downloading — browsers only
+      // honor `download` for same-origin (or blob:) URLs. Fetch the bytes and
+      // download the resulting blob instead.
+      const res = await fetch(imageUrl)
+      const blob = await res.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = blobUrl
+      link.download = "planster-quote.png"
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(blobUrl)
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   async function handleWebShare() {
-    if (!imageUrl) return
+    if (!shareUrl) return
     if (navigator.share) {
       try {
-        await navigator.share({ title: bookTitle, url: imageUrl })
+        await navigator.share({ title: bookTitle, text: quote, url: shareUrl })
       } catch {
         // user cancelled the native share sheet — nothing to do
       }
@@ -213,13 +248,13 @@ function ExternalShareTab({
   }
 
   async function handleCopyLink() {
-    if (!imageUrl) return
-    await navigator.clipboard.writeText(imageUrl)
+    if (!shareUrl) return
+    await navigator.clipboard.writeText(shareUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
-  if (!imageUrl) {
+  if (!imageUrl || !shareUrl) {
     return (
       <Button onClick={handleGenerate} disabled={generating} className="w-full gap-2">
         {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
@@ -236,11 +271,9 @@ function ExternalShareTab({
           {t("shareButton")}
         </Button>
       )}
-      <Button asChild variant="outline" size="sm" className="gap-1.5">
-        <a href={imageUrl} download target="_blank" rel="noopener noreferrer">
-          <Download className="h-3.5 w-3.5" />
-          {t("download")}
-        </a>
+      <Button onClick={handleDownload} disabled={downloading} variant="outline" size="sm" className="gap-1.5">
+        {downloading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+        {t("download")}
       </Button>
       <Button onClick={handleCopyLink} variant="outline" size="sm">
         {copied ? t("linkCopied") : t("copyLink")}

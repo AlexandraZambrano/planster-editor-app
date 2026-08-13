@@ -254,6 +254,10 @@ vi.mock("@/lib/prisma", () => ({
       updateMany: vi.fn(),
       count: vi.fn(),
     },
+    quoteShare: {
+      findUnique: vi.fn(),
+      create: vi.fn(),
+    },
     $transaction: vi.fn(),
     $queryRaw: vi.fn(),
   },

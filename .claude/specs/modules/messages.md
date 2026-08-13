@@ -53,9 +53,17 @@ to beta readers like the adjacent inline-comment action) that opens `QuoteShareD
 - **In-app share**: picks a followed user (`getFollowing()`, see `social.md`) and calls
   `sendMessage(recipientId, { quoteCard: {...} })` — stored in `Message.quoteMeta`, no image
   file generated, rendered client-side in the thread as a styled card
-- **External share**: `POST /api/quote-card` composites the quote + background + caption
-  into a PNG server-side (`src/lib/quote-card.ts`, using `sharp`) and uploads it to
-  Cloudinary (`planster/quote-cards/`) via the existing `uploadImage()` helper, returning a
-  public URL. The client then uses the Web Share API when available, or falls back to a
-  download link + copyable URL. No DB record is kept for external shares — stateless
-  generate-upload-share
+- **External share**: `POST /api/quote-card` takes `{ quote, backgroundId, bookId, chapterId }`
+  — book/chapter titles are looked up server-side from the DB (never trusted from the
+  client), which doubles as the access check: only a `PUBLISHED` chapter can be turned into
+  a share. It composites the quote + background + caption into a PNG (`src/lib/quote-card.ts`,
+  using `sharp`), uploads it to Cloudinary (`planster/quote-cards/`) via the existing
+  `uploadImage()` helper, and persists a `QuoteShare` row (`bookId`, `chapterId`, `quote`,
+  `imageUrl`). The response includes both the raw Cloudinary `url` (used client-side to
+  download the actual image bytes as a blob — a plain `<a download>` doesn't work for a
+  cross-origin URL) and `shareUrl`, an absolute link to `/share/[shareId]`
+  (`src/app/share/[shareId]/page.tsx`) — a public landing page with a real OG image (so link
+  previews on WhatsApp/X/etc. show the quote card itself), the quote, and two CTAs: read the
+  book (`/books/[bookId]`) or create a free account (`/auth/register`). The Web Share API and
+  "copy link" both share this page URL, not the raw image URL — `getQuoteShare()`
+  (`src/actions/quote-share.ts`) powers both the page and its `generateMetadata`.

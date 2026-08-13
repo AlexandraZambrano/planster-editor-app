@@ -548,8 +548,13 @@
     "generating": "Génération…",
     "download": "Télécharger",
     "shareButton": "Partager",
-    "copyLink": "Copier le lien de l'image",
+    "copyLink": "Copier le lien",
     "linkCopied": "Lien copié",
     "close": "Fermer"
+  },
+  "ShareLanding": {
+    "readBook": "Lire ce livre sur Planster",
+    "joinPrompt": "Pas encore de compte ?",
+    "joinCta": "Créer un compte gratuit"
   }
 }
