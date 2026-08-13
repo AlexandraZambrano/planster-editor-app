@@ -34,13 +34,19 @@
 - Hides: navbar, sidebar, side panel
 - The editor fills the entire screen with only the toolbar visible
 
-## Beta inline comments
-- Visible only when the author reviews their own chapter
-- Commented text fragments are highlighted in light yellow
-- Right side panel: list of comments ordered by position in the text
-- Each comment shows: beta reader name, selected text, comment, date
-- Author actions: "Mark as resolved" (archives the comment), "Reply" (opens a thread)
-- Resolved comments are hidden by default (toggle to show them)
+## Beta inline comments & reviews (author view)
+- A "Beta feedback" button in the editor's top bar (badge = unresolved comments +
+  reviews) opens a right side panel — `src/components/editor/beta-feedback-panel.tsx`,
+  data via `getChapterComments()` / `getChapterReviews()` in `src/actions/beta.ts`
+- Comments section: list ordered by position in the text, each showing beta reader
+  name, the quoted selected text, the comment, and date
+- Author actions: "Mark as resolved" (hides the comment from the default view),
+  "Reply" (opens a thread, visible to that beta reader)
+- Resolved comments are hidden by default, with a "Show resolved (N)" toggle
+- Reviews section: full-chapter reviews from beta readers, read-only for the author
+- Not yet implemented: highlighting the commented text fragment inline in the editor
+  itself (the panel is the only way to see *which* passage a comment refers to,
+  via its quoted `selectedText` — there's no in-document highlight yet)
 - Beta readers do NOT have access to the full editor; they read at `/read/[bookId]/[chapterId]`
 
 ## Access

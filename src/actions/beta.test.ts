@@ -11,6 +11,7 @@ import {
   replyToComment,
   createChapterReview,
   getChapterComments,
+  getChapterReviews,
 } from "./beta"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
@@ -491,5 +492,35 @@ describe("getChapterComments", () => {
     const result = await getChapterComments("ch-1")
     expect(result.comments).toHaveLength(1)
     expect(result.comments?.[0].fromPos).toBe(5)
+  })
+})
+
+describe("getChapterReviews", () => {
+  it("returns error when not authenticated", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(null as any)
+    const result = await getChapterReviews("ch-1")
+    expect(result.error).toBe("Unauthorized")
+  })
+
+  it("returns error when the viewer is not the author", async () => {
+    mp.chapter.findUnique.mockResolvedValue({ book: { authorId: "other" } })
+    const result = await getChapterReviews("ch-1")
+    expect(result.error).toBe("Not found")
+  })
+
+  it("returns the reviews for the author", async () => {
+    mp.chapter.findUnique.mockResolvedValue({ book: { authorId: "user-1" } })
+    mp.chapterReview.findMany.mockResolvedValue([
+      {
+        id: "r-1",
+        content: "Great chapter!",
+        createdAt: new Date(),
+        betaReader: { id: "br-1", user: { username: "reader1", displayName: "Reader", avatarUrl: null } },
+      },
+    ])
+
+    const result = await getChapterReviews("ch-1")
+    expect(result.reviews).toHaveLength(1)
+    expect(result.reviews?.[0].content).toBe("Great chapter!")
   })
 })

@@ -12,6 +12,13 @@ vi.mock("@/actions/chapters", () => ({
   reorderChapters: vi.fn(),
 }))
 
+vi.mock("@/actions/beta", () => ({
+  getChapterComments: vi.fn().mockResolvedValue({ comments: [] }),
+  getChapterReviews: vi.fn().mockResolvedValue({ reviews: [] }),
+  resolveInlineComment: vi.fn(),
+  replyToComment: vi.fn(),
+}))
+
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
