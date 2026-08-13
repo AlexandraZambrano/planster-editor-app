@@ -17,11 +17,22 @@
 | `BOOK_SAVED` | Author | Someone saves their book to their library |
 | `NEW_CHAPTER_PUBLISHED` | Reader | A chapter is published in a book in their library |
 | `COMMENT_REPLY` | Beta reader | The author replies to their comment |
+| `NEW_FOLLOWER` | Followed user | Someone follows them (see modules/social.md) |
+| `NEW_CHAPTER_COMMENT` | Author | A reader posts a public comment on a PUBLISHED chapter (see modules/social.md) |
+| `MESSAGE_REQUEST_RECEIVED` | Recipient | Someone sends them a first message (see modules/messages.md) |
+| `MESSAGE_REQUEST_ACCEPTED` | Initiator | Their message request was accepted (see modules/messages.md) |
 
 ## JSON payload per type
-- All include: `actorName`, `actorAvatarUrl`, `bookId`, `bookTitle`
-- `NEW_INLINE_COMMENT` and `COMMENT_REPLY` also include: `chapterId`, `chapterTitle`, `commentId`
+- All include: `actorName`, `actorAvatarUrl`, `bookId`, `bookTitle` (`bookId`/`bookTitle`
+  are empty strings for the follow/message types, which have no associated book)
+- `NEW_INLINE_COMMENT`, `COMMENT_REPLY`, and `NEW_CHAPTER_COMMENT` also include: `chapterId`, `chapterTitle`, `commentId` (comment types only)
 - `NEW_CHAPTER_PUBLISHED` also includes: `chapterId`, `chapterTitle`
+- `MESSAGE_REQUEST_RECEIVED` and `MESSAGE_REQUEST_ACCEPTED` also include: `conversationId`
+
+## Note on chat messages
+Ongoing chat messages (after the first one in a conversation) do **not** create
+`Notification` rows — see modules/messages.md for the separate SSE channel used instead.
+This keeps the notification bell reserved for discrete events, not continuous activity.
 
 ## UI
 - Bell icon in the navbar

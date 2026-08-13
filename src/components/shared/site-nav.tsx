@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { NotificationBell } from "@/components/notifications/notification-bell"
+import { MessagesBell } from "@/components/messages/messages-bell"
 import { LanguageSwitcher } from "./language-switcher"
 import { SignOutButton } from "./sign-out-button"
 import { MobileNav } from "./mobile-nav"
@@ -62,6 +63,7 @@ export async function SiteNav({ active }: SiteNavProps) {
         {session ? (
           <div className="hidden md:flex items-center gap-1 shrink-0">
             <LanguageSwitcher />
+            <MessagesBell />
             <NotificationBell />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -106,6 +108,7 @@ export async function SiteNav({ active }: SiteNavProps) {
         )}
 
         <div className="flex md:hidden items-center gap-1 shrink-0">
+          {session && <MessagesBell />}
           {session && <NotificationBell />}
           <MobileNav
             navLinks={navLinks}

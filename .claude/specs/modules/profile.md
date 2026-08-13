@@ -10,6 +10,9 @@ Any visitor can see the profile.
 - Profile picture (circular, 120px)
 - Display name and @username
 - Bio (max 300 chars)
+- Follower / following counts, and a Follow/Unfollow button + a Message button (hidden on
+  your own profile) — see @.claude/specs/modules/social.md and
+  @.claude/specs/modules/messages.md
 - If the user is a writer: grid of cover images of their published books (click → book page)
 - If the user has public shelves: shelf list with book count
 - Number of books in library (if the user has made it public in settings)

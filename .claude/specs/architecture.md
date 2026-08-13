@@ -124,11 +124,18 @@ planster-editor-app/
 - All user-uploaded images (covers, character photos, world building, board) are uploaded to Cloudinary
 - The helper `src/lib/cloudinary.ts` exposes `uploadImage(file, folder)` and returns the public URL
 - Never save images to `public/` or the server filesystem
+  - Exception: static, app-provided assets that are generated once and committed (not
+    user-uploaded) — the PWA icons (`public/icons/`) and the quote-share background
+    gradients (`public/quote-backgrounds/`, see `scripts/generate-quote-backgrounds.mjs`)
+    follow this pattern; the quote-share images a *user* generates are still uploaded to
+    Cloudinary, never written to disk
 
 ### Real-time notifications
 - Use Server-Sent Events (SSE) via an API route at `src/app/api/notifications/stream/route.ts`
 - The client subscribes to the stream when the notification bell component mounts
 - Fallback: polling every 30s if SSE is unavailable
+- Chat messages use a second, independent SSE channel (`src/lib/message-events.ts` +
+  `src/app/api/messages/stream/route.ts`) so chat volume never affects the notification bell
 
 ### Interactive board (React Flow)
 - The Board uses React Flow for the drag-and-drop canvas
