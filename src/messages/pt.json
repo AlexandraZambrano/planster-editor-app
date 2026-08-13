@@ -556,5 +556,15 @@
     "readBook": "Ler este livro no Planster",
     "joinPrompt": "Ainda não tem conta?",
     "joinCta": "Criar uma conta grátis"
+  },
+  "People": {
+    "tabBooks": "Livros",
+    "tabPeople": "Pessoas",
+    "searchPlaceholder": "Pesquise por nome ou usuário…",
+    "searchPrompt": "Pesquise pessoas por nome ou usuário",
+    "noResults": "Nenhuma pessoa encontrada",
+    "suggestionsTitle": "Pessoas que você talvez conheça",
+    "noSuggestions": "Ainda não há sugestões — siga alguém para começar",
+    "connectedThrough": "Seguido por {name}"
   }
 }

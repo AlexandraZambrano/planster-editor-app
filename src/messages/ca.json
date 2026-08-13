@@ -556,5 +556,15 @@
     "readBook": "Llegeix aquest llibre a Planster",
     "joinPrompt": "Encara no tens compte?",
     "joinCta": "Crea un compte gratis"
+  },
+  "People": {
+    "tabBooks": "Llibres",
+    "tabPeople": "Persones",
+    "searchPlaceholder": "Cerca per nom o usuari…",
+    "searchPrompt": "Cerca persones per nom o usuari",
+    "noResults": "No s'han trobat persones",
+    "suggestionsTitle": "Persones que potser coneixes",
+    "noSuggestions": "Encara no hi ha suggeriments — segueix algú per començar",
+    "connectedThrough": "Seguit per {name}"
   }
 }

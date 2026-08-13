@@ -556,5 +556,15 @@
     "readBook": "Read this book on Planster",
     "joinPrompt": "New here?",
     "joinCta": "Create a free account"
+  },
+  "People": {
+    "tabBooks": "Books",
+    "tabPeople": "People",
+    "searchPlaceholder": "Search by name or username…",
+    "searchPrompt": "Search for people by name or username",
+    "noResults": "No people found",
+    "suggestionsTitle": "People you may know",
+    "noSuggestions": "No suggestions yet — follow someone to get started",
+    "connectedThrough": "Followed by {name}"
   }
 }

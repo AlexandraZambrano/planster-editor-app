@@ -6,6 +6,7 @@
 |---|---|---|
 | `/` | `src/app/(public)/page.tsx` | Home: featured books, recent, genres |
 | `/explore` | `src/app/(public)/explore/page.tsx` | Catalogue with filters and search |
+| `/explore/people` | `src/app/explore/people/page.tsx` | Search for users by name/username, and follow suggestions ("people you may know") |
 | `/books/[bookId]` | `src/app/(public)/books/[bookId]/page.tsx` | Public book page |
 | `/@[username]` | `src/app/profile/[username]/page.tsx` (via rewrite — `@folder` is reserved for Next.js parallel routes and can't itself produce a URL) | User public profile |
 | `/auth/login` | `src/app/(auth)/login/page.tsx` | Login |

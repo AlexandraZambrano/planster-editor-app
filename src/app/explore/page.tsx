@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 import { getExploreBooks, type ExploreFilters as ExploreFiltersType } from "@/actions/discovery"
 import { SiteNav } from "@/components/shared/site-nav"
+import { ExploreTabs } from "@/components/discovery/explore-tabs"
 import { ExploreFilters } from "@/components/discovery/explore-filters"
 import { BookGridCard } from "@/components/discovery/book-grid-card"
 import { PaginationControls } from "@/components/discovery/pagination-controls"
@@ -35,9 +36,10 @@ export default async function ExplorePage({ searchParams }: Props) {
     page: params.page ? Number(params.page) : 1,
   }
 
-  const [{ books, totalCount, page, pageSize }, t] = await Promise.all([
+  const [{ books, totalCount, page, pageSize }, t, tPeople] = await Promise.all([
     getExploreBooks(filters),
     getTranslations("Explore"),
+    getTranslations("People"),
   ])
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
 
@@ -46,6 +48,7 @@ export default async function ExplorePage({ searchParams }: Props) {
       <SiteNav active="explore" />
       <main className="container mx-auto py-10 px-4 max-w-6xl">
         <h1 className="text-2xl font-bold mb-6">{t("title")}</h1>
+        <ExploreTabs active="books" booksLabel={tPeople("tabBooks")} peopleLabel={tPeople("tabPeople")} />
 
         <ExploreFilters />
 
