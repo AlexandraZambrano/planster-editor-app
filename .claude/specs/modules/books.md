@@ -28,7 +28,8 @@ upload box in `BookForm` (`src/components/book/book-form.tsx`), both driving the
 - **Text**: the cover itself is the editing surface — any number of freely-positioned text
   layers (title, author name, or anything else), each independently draggable, typed
   directly in place, and styled with its own font (one of 6 curated Google Fonts, see
-  `src/lib/cover-fonts.ts`, `public/fonts/covers/*.ttf`), color, and size
+  `src/lib/cover-fonts.ts`, `public/fonts/covers/*.ttf`), color (any hex color, via a native
+  color picker swatch plus a free-text hex input — not a preset palette), and size
   (`src/lib/cover-text-layers.ts` `CoverTextLayer`). A new book starts with one title layer
   pre-filled with the book's title; "+ Add text" adds more. Click a layer to select and edit
   its text inline; a small grip handle appears above the selected layer to drag-reposition it

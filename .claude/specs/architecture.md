@@ -129,10 +129,13 @@ planster-editor-app/
     (`public/quote-backgrounds/`, see `scripts/generate-quote-backgrounds.mjs`), the cover
     designer's background gradients (`public/cover-backgrounds/`, see
     `scripts/generate-cover-backgrounds.mjs`), and its curated font files
-    (`public/fonts/covers/*.ttf`, OFL-licensed Google Fonts, embedded as base64 into the SVG
-    passed to `sharp` since the Alpine Docker runner has no fontconfig installed) all follow
-    this pattern; the quote-share and cover images a *user* generates are still uploaded to
-    Cloudinary, never written to disk
+    (`public/fonts/covers/*.ttf`, OFL-licensed Google Fonts) all follow this pattern; the
+    quote-share and cover images a *user* generates are still uploaded to Cloudinary, never
+    written to disk. Those same curated font files are also installed as real system fonts
+    in the Docker image (via `fontconfig`, see the `Dockerfile`'s runner stage) — sharp's
+    SVG rasterizer (libvips → librsvg → Pango) has no support for embedding a font directly
+    in an SVG via `@font-face`; without a real, fontconfig-registered font to resolve each
+    layer's `font-family` name against, it silently renders no glyphs at all
 
 ### Real-time notifications
 - Use Server-Sent Events (SSE) via an API route at `src/app/api/notifications/stream/route.ts`

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Minus, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   Dialog,
@@ -18,9 +19,8 @@ import { CoverPreview } from "./cover-preview"
 import { COVER_BACKGROUNDS, getCoverBackground } from "@/lib/cover-backgrounds"
 import { createTextLayer, createTitleLayer, type CoverTextLayer } from "@/lib/cover-text-layers"
 import { updateBookCover } from "@/actions/books"
-import { cn } from "@/lib/utils"
 
-const TEXT_COLORS = ["#FFFFFF", "#000000", "#FFCF9C", "#FF8C6B", "#E8543F", "#7C3F82"]
+const HEX_COLOR_RE = /^#([0-9A-Fa-f]{6})$/
 const MIN_FONT_SIZE = 32
 const MAX_FONT_SIZE = 180
 const FONT_SIZE_STEP = 8
@@ -107,6 +107,16 @@ export function CoverDesignerDialog({
   const previewUrl =
     backgroundType === "PRESET" ? (getCoverBackground(backgroundValue)?.url ?? null) : backgroundValue
   const selectedLayer = textLayers.find((l) => l.id === selectedLayerId) ?? null
+
+  // Local text-field mirror of the selected layer's hex color: kept separate
+  // from the layer state so the user can type a partial/invalid hex value
+  // (e.g. "#1" while still typing) without it being reverted mid-keystroke.
+  // Only commits to the layer once the value is a complete, valid hex color.
+  const [hexInput, setHexInput] = useState(selectedLayer?.color ?? "#FFFFFF")
+  useEffect(() => {
+    setHexInput(selectedLayer?.color ?? "#FFFFFF")
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLayer?.id, selectedLayer?.color])
 
   function updateLayer(id: string, patch: Partial<CoverTextLayer>) {
     setTextLayers((prev) => prev.map((l) => (l.id === id ? { ...l, ...patch } : l)))
@@ -225,21 +235,40 @@ export function CoverDesignerDialog({
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-2">
-                    {TEXT_COLORS.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        onClick={() => updateLayer(selectedLayer.id, { color })}
-                        className={cn(
-                          "h-6 w-6 rounded-full border-2",
-                          selectedLayer.color === color ? "border-primary" : "border-transparent"
-                        )}
-                        style={{ backgroundColor: color }}
-                        aria-label={color}
+                <div className="flex items-end justify-between gap-3">
+                  <div className="space-y-1.5">
+                    <p className="text-[11px] text-muted-foreground">{t("textColorLabel")}</p>
+                    <div className="flex items-center gap-1.5">
+                      <label
+                        className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full border-2 border-muted-foreground/30 cursor-pointer"
+                        style={{ backgroundColor: HEX_COLOR_RE.test(hexInput) ? hexInput : selectedLayer.color }}
+                      >
+                        <input
+                          type="color"
+                          value={selectedLayer.color}
+                          onChange={(e) => updateLayer(selectedLayer.id, { color: e.target.value })}
+                          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                          aria-label={t("textColorLabel")}
+                          data-testid="color-swatch-input"
+                        />
+                      </label>
+                      <Input
+                        value={hexInput}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          setHexInput(value)
+                          if (HEX_COLOR_RE.test(value)) {
+                            updateLayer(selectedLayer.id, { color: value })
+                          }
+                        }}
+                        onBlur={() => setHexInput(selectedLayer.color)}
+                        maxLength={7}
+                        spellCheck={false}
+                        className="h-6 w-[5.5rem] px-1.5 font-mono text-[11px]"
+                        aria-label={t("hexColorLabel")}
+                        data-testid="hex-color-input"
                       />
-                    ))}
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-1">
