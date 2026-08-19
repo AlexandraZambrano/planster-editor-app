@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { LocationCard } from "@/components/studio/worldbuilding/location-card"
 import { NewLocationDialog } from "@/components/studio/worldbuilding/new-location-dialog"
+import { ChevronLeft } from "lucide-react"
 
 interface Props {
   params: Promise<{ bookId: string }>
@@ -56,8 +57,9 @@ export default async function WorldBuildingPage({ params }: Props) {
         <div>
           <Link
             href={`/write/${bookId}/studio`}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
+            <ChevronLeft className="h-4 w-4 mr-1" />
             {t("backToStudio")}
           </Link>
           <h1 className="text-2xl font-bold mt-1">{t("worldBuilding")}</h1>

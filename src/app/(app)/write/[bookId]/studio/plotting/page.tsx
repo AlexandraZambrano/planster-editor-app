@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
+import { ChevronLeft } from "lucide-react"
 import { getTranslations } from "next-intl/server"
 import { auth } from "@/lib/auth"
 import { getPlottingBoard } from "@/actions/studio"
@@ -24,8 +25,9 @@ export default async function PlottingPage({ params }: Props) {
       <div className="px-6 py-4 border-b flex-shrink-0">
         <Link
           href={`/write/${bookId}/studio`}
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
+          <ChevronLeft className="h-4 w-4 mr-1" />
           {t("backToStudio")}
         </Link>
         <h1 className="text-2xl font-bold mt-1">{t("plotting")}</h1>

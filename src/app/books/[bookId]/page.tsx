@@ -88,6 +88,25 @@ export default async function BookPage({ params }: Props) {
               <Badge variant="secondary">{tCommon(`bookStatus.${book.bookStatus}` as "bookStatus.IN_PROGRESS")}</Badge>
             </div>
 
+            {book.coverPhotoCredit && (
+              <p className="text-xs text-muted-foreground mb-2">
+                {t("coverPhotoCredit", { name: book.coverPhotoCredit.name })}
+                {book.coverPhotoCredit.url && (
+                  <>
+                    {" · "}
+                    <a
+                      href={book.coverPhotoCredit.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-foreground hover:underline"
+                    >
+                      Unsplash
+                    </a>
+                  </>
+                )}
+              </p>
+            )}
+
             {book.synopsis && (
               <p className="text-sm leading-relaxed text-foreground/90 mb-4 whitespace-pre-line">
                 {book.synopsis}

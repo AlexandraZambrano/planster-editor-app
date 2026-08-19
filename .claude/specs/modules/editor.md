@@ -34,6 +34,22 @@
 - Hides: navbar, sidebar, side panel
 - The editor fills the entire screen with only the toolbar visible
 
+## Private author notes
+
+- The author can select text in their own chapter and leave a private note on it — visible
+  only to them, never to beta readers or public readers. Distinct from the beta system's
+  `InlineComment` (beta-reader-to-author, see beta-system.md) and from `BookNote` (freeform
+  Writer's Studio notes, not tied to a text position)
+- `AuthorNote` model: `chapterId`, `selectedText`, `fromPos`, `toPos`, `content`
+- Server actions: `src/actions/author-notes.ts` — `createAuthorNote`, `getAuthorNotes`,
+  `deleteAuthorNote` — all gated on `session.user.id === chapter.book.authorId`
+- UI: selecting text shows a "Private note" floating action (same selection mechanic as the
+  beta reader's inline-comment button in the reading view); a "My notes" toggle in the
+  editor's top bar opens a panel listing all notes on the chapter, click-to-jump highlights
+  the passage. Highlighting is implemented as a ProseMirror decoration plugin
+  (`src/components/editor/note-highlight-extension.ts`) updated via transaction meta so the
+  editor is never recreated mid-edit (which would drop cursor position and undo history)
+
 ## Beta inline comments & reviews (author view)
 - A "Beta feedback" button in the editor's top bar (badge = unresolved comments +
   reviews) opens a right side panel — `src/components/editor/beta-feedback-panel.tsx`,

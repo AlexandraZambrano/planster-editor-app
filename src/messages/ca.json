@@ -159,6 +159,7 @@
     "minRatingStars": "{count}+ estrelles"
   },
   "Book": {
+    "coverPhotoCredit": "Foto de portada de {name}",
     "ratingCount": "({count, plural, one {# valoració} other {# valoracions}})",
     "noRatingsYet": "Encara no hi ha valoracions",
     "chapters": "Capítols",
@@ -287,6 +288,30 @@
     "imageTooLarge": "La imatge ha de ser inferior a {maxSize}MB",
     "coverTooSmall": "La coberta ha de fer com a mínim {minWidth}×{minHeight}px (la teva fa {width}×{height}px)",
     "uploadFailed": "Ha fallat la pujada. Torna-ho a provar.",
+    "uploadCoverTab": "Puja una imatge",
+    "designCoverTab": "Dissenya la portada",
+    "createCoverButton": "Dissenya la portada",
+    "editCoverButton": "Edita la portada",
+    "coverDesignerTitle": "Dissenya la teva portada",
+    "chooseFont": "Tipus de lletra",
+    "backgroundColors": "Colors",
+    "backgroundOwnImage": "La meva imatge",
+    "backgroundPhotos": "Fotos",
+    "stockSearchPlaceholder": "Cerca fotos lliures de drets…",
+    "noPhotosFound": "No s'han trobat fotos",
+    "featuredPhotos": "Fotos destacades",
+    "photoCreditLabel": "Foto de {name} a Unsplash",
+    "stockPhotoCreditNotice": "La política d'Unsplash exigeix donar crèdit: si utilitzes una d'aquestes fotos, el nom del fotògraf es mostrarà públicament a la pàgina del teu llibre, justament abans de la sinopsi.",
+    "addTextLayer": "+ Afegeix text",
+    "selectedTextLabel": "Text seleccionat",
+    "deleteTextLayer": "Elimina el text",
+    "decreaseFontSize": "Redueix la mida",
+    "increaseFontSize": "Augmenta la mida",
+    "newTextDefault": "Text",
+    "canvasHint": "Fes clic a qualsevol text per editar-lo allà mateix. Arrossega el tirador de sobre per moure'l.",
+    "saveCover": "Desa la portada",
+    "savingCover": "Desant…",
+    "coverSaveFailed": "No s'ha pogut desar la portada. Torna-ho a provar.",
     "selectGenres": "Selecciona gèneres…",
     "searchGenres": "Cerca gèneres…",
     "noGenreFound": "No s'ha trobat cap gènere.",
@@ -331,7 +356,14 @@
     "replyPlaceholder": "Escriu una resposta…",
     "send": "Envia",
     "cancel": "Cancel·la",
-    "closePanel": "Tanca el panell"
+    "closePanel": "Tanca el panell",
+    "myNotesButton": "Les meves notes",
+    "myNotesTitle": "Les meves notes privades",
+    "noNotes": "Encara no has afegit cap nota privada en aquest capítol",
+    "deleteNote": "Elimina",
+    "addNoteButton": "Nota privada",
+    "notePlaceholder": "Escriu una nota que només tu veuràs…",
+    "noteSubmitted": "Nota desada!"
   },
   "Reading": {
     "editChapter": "Edita el capítol →",
@@ -343,7 +375,10 @@
     "submit": "Envia",
     "previousChapter": "Capítol anterior",
     "nextChapter": "Capítol següent",
-    "endOfChapter": "Final del capítol"
+    "endOfChapter": "Final del capítol",
+    "myComments": "Els meus comentaris",
+    "myCommentsTitle": "Els meus comentaris en aquest capítol",
+    "noMyComments": "Encara no has deixat cap comentari en aquest capítol"
   },
   "Settings": {
     "title": "Perfil",
@@ -401,7 +436,7 @@
     "submitReview": "Envia la ressenya"
   },
   "Goals": {
-    "backToBookPanel": "← Panell del llibre",
+    "backToBookPanel": "Panell del llibre",
     "title": "Objectius d'escriptura",
     "subtitle": "Segueix el teu progrés i mantén-te en l'objectiu. Fus horari de la ratxa: UTC.",
     "progressOfGoal": "{pct}% de l'objectiu de {target} paraules",
@@ -465,7 +500,7 @@
   "Studio": {
     "writersStudio": "Estudi de l'escriptor",
     "privateWorkspaceHint": "El teu espai creatiu privat — només tu el pots veure.",
-    "backToStudio": "← Estudi",
+    "backToStudio": "Estudi",
     "characters": "Personatges",
     "charactersDescription": "Aparença, rerefons i relacions",
     "worldBuilding": "Construcció del món",
@@ -524,6 +559,7 @@
     "contactBody": "Si tens cap pregunta sobre aquesta Política de privadesa o sobre com tractem les teves dades, pots contactar amb l'Alexandra Zambrano, responsable de Planster, a planster.alexzambrano.com."
   },
   "Comments": {
+    "sectionTitle": "Valoracions i comentaris",
     "title": "Comentaris",
     "ratingLabel": "Valora aquest capítol",
     "averageRating": "{rating} ({count, plural, one {# valoració} other {# valoracions}})",

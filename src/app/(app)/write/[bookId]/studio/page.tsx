@@ -3,7 +3,7 @@ import Link from "next/link"
 import { getTranslations } from "next-intl/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { Users, MapPin, GitBranch, Clock, LayoutDashboard, StickyNote } from "lucide-react"
+import { Users, MapPin, GitBranch, Clock, LayoutDashboard, StickyNote, ChevronLeft } from "lucide-react"
 
 interface Props {
   params: Promise<{ bookId: string }>
@@ -98,9 +98,10 @@ export default async function StudioHubPage({ params }: Props) {
       <div>
         <Link
           href={`/write/${bookId}`}
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
-          ← {book.title}
+          <ChevronLeft className="h-4 w-4 mr-1" />
+          {book.title}
         </Link>
         <h1 className="text-2xl font-bold mt-1">{t("writersStudio")}</h1>
         <p className="text-sm text-muted-foreground mt-0.5">

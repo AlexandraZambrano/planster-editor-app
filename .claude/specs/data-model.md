@@ -134,6 +134,34 @@ model Book {
   writingGoals    WritingGoal[]
   readingProgress ReadingProgress[]
   quoteShares     QuoteShare[]
+  coverDesign     BookCoverDesign?
+}
+
+// ─── COVER DESIGNER ─────────────────────────────────────────────────────────
+// The editable "recipe" behind a designed cover — separate from Book.coverUrl
+// (the single source of truth for what's displayed). A plain manually-uploaded
+// cover has no row here at all; only covers built with the in-app designer do,
+// which is what makes reopening the designer later act as "edit this cover".
+
+enum CoverBackgroundType {
+  PRESET
+  UPLOAD
+  STOCK
+}
+
+model BookCoverDesign {
+  id                    String              @id @default(cuid())
+  bookId                String              @unique
+  backgroundType        CoverBackgroundType
+  backgroundValue       String // preset id, Cloudinary URL (UPLOAD), or Unsplash photo URL (STOCK)
+  textLayers            Json                @default("[]") // CoverTextLayer[] — see src/lib/cover-text-layers.ts; freely positioned/typed text (title, author name, etc.)
+  stockPhotographerName String? // required attribution for Unsplash-sourced backgrounds — shown on the public book page too, see books.md
+  stockPhotographerUrl  String?
+  stockSourceUrl        String?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
 }
 
 model Chapter {
@@ -157,8 +185,24 @@ model Chapter {
   chapterComments ChapterComment[]
   chapterRatings  ChapterRating[]
   quoteShares     QuoteShare[]
+  authorNotes     AuthorNote[]
 
   @@unique([bookId, order])
+}
+
+// A private note the author leaves on their own chapter text — visible only to
+// them, never to beta readers or public readers. Distinct from InlineComment
+// (beta-reader-to-author) and BookNote (freeform, not tied to a text position).
+model AuthorNote {
+  id           String   @id @default(cuid())
+  chapterId    String
+  selectedText String
+  fromPos      Int
+  toPos        Int
+  content      String   @db.Text
+  createdAt    DateTime @default(now())
+
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 }
 
 // ─── READING STREAK & CONTINUE READING ─────────────────────────────────────

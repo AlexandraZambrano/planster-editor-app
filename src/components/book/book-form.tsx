@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslations } from "next-intl"
@@ -15,8 +16,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { CoverUpload } from "./cover-upload"
 import { TagInput } from "./tag-input"
 import { GenreSelect } from "./genre-select"
+import { CoverDesignerDialog, type CoverDesignRecipe } from "./cover-designer/cover-designer-dialog"
 import { createBook, updateBook } from "@/actions/books"
 import { LANGUAGES, BOOK_STATUS_LABELS, BOOK_LICENSES } from "@/lib/constants"
+import { cn } from "@/lib/utils"
 
 interface BookFormProps {
   bookId?: string
@@ -28,6 +31,7 @@ type FormData = {
   title: string
   synopsis?: string
   coverUrl?: string
+  coverDesign?: CoverDesignRecipe
   genres: string[]
   tags: string[]
   language: string
@@ -48,6 +52,26 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
         title: z.string().min(1, t("titleRequired")).max(200, t("titleTooLong")),
         synopsis: z.string().max(2000, t("synopsisTooLong")).optional(),
         coverUrl: z.string().optional(),
+        coverDesign: z
+          .object({
+            backgroundType: z.enum(["PRESET", "UPLOAD", "STOCK"]),
+            backgroundValue: z.string(),
+            textLayers: z.array(
+              z.object({
+                id: z.string(),
+                text: z.string(),
+                xPercent: z.number(),
+                yPercent: z.number(),
+                fontId: z.string(),
+                color: z.string(),
+                fontSize: z.number(),
+              })
+            ),
+            stockPhotographerName: z.string().optional(),
+            stockPhotographerUrl: z.string().optional(),
+            stockSourceUrl: z.string().optional(),
+          })
+          .optional(),
         genres: z.array(z.string()),
         tags: z.array(z.string().max(30)).max(10),
         language: z.string(),
@@ -61,6 +85,8 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
     register,
     handleSubmit,
     control,
+    setValue,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -68,6 +94,7 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
       title: "",
       synopsis: "",
       coverUrl: "",
+      coverDesign: undefined,
       genres: [],
       tags: [],
       language: "es",
@@ -76,6 +103,11 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
       ...defaultValues,
     },
   })
+
+  const [coverTab, setCoverTab] = useState<"upload" | "design">(
+    defaultValues?.coverDesign ? "design" : "upload"
+  )
+  const [showCoverDesigner, setShowCoverDesigner] = useState(false)
 
   async function onSubmit(data: FormData) {
     setError(null)
@@ -108,7 +140,70 @@ export function BookForm({ bookId, defaultValues, onSuccess }: BookFormProps) {
           name="coverUrl"
           control={control}
           render={({ field }) => (
-            <CoverUpload value={field.value} onChange={field.onChange} />
+            <div className="space-y-2">
+              <div className="flex gap-1 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setCoverTab("upload")}
+                  className={cn(
+                    "rounded-full px-2.5 py-1 transition-colors",
+                    coverTab === "upload" ? "bg-primary text-primary-foreground" : "bg-muted"
+                  )}
+                >
+                  {t("uploadCoverTab")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCoverTab("design")}
+                  className={cn(
+                    "rounded-full px-2.5 py-1 transition-colors",
+                    coverTab === "design" ? "bg-primary text-primary-foreground" : "bg-muted"
+                  )}
+                  data-testid="cover-design-tab"
+                >
+                  {t("designCoverTab")}
+                </button>
+              </div>
+
+              {coverTab === "upload" ? (
+                <CoverUpload
+                  value={field.value}
+                  onChange={(url) => {
+                    field.onChange(url)
+                    setValue("coverDesign", undefined)
+                  }}
+                />
+              ) : (
+                <div className="space-y-2">
+                  <div className="relative aspect-[2/3] w-40 rounded-lg overflow-hidden border-2 border-dashed border-muted-foreground/30 bg-muted">
+                    {field.value && (
+                      <Image src={field.value} alt="Cover" fill className="object-cover" />
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowCoverDesigner(true)}
+                    data-testid="open-cover-designer"
+                  >
+                    {getValues("coverDesign") ? t("editCoverButton") : t("createCoverButton")}
+                  </Button>
+
+                  <CoverDesignerDialog
+                    open={showCoverDesigner}
+                    onOpenChange={setShowCoverDesigner}
+                    bookTitle={getValues("title") || ""}
+                    initialDesign={getValues("coverDesign")}
+                    bookId={bookId}
+                    onSave={(coverUrl, recipe) => {
+                      field.onChange(coverUrl)
+                      setValue("coverDesign", recipe)
+                    }}
+                  />
+                </div>
+              )}
+            </div>
           )}
         />
 

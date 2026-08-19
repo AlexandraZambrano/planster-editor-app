@@ -21,7 +21,8 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { BookForm } from "./book-form"
 import { updateBookPublicationStatus, deleteBook } from "@/actions/books"
-import type { Book, PublicationStatus } from "@prisma/client"
+import type { CoverTextLayer } from "@/lib/cover-text-layers"
+import type { Book, BookCoverDesign, PublicationStatus } from "@prisma/client"
 
 interface BookSettingsPanelProps {
   book: Pick<
@@ -36,7 +37,18 @@ interface BookSettingsPanelProps {
     | "bookStatus"
     | "publicationStatus"
     | "license"
-  >
+  > & {
+    coverDesign:
+      | (Pick<
+          BookCoverDesign,
+          | "backgroundType"
+          | "backgroundValue"
+          | "stockPhotographerName"
+          | "stockPhotographerUrl"
+          | "stockSourceUrl"
+        > & { textLayers: CoverTextLayer[] })
+      | null
+  }
 }
 
 export function BookSettingsPanel({ book }: BookSettingsPanelProps) {
@@ -83,6 +95,16 @@ export function BookSettingsPanel({ book }: BookSettingsPanelProps) {
             language: book.language,
             bookStatus: book.bookStatus,
             license: book.license,
+            coverDesign: book.coverDesign
+              ? {
+                  backgroundType: book.coverDesign.backgroundType,
+                  backgroundValue: book.coverDesign.backgroundValue,
+                  textLayers: book.coverDesign.textLayers,
+                  stockPhotographerName: book.coverDesign.stockPhotographerName ?? undefined,
+                  stockPhotographerUrl: book.coverDesign.stockPhotographerUrl ?? undefined,
+                  stockSourceUrl: book.coverDesign.stockSourceUrl ?? undefined,
+                }
+              : undefined,
           }}
           onSuccess={() => {}}
         />
