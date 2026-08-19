@@ -304,6 +304,8 @@
     "stockPhotoCreditNotice": "La política d'Unsplash exigeix donar crèdit: si utilitzes una d'aquestes fotos, el nom del fotògraf es mostrarà públicament a la pàgina del teu llibre, justament abans de la sinopsi.",
     "addTextLayer": "+ Afegeix text",
     "selectedTextLabel": "Text seleccionat",
+    "textColorLabel": "Color",
+    "hexColorLabel": "Color hexadecimal",
     "deleteTextLayer": "Elimina el text",
     "decreaseFontSize": "Redueix la mida",
     "increaseFontSize": "Augmenta la mida",

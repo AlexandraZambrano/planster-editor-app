@@ -64,6 +64,30 @@ describe("CoverDesignerDialog", () => {
     expect(oswaldButton.className).toContain("border-primary")
   })
 
+  it("lets the user type any hex color for the selected layer", async () => {
+    render(<CoverDesignerDialog {...BASE_PROPS} />)
+    const hexInput = screen.getByTestId("hex-color-input")
+    expect(hexInput).toHaveValue("#FFFFFF")
+
+    await userEvent.clear(hexInput)
+    await userEvent.type(hexInput, "#3AF29C")
+
+    expect(hexInput).toHaveValue("#3AF29C")
+    expect(screen.getByTestId("color-swatch-input")).toHaveValue("#3af29c")
+  })
+
+  it("ignores an incomplete hex value until it becomes a valid 6-digit color", async () => {
+    render(<CoverDesignerDialog {...BASE_PROPS} />)
+    const hexInput = screen.getByTestId("hex-color-input")
+
+    await userEvent.clear(hexInput)
+    await userEvent.type(hexInput, "#3AF")
+    expect(screen.getByTestId("color-swatch-input")).toHaveValue("#ffffff")
+
+    await userEvent.type(hexInput, "29C")
+    expect(screen.getByTestId("color-swatch-input")).toHaveValue("#3af29c")
+  })
+
   it("adds a new text layer directly onto the canvas", async () => {
     render(<CoverDesignerDialog {...BASE_PROPS} />)
     const before = screen.getAllByTestId(/^cover-layer-input-/).length
