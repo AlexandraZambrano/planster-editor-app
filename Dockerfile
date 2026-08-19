@@ -56,6 +56,16 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=prisma /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=deps /app/node_modules/@prisma ./node_modules/@prisma
 
+# sharp's SVG rasterizer (libvips → librsvg → Pango) needs fontconfig to
+# resolve ANY font by name, including custom ones — Pango has no support for
+# embedding a font directly in an SVG via @font-face, it silently renders no
+# glyphs at all without this. Installing the cover designer's curated fonts
+# as real system fonts is what lets the cover-card text actually render.
+RUN apk add --no-cache fontconfig && \
+    mkdir -p /usr/share/fonts/planster-covers && \
+    cp /app/public/fonts/covers/*.ttf /usr/share/fonts/planster-covers/ && \
+    fc-cache -f
+
 USER nextjs
 
 EXPOSE 3000

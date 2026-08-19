@@ -90,36 +90,21 @@ export async function renderCoverCard({
   backgroundValue,
   textLayers,
 }: CoverCardInput): Promise<Buffer> {
-  const usedFontIds = [...new Set(textLayers.map((l) => l.fontId))]
-  const fonts = usedFontIds.map((id) => {
-    const font = getCoverFont(id)
-    if (!font) throw new Error("Unknown font")
-    return font
-  })
-
-  const [backgroundBuffer, ...fontBuffers] = await Promise.all([
-    resolveBackgroundBuffer(backgroundType, backgroundValue),
-    ...fonts.map((font) => readFile(join(process.cwd(), "public/fonts/covers", font.fileName))),
-  ])
-
-  const fontFaces = fonts
-    .map(
-      (font, i) => `@font-face {
-        font-family: "${font.family}";
-        src: url(data:font/ttf;base64,${fontBuffers[i].toString("base64")}) format("truetype");
-      }`
-    )
-    .join("\n")
-
-  const fontFamilyById = new Map(fonts.map((f) => [f.id, f.family]))
+  // Fonts are resolved by name against the real system fonts the Dockerfile
+  // installs (via fontconfig) — sharp's SVG rasterizer (librsvg/Pango) has no
+  // support for embedding a font directly in the SVG, so there's no file to
+  // read here; only the family name needs to match.
   const layersSvg = textLayers
-    .map((layer) => renderLayerSvg(layer, fontFamilyById.get(layer.fontId) ?? "sans-serif"))
+    .map((layer) => {
+      const font = getCoverFont(layer.fontId)
+      if (!font) throw new Error("Unknown font")
+      return renderLayerSvg(layer, font.family)
+    })
     .join("")
 
+  const backgroundBuffer = await resolveBackgroundBuffer(backgroundType, backgroundValue)
+
   const overlaySvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}">
-    <defs>
-      <style>${fontFaces}</style>
-    </defs>
     ${layersSvg}
   </svg>`
 
