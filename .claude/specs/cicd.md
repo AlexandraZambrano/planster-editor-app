@@ -21,7 +21,7 @@ Push to main (merge)
 |---|---|
 | CI/CD | GitHub Actions |
 | Image registry | GitHub Container Registry (GHCR) |
-| Production server | Personal VPS with Coolify (**arm64** — the CD workflow builds multi-platform images (`linux/amd64,linux/arm64`) via QEMU so the published image matches whatever it's deployed to) |
+| Production server | Personal VPS with Coolify (**arm64** — the CD workflow's `build-and-push` job runs on GitHub's native `ubuntu-24.04-arm` runner (free on public repos) and builds `linux/arm64` only, matching the VPS exactly. No QEMU/multi-platform build — building `amd64` would be wasted work nobody deploys, and emulating `arm64` on an `amd64` runner made `npm run build` dramatically slower, sometimes over an hour) |
 | Containerisation | Docker standalone (no compose) |
 | Runtime | Node.js 22 Alpine |
 

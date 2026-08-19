@@ -12,7 +12,12 @@ jobs:
   # ─── Build y push de imagen Docker a GHCR ───────────────────────────────────
   build-and-push:
     name: Build Docker Image → GHCR
-    runs-on: ubuntu-latest
+    # Native arm64 runner (free on public repos) — the Coolify VPS is arm64-only,
+    # so there's no reason to also build amd64, and building arm64 natively here
+    # instead of emulating it with QEMU on an amd64 runner is dramatically faster
+    # for a CPU-heavy Next.js build (`npm run build` under QEMU emulation could
+    # take well over an hour; natively it's a normal few-minute build).
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
       packages: write
@@ -41,9 +46,6 @@ jobs:
             type=sha,prefix=sha-,format=short
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Set up QEMU (for arm64 emulation)
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -53,9 +55,8 @@ jobs:
         with:
           context: .
           push: true
-          # The Coolify VPS runs on arm64 — build both so the image works
-          # regardless of which architecture it's deployed to.
-          platforms: linux/amd64,linux/arm64
+          # The Coolify VPS runs on arm64 only — see the runs-on comment above.
+          platforms: linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
