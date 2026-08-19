@@ -159,6 +159,7 @@
     "minRatingStars": "{count}+ estrellas"
   },
   "Book": {
+    "coverPhotoCredit": "Foto de portada de {name}",
     "ratingCount": "({count, plural, one {# valoración} other {# valoraciones}})",
     "noRatingsYet": "Todavía no hay valoraciones",
     "chapters": "Capítulos",
@@ -287,6 +288,30 @@
     "imageTooLarge": "La imagen debe ser menor de {maxSize}MB",
     "coverTooSmall": "La portada debe medir al menos {minWidth}×{minHeight}px (la tuya mide {width}×{height}px)",
     "uploadFailed": "Error al subir. Inténtalo de nuevo.",
+    "uploadCoverTab": "Subir imagen",
+    "designCoverTab": "Diseñar portada",
+    "createCoverButton": "Diseñar portada",
+    "editCoverButton": "Editar portada",
+    "coverDesignerTitle": "Diseña tu portada",
+    "chooseFont": "Fuente",
+    "backgroundColors": "Colores",
+    "backgroundOwnImage": "Mi imagen",
+    "backgroundPhotos": "Fotos",
+    "stockSearchPlaceholder": "Busca fotos libres de derechos…",
+    "noPhotosFound": "No se encontraron fotos",
+    "featuredPhotos": "Fotos destacadas",
+    "photoCreditLabel": "Foto de {name} en Unsplash",
+    "stockPhotoCreditNotice": "La política de Unsplash exige dar crédito: si usas una de estas fotos, el nombre del fotógrafo se mostrará públicamente en la página de tu libro, justo antes de la sinopsis.",
+    "addTextLayer": "+ Añadir texto",
+    "selectedTextLabel": "Texto seleccionado",
+    "deleteTextLayer": "Eliminar texto",
+    "decreaseFontSize": "Reducir tamaño",
+    "increaseFontSize": "Aumentar tamaño",
+    "newTextDefault": "Texto",
+    "canvasHint": "Haz clic en cualquier texto para editarlo ahí mismo. Arrastra el tirador de arriba para moverlo.",
+    "saveCover": "Guardar portada",
+    "savingCover": "Guardando…",
+    "coverSaveFailed": "No se pudo guardar la portada. Inténtalo de nuevo.",
     "selectGenres": "Selecciona géneros…",
     "searchGenres": "Buscar géneros…",
     "noGenreFound": "No se encontró ningún género.",
@@ -331,7 +356,14 @@
     "replyPlaceholder": "Escribe una respuesta…",
     "send": "Enviar",
     "cancel": "Cancelar",
-    "closePanel": "Cerrar panel"
+    "closePanel": "Cerrar panel",
+    "myNotesButton": "Mis notas",
+    "myNotesTitle": "Mis notas privadas",
+    "noNotes": "Todavía no has añadido ninguna nota privada en este capítulo",
+    "deleteNote": "Eliminar",
+    "addNoteButton": "Nota privada",
+    "notePlaceholder": "Escribe una nota que solo tú verás…",
+    "noteSubmitted": "¡Nota guardada!"
   },
   "Reading": {
     "editChapter": "Editar capítulo →",
@@ -343,7 +375,10 @@
     "submit": "Enviar",
     "previousChapter": "Capítulo anterior",
     "nextChapter": "Capítulo siguiente",
-    "endOfChapter": "Fin del capítulo"
+    "endOfChapter": "Fin del capítulo",
+    "myComments": "Mis comentarios",
+    "myCommentsTitle": "Mis comentarios en este capítulo",
+    "noMyComments": "Todavía no has dejado ningún comentario en este capítulo"
   },
   "Settings": {
     "title": "Perfil",
@@ -401,7 +436,7 @@
     "submitReview": "Enviar reseña"
   },
   "Goals": {
-    "backToBookPanel": "← Panel del libro",
+    "backToBookPanel": "Panel del libro",
     "title": "Objetivos de escritura",
     "subtitle": "Sigue tu progreso y mantente en el objetivo. Zona horaria de la racha: UTC.",
     "progressOfGoal": "{pct}% del objetivo de {target} palabras",
@@ -465,7 +500,7 @@
   "Studio": {
     "writersStudio": "Estudio del escritor",
     "privateWorkspaceHint": "Tu espacio creativo privado — solo tú puedes verlo.",
-    "backToStudio": "← Estudio",
+    "backToStudio": "Estudio",
     "characters": "Personajes",
     "charactersDescription": "Apariencia, trasfondo y relaciones",
     "worldBuilding": "Construcción del mundo",
@@ -524,6 +559,7 @@
     "contactBody": "Si tienes alguna pregunta sobre esta Política de privacidad o sobre cómo tratamos tus datos, puedes contactar con Alexandra Zambrano, responsable de Planster, en planster.alexzambrano.com."
   },
   "Comments": {
+    "sectionTitle": "Valoraciones y comentarios",
     "title": "Comentarios",
     "ratingLabel": "Valora este capítulo",
     "averageRating": "{rating} ({count, plural, one {# valoración} other {# valoraciones}})",

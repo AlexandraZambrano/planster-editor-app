@@ -12,6 +12,7 @@ import {
   createChapterReview,
   getChapterComments,
   getChapterReviews,
+  getMyInlineComments,
 } from "./beta"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
@@ -492,6 +493,48 @@ describe("getChapterComments", () => {
     const result = await getChapterComments("ch-1")
     expect(result.comments).toHaveLength(1)
     expect(result.comments?.[0].fromPos).toBe(5)
+  })
+})
+
+// ─── getMyInlineComments ─────────────────────────────────────────────────────
+
+describe("getMyInlineComments", () => {
+  it("returns error when chapter is not found", async () => {
+    mp.chapter.findUnique.mockResolvedValue(null)
+    const result = await getMyInlineComments("ch-1")
+    expect(result.error).toBe("Chapter not found")
+  })
+
+  it("returns error when the viewer is not an approved beta reader", async () => {
+    mp.chapter.findUnique.mockResolvedValue({ bookId: "book-1" })
+    mp.betaReader.findUnique.mockResolvedValue({ id: "br-1", status: "PENDING" })
+    const result = await getMyInlineComments("ch-1")
+    expect(result.error).toBe("Access denied")
+  })
+
+  it("returns only the viewer's own comments, ordered by position", async () => {
+    mp.chapter.findUnique.mockResolvedValue({ bookId: "book-1" })
+    mp.betaReader.findUnique.mockResolvedValue({ id: "br-1", status: "APPROVED" })
+    mp.inlineComment.findMany.mockResolvedValue([
+      {
+        id: "c-1",
+        selectedText: "text",
+        fromPos: 5,
+        toPos: 9,
+        content: "comment",
+        resolved: false,
+        createdAt: new Date(),
+        replies: [],
+      },
+    ])
+
+    const result = await getMyInlineComments("ch-1")
+    expect(result.comments).toHaveLength(1)
+    expect(mp.inlineComment.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { chapterId: "ch-1", betaReaderId: "br-1" },
+      })
+    )
   })
 })
 

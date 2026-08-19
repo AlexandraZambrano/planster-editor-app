@@ -159,6 +159,7 @@
     "minRatingStars": "{count}+ estrelas"
   },
   "Book": {
+    "coverPhotoCredit": "Foto de capa por {name}",
     "ratingCount": "({count, plural, one {# avaliação} other {# avaliações}})",
     "noRatingsYet": "Ainda não há avaliações",
     "chapters": "Capítulos",
@@ -287,6 +288,30 @@
     "imageTooLarge": "A imagem deve ter menos de {maxSize}MB",
     "coverTooSmall": "A capa deve ter pelo menos {minWidth}×{minHeight}px (a sua tem {width}×{height}px)",
     "uploadFailed": "Falha no envio. Tente novamente.",
+    "uploadCoverTab": "Enviar imagem",
+    "designCoverTab": "Criar capa",
+    "createCoverButton": "Criar capa",
+    "editCoverButton": "Editar capa",
+    "coverDesignerTitle": "Crie sua capa",
+    "chooseFont": "Fonte",
+    "backgroundColors": "Cores",
+    "backgroundOwnImage": "Minha imagem",
+    "backgroundPhotos": "Fotos",
+    "stockSearchPlaceholder": "Busque fotos livres de direitos…",
+    "noPhotosFound": "Nenhuma foto encontrada",
+    "featuredPhotos": "Fotos em destaque",
+    "photoCreditLabel": "Foto de {name} no Unsplash",
+    "stockPhotoCreditNotice": "A política do Unsplash exige crédito: se você usar uma dessas fotos, o nome do fotógrafo será exibido publicamente na página do seu livro, logo antes da sinopse.",
+    "addTextLayer": "+ Adicionar texto",
+    "selectedTextLabel": "Texto selecionado",
+    "deleteTextLayer": "Excluir texto",
+    "decreaseFontSize": "Diminuir tamanho",
+    "increaseFontSize": "Aumentar tamanho",
+    "newTextDefault": "Texto",
+    "canvasHint": "Clique em qualquer texto para editá-lo ali mesmo. Arraste a alça acima para reposicionar.",
+    "saveCover": "Salvar capa",
+    "savingCover": "Salvando…",
+    "coverSaveFailed": "Não foi possível salvar a capa. Tente novamente.",
     "selectGenres": "Selecione os gêneros…",
     "searchGenres": "Buscar gêneros…",
     "noGenreFound": "Nenhum gênero encontrado.",
@@ -331,7 +356,14 @@
     "replyPlaceholder": "Escreva uma resposta…",
     "send": "Enviar",
     "cancel": "Cancelar",
-    "closePanel": "Fechar painel"
+    "closePanel": "Fechar painel",
+    "myNotesButton": "Minhas notas",
+    "myNotesTitle": "Minhas notas privadas",
+    "noNotes": "Você ainda não adicionou nenhuma nota privada neste capítulo",
+    "deleteNote": "Excluir",
+    "addNoteButton": "Nota privada",
+    "notePlaceholder": "Escreva uma nota que só você verá…",
+    "noteSubmitted": "Nota salva!"
   },
   "Reading": {
     "editChapter": "Editar capítulo →",
@@ -343,7 +375,10 @@
     "submit": "Enviar",
     "previousChapter": "Capítulo anterior",
     "nextChapter": "Próximo capítulo",
-    "endOfChapter": "Fim do capítulo"
+    "endOfChapter": "Fim do capítulo",
+    "myComments": "Meus comentários",
+    "myCommentsTitle": "Meus comentários neste capítulo",
+    "noMyComments": "Você ainda não deixou nenhum comentário neste capítulo"
   },
   "Settings": {
     "title": "Perfil",
@@ -401,7 +436,7 @@
     "submitReview": "Enviar avaliação"
   },
   "Goals": {
-    "backToBookPanel": "← Painel do livro",
+    "backToBookPanel": "Painel do livro",
     "title": "Metas de escrita",
     "subtitle": "Acompanhe seu progresso e mantenha-se na meta. Fuso horário da sequência: UTC.",
     "progressOfGoal": "{pct}% da meta de {target} palavras",
@@ -465,7 +500,7 @@
   "Studio": {
     "writersStudio": "Estúdio do escritor",
     "privateWorkspaceHint": "Seu espaço criativo privado — só você pode ver isto.",
-    "backToStudio": "← Estúdio",
+    "backToStudio": "Estúdio",
     "characters": "Personagens",
     "charactersDescription": "Aparência, história e relacionamentos",
     "worldBuilding": "Construção de mundo",
@@ -524,6 +559,7 @@
     "contactBody": "Se tiver alguma dúvida sobre esta Política de Privacidade ou sobre como tratamos seus dados, você pode contatar Alexandra Zambrano, responsável pelo Planster, em planster.alexzambrano.com."
   },
   "Comments": {
+    "sectionTitle": "Avaliações e comentários",
     "title": "Comentários",
     "ratingLabel": "Avalie este capítulo",
     "averageRating": "{rating} ({count, plural, one {# avaliação} other {# avaliações}})",

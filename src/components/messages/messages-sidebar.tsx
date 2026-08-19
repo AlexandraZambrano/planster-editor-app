@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ChevronLeft } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { getConversations, type ConversationSummary } from "@/actions/messages"
 import { cn } from "@/lib/utils"
@@ -28,7 +28,7 @@ export function MessagesSidebar({ activeConversationId = null }: MessagesSidebar
           className="text-muted-foreground hover:text-foreground shrink-0"
           aria-label={t("backToInbox")}
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" />
         </Link>
         <span className="text-sm font-semibold">{t("title")}</span>
       </div>

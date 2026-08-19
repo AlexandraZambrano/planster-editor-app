@@ -260,6 +260,7 @@ export type BookPageData = {
   title: string
   synopsis: string | null
   coverUrl: string | null
+  coverPhotoCredit: { name: string; url: string } | null
   genres: string[]
   language: string
   bookStatus: BookStatus
@@ -295,6 +296,9 @@ export async function getBookPageData(bookId: string): Promise<{ error?: string;
         select: { id: true, title: true, wordCount: true },
         orderBy: { order: "asc" },
       },
+      coverDesign: {
+        select: { backgroundType: true, stockPhotographerName: true, stockPhotographerUrl: true },
+      },
     },
   })
   if (!book || book.publicationStatus === "DRAFT") return { error: "Book not found" }
@@ -329,6 +333,13 @@ export async function getBookPageData(bookId: string): Promise<{ error?: string;
       title: book.title,
       synopsis: book.synopsis,
       coverUrl: book.coverUrl,
+      coverPhotoCredit:
+        book.coverDesign?.backgroundType === "STOCK" && book.coverDesign.stockPhotographerName
+          ? {
+              name: book.coverDesign.stockPhotographerName,
+              url: book.coverDesign.stockPhotographerUrl ?? "",
+            }
+          : null,
       genres: book.genres,
       language: book.language,
       bookStatus: book.bookStatus,

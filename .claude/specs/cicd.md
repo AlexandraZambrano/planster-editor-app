@@ -67,6 +67,7 @@ Add at: GitHub repo → Settings → Secrets and variables → Actions
 | `CLOUDINARY_API_KEY` | Cloudinary API key |
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret |
 | `RESEND_API_KEY` | Resend dashboard → API Keys |
+| `UNSPLASH_ACCESS_KEY` | Free Access Key from unsplash.com/oauth/applications — stock photos for the cover designer |
 
 ### App secrets
 | Secret | Description |
@@ -105,6 +106,7 @@ CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
 RESEND_API_KEY=
 NEXT_PUBLIC_APP_URL=https://planster.app
+UNSPLASH_ACCESS_KEY=
 ```
 
 ---

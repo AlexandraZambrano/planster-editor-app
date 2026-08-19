@@ -159,6 +159,7 @@
     "minRatingStars": "{count}+ étoiles"
   },
   "Book": {
+    "coverPhotoCredit": "Photo de couverture par {name}",
     "ratingCount": "({count, plural, one {# avis} other {# avis}})",
     "noRatingsYet": "Pas encore de notes",
     "chapters": "Chapitres",
@@ -287,6 +288,30 @@
     "imageTooLarge": "L'image doit faire moins de {maxSize}Mo",
     "coverTooSmall": "La couverture doit mesurer au moins {minWidth}×{minHeight}px (la vôtre fait {width}×{height}px)",
     "uploadFailed": "Échec de l'envoi. Veuillez réessayer.",
+    "uploadCoverTab": "Importer une image",
+    "designCoverTab": "Créer une couverture",
+    "createCoverButton": "Créer une couverture",
+    "editCoverButton": "Modifier la couverture",
+    "coverDesignerTitle": "Créez votre couverture",
+    "chooseFont": "Police",
+    "backgroundColors": "Couleurs",
+    "backgroundOwnImage": "Mon image",
+    "backgroundPhotos": "Photos",
+    "stockSearchPlaceholder": "Rechercher des photos libres de droits…",
+    "noPhotosFound": "Aucune photo trouvée",
+    "featuredPhotos": "Photos populaires",
+    "photoCreditLabel": "Photo de {name} sur Unsplash",
+    "stockPhotoCreditNotice": "La politique d'Unsplash exige un crédit photo : si vous utilisez l'une de ces photos, le nom du photographe sera affiché publiquement sur la page de votre livre, juste avant le résumé.",
+    "addTextLayer": "+ Ajouter du texte",
+    "selectedTextLabel": "Texte sélectionné",
+    "deleteTextLayer": "Supprimer le texte",
+    "decreaseFontSize": "Réduire la taille",
+    "increaseFontSize": "Augmenter la taille",
+    "newTextDefault": "Texte",
+    "canvasHint": "Cliquez sur un texte pour le modifier directement. Faites glisser la poignée au-dessus pour le déplacer.",
+    "saveCover": "Enregistrer la couverture",
+    "savingCover": "Enregistrement…",
+    "coverSaveFailed": "Impossible d'enregistrer la couverture. Veuillez réessayer.",
     "selectGenres": "Sélectionner des genres…",
     "searchGenres": "Rechercher des genres…",
     "noGenreFound": "Aucun genre trouvé.",
@@ -331,7 +356,14 @@
     "replyPlaceholder": "Écrivez une réponse…",
     "send": "Envoyer",
     "cancel": "Annuler",
-    "closePanel": "Fermer le panneau"
+    "closePanel": "Fermer le panneau",
+    "myNotesButton": "Mes notes",
+    "myNotesTitle": "Mes notes privées",
+    "noNotes": "Vous n'avez pas encore ajouté de note privée à ce chapitre",
+    "deleteNote": "Supprimer",
+    "addNoteButton": "Note privée",
+    "notePlaceholder": "Écrivez une note que vous seul(e) verrez…",
+    "noteSubmitted": "Note enregistrée !"
   },
   "Reading": {
     "editChapter": "Modifier le chapitre →",
@@ -343,7 +375,10 @@
     "submit": "Envoyer",
     "previousChapter": "Chapitre précédent",
     "nextChapter": "Chapitre suivant",
-    "endOfChapter": "Fin du chapitre"
+    "endOfChapter": "Fin du chapitre",
+    "myComments": "Mes commentaires",
+    "myCommentsTitle": "Mes commentaires sur ce chapitre",
+    "noMyComments": "Vous n'avez pas encore laissé de commentaire sur ce chapitre"
   },
   "Settings": {
     "title": "Profil",
@@ -401,7 +436,7 @@
     "submitReview": "Envoyer l'avis"
   },
   "Goals": {
-    "backToBookPanel": "← Panneau du livre",
+    "backToBookPanel": "Panneau du livre",
     "title": "Objectifs d'écriture",
     "subtitle": "Suivez votre progression et restez dans les objectifs. Fuseau horaire de la série : UTC.",
     "progressOfGoal": "{pct} % de l'objectif de {target} mots",
@@ -465,7 +500,7 @@
   "Studio": {
     "writersStudio": "Studio de l'écrivain",
     "privateWorkspaceHint": "Votre espace créatif privé — vous seul pouvez le voir.",
-    "backToStudio": "← Studio",
+    "backToStudio": "Studio",
     "characters": "Personnages",
     "charactersDescription": "Apparence, passé et relations",
     "worldBuilding": "Univers",
@@ -524,6 +559,7 @@
     "contactBody": "Si vous avez des questions sur cette politique de confidentialité ou sur la façon dont nous traitons vos données, vous pouvez contacter Alexandra Zambrano, responsable de Planster, à planster.alexzambrano.com."
   },
   "Comments": {
+    "sectionTitle": "Notes et commentaires",
     "title": "Commentaires",
     "ratingLabel": "Notez ce chapitre",
     "averageRating": "{rating} ({count, plural, one {# note} other {# notes}})",

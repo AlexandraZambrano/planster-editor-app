@@ -27,6 +27,10 @@
 - Clean view: only the chapter text, without the editor toolbar
 - Minimal top bar: book title, chapter title, prev/next navigation
 - Beta can select text → tooltip "Comment" appears → popover opens to write a comment
+- "My comments" toggle in the top bar (`getMyInlineComments` in `src/actions/beta.ts`) opens
+  a panel listing the beta reader's own inline comments on the chapter (quoted passage,
+  comment text, any author reply); clicking one scrolls to and highlights the commented
+  passage in the text (`src/components/reading/comment-highlight-extension.ts`)
 - At the end of the chapter: "Your review of this chapter" section (textarea, max 1000 chars, one submit per chapter per beta reader)
 - A beta reader's comments are NOT visible to other betas
 - On publishing a comment or review: notify the author

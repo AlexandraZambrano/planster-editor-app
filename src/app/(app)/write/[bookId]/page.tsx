@@ -14,6 +14,7 @@ import { BookSettingsPanel } from "@/components/book/book-settings-panel"
 import { BetaManagement } from "@/components/beta/beta-management"
 import { SiteNav } from "@/components/shared/site-nav"
 import { cn } from "@/lib/utils"
+import type { CoverTextLayer } from "@/lib/cover-text-layers"
 
 const PUB_STATUS_STYLES: Record<string, string> = {
   DRAFT: "bg-muted text-muted-foreground",
@@ -49,6 +50,16 @@ export default async function BookPanelPage({ params }: Props) {
             visibility: true,
             wordCount: true,
             updatedAt: true,
+          },
+        },
+        coverDesign: {
+          select: {
+            backgroundType: true,
+            backgroundValue: true,
+            textLayers: true,
+            stockPhotographerName: true,
+            stockPhotographerUrl: true,
+            stockSourceUrl: true,
           },
         },
       },
@@ -160,6 +171,9 @@ export default async function BookPanelPage({ params }: Props) {
                     bookStatus: book.bookStatus,
                     publicationStatus: book.publicationStatus,
                     license: book.license,
+                    coverDesign: book.coverDesign
+                      ? { ...book.coverDesign, textLayers: book.coverDesign.textLayers as unknown as CoverTextLayer[] }
+                      : null,
                   }}
                 />
               </div>

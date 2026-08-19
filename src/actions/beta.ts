@@ -451,6 +451,69 @@ export async function getChapterComments(chapterId: string): Promise<{
   return { comments }
 }
 
+// ─── INLINE COMMENTS (BETA READER'S OWN VIEW) ───────────────────────────────
+
+export type MyInlineComment = {
+  id: string
+  selectedText: string
+  fromPos: number
+  toPos: number
+  content: string
+  resolved: boolean
+  createdAt: Date
+  replies: Array<{
+    id: string
+    content: string
+    createdAt: Date
+    author: { username: string }
+  }>
+}
+
+export async function getMyInlineComments(chapterId: string): Promise<{
+  error?: string
+  comments?: MyInlineComment[]
+}> {
+  const session = await auth()
+  if (!session) return { error: "Unauthorized" }
+
+  const chapter = await prisma.chapter.findUnique({
+    where: { id: chapterId },
+    select: { bookId: true },
+  })
+  if (!chapter) return { error: "Chapter not found" }
+
+  const betaReader = await prisma.betaReader.findUnique({
+    where: { bookId_userId: { bookId: chapter.bookId, userId: session.user.id } },
+    select: { id: true, status: true },
+  })
+  if (!betaReader || betaReader.status !== "APPROVED") return { error: "Access denied" }
+
+  const comments = await prisma.inlineComment.findMany({
+    where: { chapterId, betaReaderId: betaReader.id },
+    select: {
+      id: true,
+      selectedText: true,
+      fromPos: true,
+      toPos: true,
+      content: true,
+      resolved: true,
+      createdAt: true,
+      replies: {
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          author: { select: { username: true } },
+        },
+        orderBy: { createdAt: "asc" },
+      },
+    },
+    orderBy: { fromPos: "asc" },
+  })
+
+  return { comments }
+}
+
 // ─── CHAPTER REVIEWS (AUTHOR VIEW) ──────────────────────────────────────────
 
 export type ChapterReviewEntry = {

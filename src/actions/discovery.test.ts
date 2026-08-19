@@ -228,4 +228,53 @@ describe("getBookPageData", () => {
 
     expect(result.book?.isViewerAuthor).toBe(true)
   })
+
+  it("surfaces the Unsplash photographer credit when the cover used a stock photo", async () => {
+    mockPrisma.book.findUnique.mockResolvedValue({
+      id: "book-1",
+      title: "My Book",
+      synopsis: null,
+      coverUrl: null,
+      genres: [],
+      language: "en",
+      bookStatus: "IN_PROGRESS",
+      publicationStatus: "PUBLISHED",
+      authorId: "author-1",
+      author: { id: "author-1", username: "author1", displayName: "Author One", avatarUrl: null },
+      chapters: [],
+      coverDesign: {
+        backgroundType: "STOCK",
+        stockPhotographerName: "Jane Doe",
+        stockPhotographerUrl: "https://unsplash.com/@jane",
+      },
+    })
+
+    const result = await getBookPageData("book-1")
+
+    expect(result.book?.coverPhotoCredit).toEqual({
+      name: "Jane Doe",
+      url: "https://unsplash.com/@jane",
+    })
+  })
+
+  it("omits the photo credit for a preset or uploaded cover background", async () => {
+    mockPrisma.book.findUnique.mockResolvedValue({
+      id: "book-1",
+      title: "My Book",
+      synopsis: null,
+      coverUrl: null,
+      genres: [],
+      language: "en",
+      bookStatus: "IN_PROGRESS",
+      publicationStatus: "PUBLISHED",
+      authorId: "author-1",
+      author: { id: "author-1", username: "author1", displayName: "Author One", avatarUrl: null },
+      chapters: [],
+      coverDesign: { backgroundType: "PRESET", stockPhotographerName: null, stockPhotographerUrl: null },
+    })
+
+    const result = await getBookPageData("book-1")
+
+    expect(result.book?.coverPhotoCredit).toBeNull()
+  })
 })

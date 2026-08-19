@@ -159,6 +159,7 @@
     "minRatingStars": "{count}+ stars"
   },
   "Book": {
+    "coverPhotoCredit": "Cover photo by {name}",
     "ratingCount": "({count, plural, one {# rating} other {# ratings}})",
     "noRatingsYet": "No ratings yet",
     "chapters": "Chapters",
@@ -287,6 +288,30 @@
     "imageTooLarge": "Image must be smaller than {maxSize}MB",
     "coverTooSmall": "Cover must be at least {minWidth}×{minHeight}px (yours is {width}×{height}px)",
     "uploadFailed": "Upload failed. Please try again.",
+    "uploadCoverTab": "Upload image",
+    "designCoverTab": "Design a cover",
+    "createCoverButton": "Design cover",
+    "editCoverButton": "Edit cover",
+    "coverDesignerTitle": "Design your cover",
+    "chooseFont": "Font",
+    "backgroundColors": "Colors",
+    "backgroundOwnImage": "My image",
+    "backgroundPhotos": "Photos",
+    "stockSearchPlaceholder": "Search free stock photos…",
+    "noPhotosFound": "No photos found",
+    "featuredPhotos": "Featured photos",
+    "photoCreditLabel": "Photo by {name} on Unsplash",
+    "stockPhotoCreditNotice": "Unsplash's policy requires photo credit: if you use one of these photos, the photographer's name will be shown publicly on your book's page, right before the synopsis.",
+    "addTextLayer": "+ Add text",
+    "selectedTextLabel": "Selected text",
+    "deleteTextLayer": "Delete text",
+    "decreaseFontSize": "Decrease size",
+    "increaseFontSize": "Increase size",
+    "newTextDefault": "Text",
+    "canvasHint": "Click any text to edit it in place. Drag the handle above it to reposition.",
+    "saveCover": "Save cover",
+    "savingCover": "Saving…",
+    "coverSaveFailed": "Couldn't save the cover. Please try again.",
     "selectGenres": "Select genres…",
     "searchGenres": "Search genres…",
     "noGenreFound": "No genre found.",
@@ -331,7 +356,14 @@
     "replyPlaceholder": "Write a reply…",
     "send": "Send",
     "cancel": "Cancel",
-    "closePanel": "Close panel"
+    "closePanel": "Close panel",
+    "myNotesButton": "My notes",
+    "myNotesTitle": "My private notes",
+    "noNotes": "You haven't added any private notes to this chapter yet",
+    "deleteNote": "Delete",
+    "addNoteButton": "Private note",
+    "notePlaceholder": "Write a note only you will see…",
+    "noteSubmitted": "Note saved!"
   },
   "Reading": {
     "editChapter": "Edit chapter →",
@@ -343,7 +375,10 @@
     "submit": "Submit",
     "previousChapter": "Previous chapter",
     "nextChapter": "Next chapter",
-    "endOfChapter": "End of chapter"
+    "endOfChapter": "End of chapter",
+    "myComments": "My comments",
+    "myCommentsTitle": "My comments on this chapter",
+    "noMyComments": "You haven't left any comments on this chapter yet"
   },
   "Settings": {
     "title": "Profile",
@@ -401,7 +436,7 @@
     "submitReview": "Submit review"
   },
   "Goals": {
-    "backToBookPanel": "← Book panel",
+    "backToBookPanel": "Book panel",
     "title": "Writing Goals",
     "subtitle": "Track your progress and stay on target. Streak timezone: UTC.",
     "progressOfGoal": "{pct}% of {target} word goal",
@@ -465,7 +500,7 @@
   "Studio": {
     "writersStudio": "Writer's Studio",
     "privateWorkspaceHint": "Your private creative workspace — only you can see this.",
-    "backToStudio": "← Studio",
+    "backToStudio": "Studio",
     "characters": "Characters",
     "charactersDescription": "Appearance, backstory and relationships",
     "worldBuilding": "World Building",
@@ -524,6 +559,7 @@
     "contactBody": "If you have any questions about this Privacy Policy or how we handle your data, you can reach Alexandra Zambrano, who operates Planster, at planster.alexzambrano.com."
   },
   "Comments": {
+    "sectionTitle": "Ratings & comments",
     "title": "Comments",
     "ratingLabel": "Rate this chapter",
     "averageRating": "{rating} ({count, plural, one {# rating} other {# ratings}})",

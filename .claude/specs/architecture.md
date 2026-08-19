@@ -125,9 +125,13 @@ planster-editor-app/
 - The helper `src/lib/cloudinary.ts` exposes `uploadImage(file, folder)` and returns the public URL
 - Never save images to `public/` or the server filesystem
   - Exception: static, app-provided assets that are generated once and committed (not
-    user-uploaded) — the PWA icons (`public/icons/`) and the quote-share background
-    gradients (`public/quote-backgrounds/`, see `scripts/generate-quote-backgrounds.mjs`)
-    follow this pattern; the quote-share images a *user* generates are still uploaded to
+    user-uploaded) — the PWA icons (`public/icons/`), the quote-share background gradients
+    (`public/quote-backgrounds/`, see `scripts/generate-quote-backgrounds.mjs`), the cover
+    designer's background gradients (`public/cover-backgrounds/`, see
+    `scripts/generate-cover-backgrounds.mjs`), and its curated font files
+    (`public/fonts/covers/*.ttf`, OFL-licensed Google Fonts, embedded as base64 into the SVG
+    passed to `sharp` since the Alpine Docker runner has no fontconfig installed) all follow
+    this pattern; the quote-share and cover images a *user* generates are still uploaded to
     Cloudinary, never written to disk
 
 ### Real-time notifications
@@ -160,6 +164,11 @@ CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
 RESEND_API_KEY=
 NEXT_PUBLIC_APP_URL=
+
+# Unsplash — free Access Key from https://unsplash.com/oauth/applications
+# (stock photos for the cover designer). Starts in "Demo" mode (50 req/hour);
+# apply for production access from the same dashboard when ready to scale.
+UNSPLASH_ACCESS_KEY=
 ```
 
 > **Supabase + Prisma note:** Supabase uses a connection pooler (port 6543) for runtime queries and a direct connection (port 5432) for migrations. In `prisma/schema.prisma` use `url = env("DATABASE_URL")` and `directUrl = env("DIRECT_URL")`. The `DATABASE_URL` points to the pooler (Transaction mode), `DIRECT_URL` to the direct connection.

@@ -65,6 +65,7 @@
 | `/api/messages/stream` | SSE chat message stream (separate channel from notifications) |
 | `/api/upload` | Cloudinary image upload endpoint |
 | `/api/quote-card` | Generates a quote-card PNG (background + quote + caption) and uploads it to Cloudinary |
+| `/api/cover-design` | Composites a book cover (background + title text in a chosen font) and uploads it to Cloudinary |
 
 ## Access notes
 

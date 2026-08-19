@@ -19,6 +19,12 @@ vi.mock("@/actions/beta", () => ({
   replyToComment: vi.fn(),
 }))
 
+vi.mock("@/actions/author-notes", () => ({
+  getAuthorNotes: vi.fn().mockResolvedValue({ notes: [] }),
+  createAuthorNote: vi.fn(),
+  deleteAuthorNote: vi.fn(),
+}))
+
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),

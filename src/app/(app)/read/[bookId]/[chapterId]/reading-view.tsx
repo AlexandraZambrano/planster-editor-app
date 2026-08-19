@@ -6,7 +6,7 @@ import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import TextAlign from "@tiptap/extension-text-align"
 import { TextStyle } from "@/components/editor/font-size"
-import { ChevronLeft, ChevronRight, MessageSquarePlus, Share2, X } from "lucide-react"
+import { ChevronLeft, ChevronRight, MessageSquarePlus, MessageSquareText, Share2, X } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -14,7 +14,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ChapterReviewForm } from "@/components/beta/chapter-review-form"
 import { ChapterSocial } from "@/components/reading/chapter-social"
 import { QuoteShareDialog } from "@/components/reading/quote-share-dialog"
-import { createInlineComment } from "@/actions/beta"
+import { MyCommentsPanel } from "@/components/reading/my-comments-panel"
+import { CommentHighlight } from "@/components/reading/comment-highlight-extension"
+import { createInlineComment, getMyInlineComments, type MyInlineComment } from "@/actions/beta"
 import { logReadingActivity } from "@/actions/reading"
 
 interface Props {
@@ -65,58 +67,71 @@ export function ReadingView({
   const [commentError, setCommentError] = useState<string | null>(null)
   const [commentSuccess, setCommentSuccess] = useState(false)
   const [showShareDialog, setShowShareDialog] = useState(false)
+  const [myComments, setMyComments] = useState<MyInlineComment[] | null>(null)
+  const [showMyComments, setShowMyComments] = useState(false)
 
   useEffect(() => {
     logReadingActivity(bookId, chapterId)
   }, [bookId, chapterId])
 
+  useEffect(() => {
+    if (!isBeta) return
+    getMyInlineComments(chapterId).then((r) => setMyComments(r.comments ?? []))
+  }, [isBeta, chapterId])
+
   const savedSelectionRef = useRef<SelectionState>(null)
 
-  const editor = useEditor({
-    immediatelyRender: false,
-    editable: false,
-    extensions: [
-      StarterKit,
-      TextStyle,
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
-    ],
-    content: content && Object.keys(content).length > 0 ? content : undefined,
-    editorProps: {
-      attributes: {
-        class: "focus:outline-none",
-        style: "padding: 40px 56px;",
+  const editor = useEditor(
+    {
+      immediatelyRender: false,
+      editable: false,
+      extensions: [
+        StarterKit,
+        TextStyle,
+        TextAlign.configure({ types: ["heading", "paragraph"] }),
+        CommentHighlight.configure({
+          comments: (myComments ?? []).map((c) => ({ id: c.id, from: c.fromPos, to: c.toPos })),
+        }),
+      ],
+      content: content && Object.keys(content).length > 0 ? content : undefined,
+      editorProps: {
+        attributes: {
+          class: "focus:outline-none",
+          style: "padding: 40px 56px;",
+        },
+      },
+      onSelectionUpdate({ editor: ed }) {
+        if (!isBeta && !canShareQuote) return
+        const { from, to } = ed.state.selection
+        if (from === to) {
+          if (!showCommentForm) setSelection(null)
+          return
+        }
+        const text = ed.state.doc.textBetween(from, to, " ")
+        if (!text.trim()) {
+          setSelection(null)
+          return
+        }
+        const nativeSel = window.getSelection()
+        if (!nativeSel || nativeSel.rangeCount === 0) return
+        const range = nativeSel.getRangeAt(0)
+        const rect = range.getBoundingClientRect()
+        const newSel: SelectionState = {
+          from,
+          to,
+          text: text.trim(),
+          rect: {
+            top: rect.top + window.scrollY,
+            left: rect.left + rect.width / 2,
+            width: rect.width,
+          },
+        }
+        setSelection(newSel)
+        savedSelectionRef.current = newSel
       },
     },
-    onSelectionUpdate({ editor: ed }) {
-      if (!isBeta && !canShareQuote) return
-      const { from, to } = ed.state.selection
-      if (from === to) {
-        if (!showCommentForm) setSelection(null)
-        return
-      }
-      const text = ed.state.doc.textBetween(from, to, " ")
-      if (!text.trim()) {
-        setSelection(null)
-        return
-      }
-      const nativeSel = window.getSelection()
-      if (!nativeSel || nativeSel.rangeCount === 0) return
-      const range = nativeSel.getRangeAt(0)
-      const rect = range.getBoundingClientRect()
-      const newSel: SelectionState = {
-        from,
-        to,
-        text: text.trim(),
-        rect: {
-          top: rect.top + window.scrollY,
-          left: rect.left + rect.width / 2,
-          width: rect.width,
-        },
-      }
-      setSelection(newSel)
-      savedSelectionRef.current = newSel
-    },
-  })
+    [myComments]
+  )
 
   const [shareQuoteText, setShareQuoteText] = useState("")
 
@@ -167,6 +182,14 @@ export function ReadingView({
     }
   }
 
+  function jumpToComment(commentId: string) {
+    const target = document.querySelector(`[data-comment-id="${commentId}"]`)
+    if (!target) return
+    target.scrollIntoView({ behavior: "smooth", block: "center" })
+    target.classList.add("!bg-amber-400/70")
+    setTimeout(() => target.classList.remove("!bg-amber-400/70"), 1200)
+  }
+
   // Dismiss comment form when clicking outside
   const formRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -188,9 +211,10 @@ export function ReadingView({
       <header className="sticky top-0 z-10 bg-background border-b px-4 py-2.5 flex items-center gap-3 text-sm">
         <Link
           href={isAuthor ? `/write/${bookId}` : `/books/${bookId}`}
-          className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+          className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors shrink-0"
         >
-          ← {bookTitle}
+          <ChevronLeft className="h-4 w-4 mr-1" />
+          {bookTitle}
         </Link>
         <span className="text-muted-foreground">/</span>
         <span className="font-medium truncate">{chapterTitle}</span>
@@ -202,6 +226,25 @@ export function ReadingView({
           >
             {t("editChapter")}
           </Link>
+        )}
+
+        {isBeta && (
+          <Button
+            type="button"
+            size="sm"
+            variant={showMyComments ? "secondary" : "ghost"}
+            className={`h-7 gap-1.5 text-xs relative shrink-0 ${isAuthor ? "" : "ml-auto"}`}
+            onClick={() => setShowMyComments((v) => !v)}
+            data-testid="my-comments-toggle"
+          >
+            <MessageSquareText className="h-3.5 w-3.5" />
+            {t("myComments")}
+            {myComments && myComments.length > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white">
+                {myComments.length > 99 ? "99+" : myComments.length}
+              </span>
+            )}
+          </Button>
         )}
       </header>
 
@@ -337,6 +380,14 @@ export function ReadingView({
           bookTitle={bookTitle}
           chapterId={chapterId}
           chapterTitle={chapterTitle}
+        />
+      )}
+
+      {isBeta && showMyComments && (
+        <MyCommentsPanel
+          comments={myComments}
+          onClose={() => setShowMyComments(false)}
+          onJump={jumpToComment}
         />
       )}
 

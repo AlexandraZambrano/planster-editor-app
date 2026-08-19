@@ -70,6 +70,12 @@ vi.mock("@/lib/prisma", () => ({
       update: vi.fn(),
       delete: vi.fn(),
     },
+    bookCoverDesign: {
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      upsert: vi.fn(),
+      deleteMany: vi.fn(),
+    },
     chapter: {
       findUnique: vi.fn(),
       findFirst: vi.fn(),
@@ -261,6 +267,12 @@ vi.mock("@/lib/prisma", () => ({
     quoteShare: {
       findUnique: vi.fn(),
       create: vi.fn(),
+    },
+    authorNote: {
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      delete: vi.fn(),
     },
     $transaction: vi.fn(),
     $queryRaw: vi.fn(),
