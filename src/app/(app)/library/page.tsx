@@ -73,7 +73,7 @@ export default async function LibraryPage({ searchParams }: Props) {
                       book={book}
                       className={cn(
                         i > 0 && "-ml-8 sm:-ml-10",
-                        isCenter ? "z-10 shadow-xl -translate-y-3 scale-105" : "z-0"
+                        isCenter ? "z-10 shadow-lift -translate-y-3 scale-105" : "z-0"
                       )}
                     />
                   )

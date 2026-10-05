@@ -41,10 +41,10 @@ export function LibraryBookCard({ entry, shelves, onRemove }: LibraryBookCardPro
   const memberShelves = shelves.filter((s) => shelfIds.includes(s.id))
 
   return (
-    <div className="flex gap-4 p-4 rounded-xl bg-muted border border-white/60">
+    <div className="flex gap-4 p-4 rounded-2xl bg-card border shadow-soft">
       <Link
         href={`/books/${entry.book.id}`}
-        className="relative w-20 sm:w-24 aspect-[2/3] shrink-0 rounded-md overflow-hidden bg-muted border"
+        className="relative w-20 sm:w-24 aspect-[2/3] shrink-0 rounded-lg overflow-hidden bg-muted border shadow-soft"
       >
         {entry.book.coverUrl ? (
           <Image
@@ -64,12 +64,12 @@ export function LibraryBookCard({ entry, shelves, onRemove }: LibraryBookCardPro
       </Link>
 
       <div className="flex-1 min-w-0">
-        <Link href={`/books/${entry.book.id}`} className="hover:underline">
+        <Link href={`/books/${entry.book.id}`} className="inline-block py-0.5 hover:text-primary transition-colors">
           <p className="font-bold leading-tight">{entry.book.title}</p>
         </Link>
         <Link
           href={`/@${entry.book.author.username}`}
-          className="text-xs text-muted-foreground hover:text-foreground inline-block mb-1"
+          className="text-xs text-muted-foreground hover:text-foreground inline-block py-1"
         >
           {tCommon("byAuthor", { name: entry.book.author.displayName })}
         </Link>
