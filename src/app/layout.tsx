@@ -49,8 +49,9 @@ export default async function RootLayout({
           {t("skipToContent")}
         </a>
         <NextIntlClientProvider messages={messages}>
-          {/* flex-1 pins the footer to the bottom on short pages instead of floating mid-screen */}
-          <div id="content" tabIndex={-1} className="flex flex-1 flex-col outline-none">
+          {/* flex-1 pins the footer to the bottom on short pages instead of floating mid-screen;
+              [&>*]:w-full stops "mx-auto max-w-*" page wrappers from shrinking to their content in the flex column */}
+          <div id="content" tabIndex={-1} className="flex flex-1 flex-col outline-none [&>*]:w-full">
             {children}
           </div>
           <FooterGate>

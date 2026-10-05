@@ -24,8 +24,8 @@ export function BookCard({ book, chapterCount }: BookCardProps) {
   const dateLocale = useDateLocale()
 
   return (
-    <Link href={`/write/${book.id}`} className="group flex gap-4 p-4 rounded-xl bg-muted border border-white/60">
-      <div className="relative w-20 sm:w-24 aspect-[2/3] shrink-0 rounded-md overflow-hidden bg-muted border">
+    <Link href={`/write/${book.id}`} className="group flex gap-4 p-4 rounded-2xl bg-card border shadow-soft transition-shadow hover:shadow-lift">
+      <div className="relative w-20 sm:w-24 aspect-[2/3] shrink-0 rounded-lg overflow-hidden bg-muted border">
         {book.coverUrl ? (
           <Image
             src={book.coverUrl}

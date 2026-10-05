@@ -185,7 +185,7 @@ function MessageBubble({ message, isOwn }: { message: MessageItem; isOwn: boolea
       <div
         className={cn(
           "max-w-[75%] rounded-2xl px-3.5 py-2 text-sm",
-          isOwn ? "bg-foreground text-white" : "bg-muted text-foreground"
+          isOwn ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
         )}
       >
         {quote ? (
