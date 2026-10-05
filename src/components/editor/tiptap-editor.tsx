@@ -2,11 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import { useEditor, EditorContent } from "@tiptap/react"
-import StarterKit from "@tiptap/starter-kit"
-import TextAlign from "@tiptap/extension-text-align"
-import Underline from "@tiptap/extension-underline"
 import { useTranslations } from "next-intl"
-import { TextStyle } from "./font-size"
+import { chapterSchemaExtensions } from "./chapter-extensions"
 import { Toolbar } from "./toolbar"
 import { BetaFeedbackPanel } from "./beta-feedback-panel"
 import { AuthorNotesPanel } from "./author-notes-panel"
@@ -119,15 +116,7 @@ export function TiptapEditor({
 
   const editor = useEditor({
     immediatelyRender: false,
-    extensions: [
-      StarterKit,
-      TextStyle,
-      Underline,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      NoteHighlight,
-    ],
+    extensions: [...chapterSchemaExtensions, NoteHighlight],
     content: initialContent && Object.keys(initialContent).length > 0 ? initialContent : undefined,
     editorProps: {
       attributes: {

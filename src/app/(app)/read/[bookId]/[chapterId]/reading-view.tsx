@@ -3,9 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useEditor, EditorContent } from "@tiptap/react"
-import StarterKit from "@tiptap/starter-kit"
-import TextAlign from "@tiptap/extension-text-align"
-import { TextStyle } from "@/components/editor/font-size"
+import { chapterSchemaExtensions } from "@/components/editor/chapter-extensions"
 import { ChevronLeft, ChevronRight, MessageSquarePlus, MessageSquareText, Share2, X } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
@@ -86,9 +84,7 @@ export function ReadingView({
       immediatelyRender: false,
       editable: false,
       extensions: [
-        StarterKit,
-        TextStyle,
-        TextAlign.configure({ types: ["heading", "paragraph"] }),
+        ...chapterSchemaExtensions,
         CommentHighlight.configure({
           comments: (myComments ?? []).map((c) => ({ id: c.id, from: c.fromPos, to: c.toPos })),
         }),
