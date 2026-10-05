@@ -15,11 +15,11 @@ export function RecommendationCard({ book, className }: RecommendationCardProps)
     <Link
       href={`/books/${book.id}`}
       className={cn(
-        "relative flex flex-col items-center text-center bg-white rounded-2xl p-4 w-40 sm:w-48 shrink-0 shadow-sm transition-transform duration-200 hover:z-30 hover:-translate-y-3 hover:scale-105 hover:shadow-xl",
+        "relative flex flex-col items-center text-center bg-card border rounded-2xl p-3 sm:p-4 w-32 sm:w-48 shrink-0 shadow-soft transition-transform duration-200 hover:z-30 hover:-translate-y-3 hover:scale-105 hover:shadow-lift",
         className
       )}
     >
-      <div className="relative w-20 sm:w-24 aspect-[2/3] rounded-lg overflow-hidden bg-muted border mb-2.5">
+      <div className="relative w-20 sm:w-24 aspect-[2/3] rounded-lg overflow-hidden bg-muted border mb-2.5 shadow-soft">
         {book.coverUrl ? (
           <Image src={book.coverUrl} alt={book.title} fill sizes="96px" className="object-cover" />
         ) : (
