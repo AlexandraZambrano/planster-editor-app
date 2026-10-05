@@ -68,7 +68,8 @@
       "CC_BY_NC": "CC BY-NC 4.0 — Attribution-PasDUtilisationCommerciale",
       "CC_BY_NC_ND": "CC BY-NC-ND 4.0 — Attribution-PasDUtilisationCommerciale-PasDeModification",
       "PUBLIC_DOMAIN": "Domaine public"
-    }
+    },
+    "starsValue": "{count} sur 5 étoiles"
   },
   "Landing": {
     "startReading": "Commencer à lire",

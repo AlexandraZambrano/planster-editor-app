@@ -208,21 +208,22 @@ export function ReadingView({
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top bar */}
-      <header className="sticky top-0 z-10 bg-background border-b px-4 py-2.5 flex items-center gap-3 text-sm">
+      <header className="sticky top-0 z-10 bg-background/90 backdrop-blur-md border-b px-4 py-1.5 flex items-center gap-3 text-sm">
         <Link
           href={isAuthor ? `/write/${bookId}` : `/books/${bookId}`}
-          className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors shrink-0"
+          className="inline-flex items-center py-1.5 text-muted-foreground hover:text-foreground transition-colors shrink-0"
         >
-          <ChevronLeft className="h-4 w-4 mr-1" />
+          <ChevronLeft className="h-4 w-4 mr-1" aria-hidden />
           {bookTitle}
         </Link>
-        <span className="text-muted-foreground">/</span>
-        <span className="font-medium truncate">{chapterTitle}</span>
+        <span className="text-muted-foreground" aria-hidden>/</span>
+        {/* The chapter title is the page's main heading for screen-reader navigation */}
+        <h1 className="font-sans text-sm font-medium tracking-normal truncate">{chapterTitle}</h1>
 
         {isAuthor && (
           <Link
             href={`/write/${bookId}/editor/${chapterId}`}
-            className="ml-auto text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
+            className="ml-auto py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
           >
             {t("editChapter")}
           </Link>
@@ -250,7 +251,7 @@ export function ReadingView({
 
       {/* Content */}
       <main className="flex-1 px-4 py-8">
-        <div className="mx-auto w-[816px] max-w-full bg-white shadow-sm rounded-sm border border-gray-100 relative">
+        <div className="mx-auto w-[816px] max-w-full bg-card shadow-soft rounded-2xl border relative">
           <EditorContent editor={editor} />
 
           {/* Floating selection toolbar: comment (beta only) + share quote (any reader on a PUBLISHED chapter) */}
