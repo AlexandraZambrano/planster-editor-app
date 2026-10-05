@@ -55,7 +55,7 @@ export function MessagesBell() {
       <Link href="/messages">
         <MessageCircle className="h-5 w-5" />
         {count > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white">
+          <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground ring-2 ring-background">
             {badgeLabel}
           </span>
         )}

@@ -57,7 +57,7 @@ export function MessagesSidebar({ activeConversationId = null }: MessagesSidebar
                         sizes="36px"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82] text-white text-xs font-bold">
+                      <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback text-white text-xs font-bold">
                         {c.otherUser.displayName[0]?.toUpperCase()}
                       </div>
                     )}

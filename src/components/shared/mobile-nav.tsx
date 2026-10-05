@@ -14,83 +14,51 @@ import {
 } from "@/components/ui/sheet"
 import { LanguageSwitcher } from "./language-switcher"
 import { SignOutButton } from "./sign-out-button"
-import { cn } from "@/lib/utils"
-import type { SiteNavActive } from "./site-nav"
-
-interface NavLink {
-  id: string
-  label: string
-  href: string
-  activeKey: SiteNavActive | null
-}
 
 interface MobileNavProps {
-  navLinks: NavLink[]
-  active?: SiteNavActive
   isSignedIn: boolean
   username?: string | null
 }
 
-export function MobileNav({ navLinks, active, isSignedIn, username }: MobileNavProps) {
+// Secondary navigation only (account, language) — primary destinations live in the bottom tab bar.
+export function MobileNav({ isSignedIn, username }: MobileNavProps) {
   const t = useTranslations("Nav")
   const tLanguage = useTranslations("Language")
+  const itemClass =
+    "rounded-xl px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
 
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          aria-label={t("openMenu")}
-        >
+        <Button type="button" variant="ghost" size="icon" aria-label={t("openMenu")}>
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-72 flex flex-col">
         <SheetHeader>
-          <SheetTitle className="text-left">Planster</SheetTitle>
+          <SheetTitle className="text-left font-display">Planster</SheetTitle>
         </SheetHeader>
 
-        <nav className="flex flex-col gap-1 mt-4">
-          {navLinks.map((item) => (
-            <SheetClose asChild key={item.id}>
-              <Link
-                href={item.href}
-                className={cn(
-                  "rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                  active !== undefined && active === item.activeKey
-                    ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
-              >
-                {item.label}
-              </Link>
-            </SheetClose>
-          ))}
-        </nav>
-
-        <div className="border-t my-4" />
-
         {isSignedIn ? (
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 mt-4">
             <SheetClose asChild>
-              <Link
-                href="/settings"
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              >
+              <Link href={username ? `/@${username}` : "/settings"} className={itemClass}>
                 {username ? `@${username}` : t("myProfile")}
               </Link>
             </SheetClose>
             <SheetClose asChild>
-              <div className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer">
+              <Link href="/settings" className={itemClass}>
+                {t("settings")}
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <div className={`${itemClass} cursor-pointer`}>
                 <SignOutButton />
               </div>
             </SheetClose>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 mt-4">
             <SheetClose asChild>
               <Button asChild variant="outline" className="w-full">
                 <Link href="/auth/login">{t("signIn")}</Link>
@@ -105,7 +73,7 @@ export function MobileNav({ navLinks, active, isSignedIn, username }: MobileNavP
         )}
 
         <div className="mt-auto pt-4 border-t flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">{tLanguage("label")}</span>
+          <span className="text-sm text-muted-foreground">{tLanguage("label")}</span>
           <LanguageSwitcher />
         </div>
       </SheetContent>

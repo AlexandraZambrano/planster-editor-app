@@ -29,7 +29,7 @@ export default async function TimelinePage({ params }: Props) {
   if ("error" in timelineResult) notFound()
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col flex-1">
       <div className="px-6 py-4 border-b flex-shrink-0">
         <Link
           href={`/write/${bookId}/studio`}

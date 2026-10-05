@@ -10,7 +10,14 @@
     "signOut": "Tanca sessió",
     "notifications": "Notificacions",
     "accountMenu": "Menú del compte",
-    "openMenu": "Obre el menú"
+    "openMenu": "Obre el menú",
+    "skipToContent": "Salta al contingut",
+    "primaryNav": "Principal",
+    "tabExplore": "Explora",
+    "tabWrite": "Escriu",
+    "tabLibrary": "Biblioteca",
+    "tabMe": "Jo",
+    "settings": "Configuració"
   },
   "Language": {
     "label": "Idioma"

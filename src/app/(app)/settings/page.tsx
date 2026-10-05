@@ -20,7 +20,7 @@ export default async function SettingsPage() {
   return (
     <>
       <SiteNav />
-      <main className="bg-white min-h-[calc(100vh-4rem)]">
+      <main className="flex-1">
         <div className="container mx-auto py-10 px-4 max-w-2xl space-y-8">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">{t("title")}</h1>
 

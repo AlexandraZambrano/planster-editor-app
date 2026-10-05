@@ -14,8 +14,8 @@ export function BookSection({ id, title, titleClassName, books }: BookSectionPro
 
   return (
     <section id={id} className="mb-10 scroll-mt-20">
-      <h2 className={cn("text-lg font-semibold mb-4", titleClassName)}>{title}</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-8 gap-5">
+      {title && <h2 className={cn("text-2xl font-semibold mb-5", titleClassName)}>{title}</h2>}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-5 gap-y-8">
         {books.map((book) => (
           <BookGridCard key={book.id} book={book} />
         ))}

@@ -10,7 +10,14 @@
     "signOut": "Sair",
     "notifications": "Notificações",
     "accountMenu": "Menu da conta",
-    "openMenu": "Abrir menu"
+    "openMenu": "Abrir menu",
+    "skipToContent": "Pular para o conteúdo",
+    "primaryNav": "Principal",
+    "tabExplore": "Explorar",
+    "tabWrite": "Escrever",
+    "tabLibrary": "Biblioteca",
+    "tabMe": "Eu",
+    "settings": "Configurações"
   },
   "Language": {
     "label": "Idioma"

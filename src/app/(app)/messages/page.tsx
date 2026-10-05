@@ -12,7 +12,7 @@ export default async function MessagesPage() {
   return (
     <>
       <SiteNav />
-      <main className="bg-white min-h-[calc(100vh-4rem)]">
+      <main className="flex-1">
         <div className="container mx-auto py-10 px-4 max-w-2xl">
           <h1 className="text-2xl font-bold mb-6">{t("title")}</h1>
           <InboxList requests={requests ?? []} active={active ?? []} />

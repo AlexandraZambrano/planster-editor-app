@@ -15,7 +15,7 @@ export function PersonCard({ person, caption }: PersonCardProps) {
         {person.avatarUrl ? (
           <Image src={person.avatarUrl} alt={person.displayName} fill className="object-cover" sizes="48px" />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82] text-white font-bold">
+          <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback text-white font-bold">
             {person.displayName[0]?.toUpperCase()}
           </div>
         )}

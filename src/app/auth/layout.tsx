@@ -14,8 +14,8 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
   const t = await getTranslations("Common")
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-secondary/40 px-4">
-      <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-sm p-8">
+    <div className="flex-1 flex items-center justify-center bg-secondary/60 px-4 py-12">
+      <div className="relative w-full max-w-sm bg-card rounded-3xl border shadow-lift p-8">
         <Link
           href="/"
           aria-label={t("close")}

@@ -35,7 +35,7 @@ export function BookCard({ book, chapterCount }: BookCardProps) {
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
+          <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback">
             <span className="text-2xl font-bold text-white select-none">
               {book.title[0]?.toUpperCase() ?? <BookOpen />}
             </span>

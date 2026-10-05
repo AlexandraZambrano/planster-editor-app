@@ -166,7 +166,7 @@ export function ChapterItem({ chapter, bookId, onDelete }: ChapterItemProps) {
         <Button
           type="button"
           size="sm"
-          className="h-auto gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-red-500 hover:bg-red-600 text-white shrink-0"
+          className="h-auto gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-destructive hover:bg-destructive/90 text-destructive-foreground shrink-0"
           onClick={handleDelete}
           disabled={isPending}
         >

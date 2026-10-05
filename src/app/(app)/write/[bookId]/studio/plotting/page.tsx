@@ -21,7 +21,7 @@ export default async function PlottingPage({ params }: Props) {
   const { chapters, characters, locations } = result
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col flex-1">
       <div className="px-6 py-4 border-b flex-shrink-0">
         <Link
           href={`/write/${bookId}/studio`}

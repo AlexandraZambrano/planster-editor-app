@@ -34,7 +34,7 @@ export default async function ProfilePage({ params }: Props) {
   return (
     <>
       <SiteNav />
-      <main className="bg-white min-h-[calc(100vh-4rem)]">
+      <main className="flex-1">
         <div className="container mx-auto py-10 px-4 max-w-4xl">
           <div className="flex items-center gap-5 mb-8 bg-muted rounded-xl p-6">
             <div className="relative h-[120px] w-[120px] rounded-full overflow-hidden bg-muted border shrink-0">
@@ -48,7 +48,7 @@ export default async function ProfilePage({ params }: Props) {
                   sizes="120px"
                 />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
+                <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback">
                   <span className="text-4xl font-bold text-white">
                     {profile.displayName[0]?.toUpperCase()}
                   </span>
@@ -102,7 +102,7 @@ export default async function ProfilePage({ params }: Props) {
                           className="object-cover transition-transform duration-300 group-hover:scale-105"
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
+                        <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback">
                           <span className="text-3xl font-bold text-white select-none">
                             {book.title[0]?.toUpperCase() ?? <BookOpen />}
                           </span>

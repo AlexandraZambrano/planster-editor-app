@@ -10,7 +10,14 @@
     "signOut": "Cerrar sesión",
     "notifications": "Notificaciones",
     "accountMenu": "Menú de cuenta",
-    "openMenu": "Abrir menú"
+    "openMenu": "Abrir menú",
+    "skipToContent": "Saltar al contenido",
+    "primaryNav": "Principal",
+    "tabExplore": "Explorar",
+    "tabWrite": "Escribir",
+    "tabLibrary": "Biblioteca",
+    "tabMe": "Yo",
+    "settings": "Ajustes"
   },
   "Language": {
     "label": "Idioma"

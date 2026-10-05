@@ -7,7 +7,6 @@ import { SiteNav } from "@/components/shared/site-nav"
 import { LandingHero } from "@/components/discovery/landing-hero"
 import { HowItWorks } from "@/components/discovery/how-it-works"
 import { AuthenticatedHome } from "@/components/discovery/authenticated-home"
-import { PopularReadsStack } from "@/components/discovery/popular-reads-stack"
 import { PopularCarousel } from "@/components/discovery/popular-carousel"
 import { BookSection } from "@/components/discovery/book-section"
 import { Button } from "@/components/ui/button"
@@ -25,13 +24,14 @@ export default async function Home() {
     <>
       <SiteNav active="home" />
 
+      <main className="flex-1">
       {session ? (
         <>
           <AuthenticatedHome displayName={session.user.username} />
 
-          <main className="container mx-auto py-14 px-4 max-w-6xl">
+          <div className="container mx-auto py-14 px-4 max-w-6xl">
             <section className="mb-14">
-              <h2 className="text-2xl font-bold text-center mb-8">{t("bestReads")}</h2>
+              <h2 className="text-3xl font-semibold mb-8">{t("bestReads")}</h2>
               {popular.length > 0 ? (
                 <PopularCarousel books={popular} />
               ) : (
@@ -41,29 +41,29 @@ export default async function Home() {
 
             <BookSection title={t("featured")} books={featured} />
             <BookSection title={t("mostRecent")} books={recent} />
-          </main>
+          </div>
         </>
       ) : (
         <>
-          <LandingHero />
+          <LandingHero books={popular} />
           <HowItWorks />
 
-          <section className="bg-muted py-16 text-center">
-            <h2 className="text-3xl font-extrabold mb-8">{t("mostPopularReads")}</h2>
-
+          <section className="container mx-auto max-w-6xl px-4 py-16 sm:py-20">
+            <div className="flex items-end justify-between gap-4 mb-8">
+              <h2 className="text-3xl font-semibold">{t("mostPopularReads")}</h2>
+              <Button asChild variant="outline" className="shrink-0">
+                <Link href="/explore">{t("seeNow")}</Link>
+              </Button>
+            </div>
             {popular.length > 0 ? (
-              <>
-                <PopularReadsStack books={popular} />
-                <Button asChild size="lg" className="rounded-full mt-10">
-                  <Link href="/explore">{t("seeNow")}</Link>
-                </Button>
-              </>
+              <BookSection title="" books={popular} />
             ) : (
               <p className="text-sm text-muted-foreground">{t("noRatedBooks")}</p>
             )}
           </section>
         </>
       )}
+      </main>
     </>
   )
 }

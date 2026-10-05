@@ -362,7 +362,7 @@ export function TiptapEditor({
             <MessageSquare className="h-3.5 w-3.5" />
             {t("feedbackButton")}
             {feedbackCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white">
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-medium text-destructive-foreground">
                 {feedbackCount > 99 ? "99+" : feedbackCount}
               </span>
             )}
