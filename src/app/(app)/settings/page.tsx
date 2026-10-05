@@ -8,13 +8,13 @@ import { ProfileForm } from "@/components/settings/profile-form"
 import { PrivacyToggles } from "@/components/settings/privacy-toggles"
 import { ChangePasswordForm } from "@/components/settings/change-password-form"
 
-export const metadata: Metadata = { title: "Profile" }
+export const metadata: Metadata = { title: "Settings" }
 
 export default async function SettingsPage() {
   const session = await auth()
   if (!session) redirect("/auth/login")
 
-  const [{ settings, error }, t] = await Promise.all([getSettings(), getTranslations("Settings")])
+  const [{ settings, error }, t, tNav] = await Promise.all([getSettings(), getTranslations("Settings"), getTranslations("Nav")])
   if (error || !settings) redirect("/auth/login")
 
   return (
@@ -22,20 +22,20 @@ export default async function SettingsPage() {
       <SiteNav />
       <main className="flex-1">
         <div className="container mx-auto py-10 px-4 max-w-2xl space-y-8">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">{t("title")}</h1>
+          <h1 className="text-3xl sm:text-4xl font-semibold">{tNav("settings")}</h1>
 
-          <section className="bg-muted rounded-xl p-6">
-            <h2 className="text-lg font-semibold mb-4">{t("profile")}</h2>
+          <section className="bg-card border rounded-2xl shadow-soft p-5 sm:p-6">
+            <h2 className="text-xl font-semibold mb-5">{t("profile")}</h2>
             <ProfileForm initial={settings} />
           </section>
 
-          <section className="bg-muted rounded-xl p-6">
-            <h2 className="text-lg font-semibold mb-4">{t("privacy")}</h2>
+          <section className="bg-card border rounded-2xl shadow-soft p-5 sm:p-6">
+            <h2 className="text-xl font-semibold mb-5">{t("privacy")}</h2>
             <PrivacyToggles initial={settings} />
           </section>
 
-          <section className="bg-muted rounded-xl p-6">
-            <h2 className="text-lg font-semibold mb-4">{t("password")}</h2>
+          <section className="bg-card border rounded-2xl shadow-soft p-5 sm:p-6">
+            <h2 className="text-xl font-semibold mb-5">{t("password")}</h2>
             <ChangePasswordForm />
           </section>
         </div>

@@ -24,7 +24,7 @@ export function PrivacyToggles({ initial }: PrivacyTogglesProps) {
 
   return (
     <div className="space-y-4 max-w-md">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <div>
           <Label htmlFor="show-library-count">{t("showLibraryCount")}</Label>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -41,7 +41,7 @@ export function PrivacyToggles({ initial }: PrivacyTogglesProps) {
         />
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <div>
           <Label htmlFor="show-ratings">{t("showRatings")}</Label>
           <p className="text-xs text-muted-foreground mt-0.5">

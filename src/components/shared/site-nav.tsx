@@ -19,14 +19,14 @@ import { MobileNav } from "./mobile-nav"
 import { Logo } from "./logo"
 import { cn } from "@/lib/utils"
 
-export type SiteNavActive = "home" | "explore" | "library" | "write"
+export type SiteNavActive = "home" | "explore" | "library" | "write" | "me"
 
 interface SiteNavProps {
   active?: SiteNavActive
 }
 
 interface NavItem {
-  key: SiteNavActive | "me"
+  key: SiteNavActive
   label: string
   tabLabel: string
   href: string

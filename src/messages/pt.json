@@ -196,7 +196,8 @@
     "following": "Seguindo",
     "followers": "{count, plural, one {# seguidor} other {# seguidores}}",
     "followingCount": "{count, plural, one {# seguindo} other {# seguindo}}",
-    "message": "Mensagem"
+    "message": "Mensagem",
+    "editProfile": "Editar perfil"
   },
   "Library": {
     "title": "Minha Biblioteca",
@@ -415,7 +416,8 @@
     "currentPassword": "Senha atual",
     "newPassword": "Nova senha",
     "updating": "Atualizando…",
-    "changePassword": "Alterar senha"
+    "changePassword": "Alterar senha",
+    "changePhoto": "Alterar foto de perfil"
   },
   "Beta": {
     "pending": "Pendentes",

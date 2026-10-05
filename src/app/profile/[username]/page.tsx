@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { BookOpen } from "lucide-react"
 import { getTranslations } from "next-intl/server"
-import { MessageCircle } from "lucide-react"
+import { MessageCircle, Pencil } from "lucide-react"
 import { getPublicProfile } from "@/actions/profile"
 import { SiteNav } from "@/components/shared/site-nav"
 import { StarRating } from "@/components/library/star-rating"
@@ -33,66 +33,76 @@ export default async function ProfilePage({ params }: Props) {
 
   return (
     <>
-      <SiteNav />
+      <SiteNav active={profile.isOwnProfile ? "me" : undefined} />
       <main className="flex-1">
-        <div className="container mx-auto py-10 px-4 max-w-4xl">
-          <div className="flex items-center gap-5 mb-8 bg-muted rounded-xl p-6">
-            <div className="relative h-[120px] w-[120px] rounded-full overflow-hidden bg-muted border shrink-0">
-              {profile.avatarUrl ? (
-                <Image
-                  src={profile.avatarUrl}
-                  alt={profile.displayName}
-                  fill
-                  className="object-cover"
-                  style={{ objectPosition: `center ${profile.avatarPositionY}%` }}
-                  sizes="120px"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback">
-                  <span className="text-4xl font-bold text-white">
-                    {profile.displayName[0]?.toUpperCase()}
-                  </span>
+        <div className="container mx-auto pt-4 sm:pt-8 pb-12 px-4 max-w-4xl">
+          <section className="mb-10">
+            {/* Decorative banner */}
+            <div aria-hidden className="h-28 sm:h-40 rounded-3xl bg-cover-fallback opacity-90" />
+
+            <div className="px-2 sm:px-6">
+              <div className="flex items-end justify-between gap-3 -mt-12 sm:-mt-16">
+                <div className="relative h-24 w-24 sm:h-32 sm:w-32 rounded-full overflow-hidden bg-muted ring-4 ring-background shadow-lift shrink-0">
+                  {profile.avatarUrl ? (
+                    <Image
+                      src={profile.avatarUrl}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      style={{ objectPosition: `center ${profile.avatarPositionY}%` }}
+                      sizes="128px"
+                      priority
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback">
+                      <span className="text-4xl font-bold text-white" aria-hidden>
+                        {profile.displayName[0]?.toUpperCase()}
+                      </span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className="flex-1">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h1 className="text-2xl font-bold">{profile.displayName}</h1>
-                  <p className="text-sm text-muted-foreground">@{profile.username}</p>
-                </div>
-                {!profile.isOwnProfile && (
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Button asChild variant="outline" size="sm" className="gap-1.5">
-                      <Link href={`/messages/u/${profile.username}`}>
-                        <MessageCircle className="h-4 w-4" />
-                        {tMessages("title")}
+
+                <div className="flex justify-end items-center gap-2 pb-1">
+                  {profile.isOwnProfile ? (
+                    <Button asChild variant="outline">
+                      <Link href="/settings">
+                        <Pencil aria-hidden />
+                        {t("editProfile")}
                       </Link>
                     </Button>
-                    <FollowButton userId={profile.id} initialIsFollowing={profile.isFollowing} />
-                  </div>
-                )}
+                  ) : (
+                    <>
+                      <Button asChild variant="outline" size="icon" className="sm:w-auto sm:px-5">
+                        <Link href={`/messages/u/${profile.username}`} aria-label={tMessages("title")}>
+                          <MessageCircle aria-hidden />
+                          <span className="hidden sm:inline">{tMessages("title")}</span>
+                        </Link>
+                      </Button>
+                      <FollowButton userId={profile.id} initialIsFollowing={profile.isFollowing} />
+                    </>
+                  )}
+                </div>
               </div>
-              {profile.bio && <p className="text-sm mt-2 max-w-md">{profile.bio}</p>}
-              <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                <span>{t("followers", { count: profile.followerCount })}</span>
-                <span>{t("followingCount", { count: profile.followingCount })}</span>
-              </div>
-              {profile.libraryCount !== null && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  {t("libraryCount", { count: profile.libraryCount })}
-                </p>
-              )}
+
+              <h1 className="text-3xl sm:text-4xl font-semibold mt-4">{profile.displayName}</h1>
+              <p className="text-muted-foreground">@{profile.username}</p>
+              {profile.bio && <p className="mt-3 max-w-prose leading-relaxed">{profile.bio}</p>}
+
+              <ul className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-4 text-sm text-muted-foreground">
+                <li>{t("followers", { count: profile.followerCount })}</li>
+                <li>{t("followingCount", { count: profile.followingCount })}</li>
+                {profile.libraryCount !== null && <li>{t("libraryCount", { count: profile.libraryCount })}</li>}
+              </ul>
             </div>
-          </div>
+          </section>
 
           {profile.books.length > 0 && (
-            <section className="mb-8">
-              <h2 className="text-lg font-bold text-foreground mb-4">{t("publishedBooks")}</h2>
-              <div className="bg-muted rounded-xl p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
+            <section className="mb-10">
+              <h2 className="text-2xl font-semibold mb-4">{t("publishedBooks")}</h2>
+              <div className="bg-card border rounded-2xl shadow-soft p-4 sm:p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
                 {profile.books.map((book) => (
                   <Link key={book.id} href={`/books/${book.id}`} className="group block">
-                    <div className="aspect-[2/3] relative overflow-hidden rounded-lg bg-muted border">
+                    <div className="aspect-[2/3] relative overflow-hidden rounded-xl bg-muted border shadow-soft">
                       {book.coverUrl ? (
                         <Image
                           src={book.coverUrl}
@@ -109,7 +119,7 @@ export default async function ProfilePage({ params }: Props) {
                         </div>
                       )}
                     </div>
-                    <p className="text-sm font-medium mt-2 line-clamp-2">{book.title}</p>
+                    <p className="text-sm font-semibold mt-2 line-clamp-2 group-hover:text-primary transition-colors">{book.title}</p>
                   </Link>
                 ))}
               </div>
@@ -117,13 +127,13 @@ export default async function ProfilePage({ params }: Props) {
           )}
 
           {profile.publicShelves.length > 0 && (
-            <section className="mb-8">
-              <h2 className="text-lg font-bold text-foreground mb-4">{t("shelves")}</h2>
-              <div className="bg-muted rounded-xl p-6 space-y-2">
+            <section className="mb-10">
+              <h2 className="text-2xl font-semibold mb-4">{t("shelves")}</h2>
+              <div className="bg-card border rounded-2xl shadow-soft p-2 sm:p-3 space-y-1">
                 {profile.publicShelves.map((shelf) => (
                   <div
                     key={shelf.id}
-                    className="flex items-center justify-between px-3 py-2.5 bg-white/70 rounded-lg text-sm"
+                    className="flex items-center justify-between gap-3 px-3 py-3 rounded-xl text-sm"
                   >
                     <span className="font-medium">{shelf.name}</span>
                     <span className="text-muted-foreground">
@@ -137,13 +147,13 @@ export default async function ProfilePage({ params }: Props) {
 
           {profile.ratings && profile.ratings.length > 0 && (
             <section>
-              <h2 className="text-lg font-bold text-foreground mb-4">{t("ratings")}</h2>
-              <div className="bg-muted rounded-xl p-6 space-y-2">
+              <h2 className="text-2xl font-semibold mb-4">{t("ratings")}</h2>
+              <div className="bg-card border rounded-2xl shadow-soft p-2 sm:p-3 space-y-1">
                 {profile.ratings.map((r) => (
                   <Link
                     key={r.bookId}
                     href={`/books/${r.bookId}`}
-                    className="flex items-center justify-between px-3 py-2.5 bg-white/70 rounded-lg text-sm hover:bg-white transition-colors"
+                    className="flex items-center justify-between gap-3 px-3 py-3 rounded-xl text-sm hover:bg-muted transition-colors"
                   >
                     <span className="font-medium">{r.bookTitle}</span>
                     <StarRating value={r.rating} readOnly size="sm" />

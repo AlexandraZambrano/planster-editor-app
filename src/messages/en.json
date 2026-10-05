@@ -196,7 +196,8 @@
     "following": "Following",
     "followers": "{count, plural, one {# follower} other {# followers}}",
     "followingCount": "{count, plural, one {# following} other {# following}}",
-    "message": "Message"
+    "message": "Message",
+    "editProfile": "Edit profile"
   },
   "Library": {
     "title": "My Library",
@@ -415,7 +416,8 @@
     "currentPassword": "Current password",
     "newPassword": "New password",
     "updating": "Updating…",
-    "changePassword": "Change password"
+    "changePassword": "Change password",
+    "changePhoto": "Change profile photo"
   },
   "Beta": {
     "pending": "Pending",
