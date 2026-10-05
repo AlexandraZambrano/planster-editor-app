@@ -29,7 +29,7 @@ function Avatar({ user }: { user: { displayName: string; avatarUrl: string | nul
       {user.avatarUrl ? (
         <Image src={user.avatarUrl} alt={user.displayName} fill className="object-cover" sizes="28px" />
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82] text-white text-[10px] font-bold">
+        <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback text-white text-[10px] font-bold">
           {user.displayName[0]?.toUpperCase()}
         </div>
       )}

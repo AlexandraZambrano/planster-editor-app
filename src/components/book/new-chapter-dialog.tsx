@@ -67,7 +67,7 @@ export function NewChapterDialog({ bookId, onCreated }: NewChapterDialogProps) {
       <DialogTrigger asChild>
         <Button
           size="sm"
-          className="rounded-full bg-blue-500 hover:bg-blue-600 text-white"
+          className="rounded-full"
           data-testid="new-chapter-button"
         >
           <PlusIcon className="h-4 w-4 mr-1.5" />

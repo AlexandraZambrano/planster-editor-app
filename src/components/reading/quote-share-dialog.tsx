@@ -160,7 +160,7 @@ function InAppShareTab({
             {user.avatarUrl ? (
               <Image src={user.avatarUrl} alt={user.displayName} fill className="object-cover" sizes="32px" />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82] text-white text-xs font-bold">
+              <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback text-white text-xs font-bold">
                 {user.displayName[0]?.toUpperCase()}
               </div>
             )}

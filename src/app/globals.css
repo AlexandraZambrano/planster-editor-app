@@ -2,38 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer base {
   :root {
-    /* Brand palette: #FFCF9C peach, #FF8C6B coral, #E8543F red-orange, #7C3F82 purple, #2C2153 navy */
-    --background: 0 0% 100%;
-    --foreground: 253 43% 23%;
+    /* Brand: ink #1D1733 on paper #FBFAF7, violet #6D28D9 primary, ember #EA580C highlight.
+       Every text pair here is >= 4.5:1 (white on primary 7.2:1, muted-foreground on paper 6.3:1).
+       --highlight is decorative only (white on it is 3.6:1) — never put body text on it. */
+    --background: 45 33% 98%;
+    --foreground: 252 38% 14%;
     --card: 0 0% 100%;
-    --card-foreground: 253 43% 23%;
+    --card-foreground: 252 38% 14%;
     --popover: 0 0% 100%;
-    --popover-foreground: 253 43% 23%;
-    --primary: 7 79% 58%;
+    --popover-foreground: 252 38% 14%;
+    --primary: 263 70% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 31 100% 81%;
-    --secondary-foreground: 253 43% 23%;
-    --muted: 31 45% 96%;
-    --muted-foreground: 253 20% 45%;
-    --accent: 13 100% 71%;
-    --accent-foreground: 253 43% 23%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 31 35% 90%;
-    --input: 31 35% 90%;
-    --ring: 7 79% 58%;
-    --chart-1: 31 100% 81%;
-    --chart-2: 13 100% 71%;
-    --chart-3: 7 79% 58%;
-    --chart-4: 295 35% 38%;
-    --chart-5: 253 43% 23%;
-    --radius: 1rem;
+    --secondary: 258 70% 95%;
+    --secondary-foreground: 260 60% 30%;
+    --muted: 43 20% 94%;
+    --muted-foreground: 254 12% 40%;
+    --accent: 259 82% 96%;
+    --accent-foreground: 263 67% 35%;
+    --highlight: 21 90% 48%;
+    --highlight-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 42 20% 88%;
+    /* Darker than --border on purpose: form fields need 3:1 against the page to be identifiable */
+    --input: 255 9% 58%;
+    --ring: 263 70% 50%;
+    --chart-1: 263 70% 50%;
+    --chart-2: 21 90% 48%;
+    --chart-3: 173 80% 32%;
+    --chart-4: 330 75% 50%;
+    --chart-5: 38 92% 50%;
+    --radius: 0.875rem;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -85,6 +86,44 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1,
+  h2 {
+    @apply font-display tracking-tight;
+    text-wrap: balance;
+  }
+  /* Elements without their own focus style (plain links, etc.) still get a clear indicator */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: hsl(var(--primary) / 0.18);
+  }
+}
+
+@layer utilities {
+  /* Placeholder for books without a cover image */
+  .bg-cover-fallback {
+    background-image: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--highlight)) 100%);
+  }
+}
+
+/* Keep page content clear of the fixed mobile tab bar (only on pages that render it) */
+@media (max-width: 767px) {
+  body:has(#mobile-tabbar) {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

@@ -79,10 +79,13 @@ export function AvatarUpload({
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-4">
-        <div
+        <button
+          type="button"
+          aria-label={t("changePhoto")}
+          disabled={uploading}
           className={cn(
-            "relative h-24 w-24 rounded-full overflow-hidden border-2 border-dashed border-muted-foreground/30 bg-muted cursor-pointer hover:border-muted-foreground/60 transition-colors shrink-0",
-            "flex items-center justify-center"
+            "group relative h-24 w-24 rounded-full overflow-hidden border-2 border-dashed border-muted-foreground/30 bg-muted cursor-pointer hover:border-primary/60 transition-colors shrink-0",
+            "flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           )}
           onClick={() => inputRef.current?.click()}
         >
@@ -90,23 +93,23 @@ export function AvatarUpload({
             <>
               <Image
                 src={value}
-                alt={displayName}
+                alt=""
                 fill
                 className="object-cover"
                 style={{ objectPosition: `center ${positionY}%` }}
               />
-              <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Upload className="h-5 w-5 text-white" />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity flex items-center justify-center">
+                <Upload className="h-5 w-5 text-white" aria-hidden />
               </div>
             </>
           ) : uploading ? (
             <span className="text-xs text-muted-foreground">{t("uploading")}</span>
           ) : (
             <div className="flex flex-col items-center gap-1 text-muted-foreground">
-              <ImageIcon className="h-6 w-6" />
+              <ImageIcon className="h-6 w-6" aria-hidden />
             </div>
           )}
-        </div>
+        </button>
 
         {value && (
           <div className="flex-1 max-w-[180px] space-y-1.5">
@@ -115,6 +118,7 @@ export function AvatarUpload({
             </label>
             <Slider
               id="avatar-position"
+              aria-label={t("adjustPosition")}
               min={0}
               max={100}
               step={1}

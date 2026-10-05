@@ -10,7 +10,14 @@
     "signOut": "Tanca sessió",
     "notifications": "Notificacions",
     "accountMenu": "Menú del compte",
-    "openMenu": "Obre el menú"
+    "openMenu": "Obre el menú",
+    "skipToContent": "Salta al contingut",
+    "primaryNav": "Principal",
+    "tabExplore": "Explora",
+    "tabWrite": "Escriu",
+    "tabLibrary": "Biblioteca",
+    "tabMe": "Jo",
+    "settings": "Configuració"
   },
   "Language": {
     "label": "Idioma"
@@ -189,7 +196,8 @@
     "following": "Seguint",
     "followers": "{count, plural, one {# seguidor} other {# seguidors}}",
     "followingCount": "{count, plural, one {# seguit} other {# seguits}}",
-    "message": "Missatge"
+    "message": "Missatge",
+    "editProfile": "Edita el perfil"
   },
   "Library": {
     "title": "La meva Biblioteca",
@@ -408,7 +416,8 @@
     "currentPassword": "Contrasenya actual",
     "newPassword": "Nova contrasenya",
     "updating": "Actualitzant…",
-    "changePassword": "Canvia la contrasenya"
+    "changePassword": "Canvia la contrasenya",
+    "changePhoto": "Canvia la foto de perfil"
   },
   "Beta": {
     "pending": "Pendents",

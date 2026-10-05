@@ -35,7 +35,7 @@ export default async function WritePage() {
   return (
     <>
       <SiteNav active="write" />
-      <main className="bg-white min-h-[calc(100vh-4rem)]">
+      <main className="flex-1">
         <div className="container mx-auto py-14 px-4 max-w-6xl">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-foreground max-w-xl">
             {t("heroTitle")}

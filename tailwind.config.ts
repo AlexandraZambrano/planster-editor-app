@@ -9,7 +9,19 @@ export default {
   ],
   theme: {
   	extend: {
+  		fontFamily: {
+  			sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+  			display: ['var(--font-display)', 'Georgia', 'serif']
+  		},
+  		boxShadow: {
+  			soft: '0 1px 2px hsl(var(--foreground) / 0.04), 0 4px 16px -4px hsl(var(--foreground) / 0.08)',
+  			lift: '0 2px 4px hsl(var(--foreground) / 0.05), 0 12px 32px -8px hsl(var(--foreground) / 0.16)'
+  		},
   		colors: {
+  			highlight: {
+  				DEFAULT: 'hsl(var(--highlight))',
+  				foreground: 'hsl(var(--highlight-foreground))'
+  			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

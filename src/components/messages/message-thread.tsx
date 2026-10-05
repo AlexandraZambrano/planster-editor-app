@@ -112,13 +112,13 @@ export function MessageThread({
   const canReply = status !== "DECLINED" && !showAcceptBanner
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] md:h-full flex-1 min-w-0">
+    <div className="flex flex-col h-[calc(100dvh-8rem-env(safe-area-inset-bottom))] md:h-full flex-1 min-w-0">
       <header className="border-b px-4 py-3 flex items-center gap-3">
         <div className="relative h-9 w-9 rounded-full overflow-hidden bg-muted shrink-0">
           {otherUser.avatarUrl ? (
             <Image src={otherUser.avatarUrl} alt={otherUser.displayName} fill className="object-cover" sizes="36px" />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82] text-white text-sm font-bold">
+            <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback text-white text-sm font-bold">
               {otherUser.displayName[0]?.toUpperCase()}
             </div>
           )}
@@ -185,7 +185,7 @@ function MessageBubble({ message, isOwn }: { message: MessageItem; isOwn: boolea
       <div
         className={cn(
           "max-w-[75%] rounded-2xl px-3.5 py-2 text-sm",
-          isOwn ? "bg-foreground text-white" : "bg-muted text-foreground"
+          isOwn ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
         )}
       >
         {quote ? (

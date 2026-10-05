@@ -19,14 +19,14 @@ export function PopularReadsStack({ books }: PopularReadsStackProps) {
   const shown = books.slice(0, OFFSETS.length)
 
   return (
-    <div className="relative mx-auto" style={{ height: 280, maxWidth: 560 }}>
+    <div className="relative mx-auto w-full origin-top scale-[0.7] -mb-20 sm:scale-100 sm:mb-0" style={{ height: 280, maxWidth: 560 }}>
       {shown.map((book, i) => {
         const offset = OFFSETS[i]
         return (
           <Link
             key={book.id}
             href={`/books/${book.id}`}
-            className="absolute top-0 left-1/2 w-32 sm:w-36 aspect-[2/3] rounded-lg overflow-hidden border shadow-md bg-muted transition-transform hover:-translate-y-2 hover:z-10"
+            className="absolute top-0 left-1/2 w-32 sm:w-36 aspect-[2/3] rounded-xl overflow-hidden border shadow-lift bg-muted transition-transform hover:-translate-y-2 hover:z-10"
             style={{
               transform: `translateX(calc(-50% + ${offset.x}px)) translateY(${offset.y}px) rotate(${offset.rotate}deg)`,
               zIndex: offset.z,
@@ -41,7 +41,7 @@ export function PopularReadsStack({ books }: PopularReadsStackProps) {
                 className="object-cover"
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
+              <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback">
                 <span className="text-4xl font-bold text-white select-none">
                   {book.title[0]?.toUpperCase() ?? <BookOpen />}
                 </span>

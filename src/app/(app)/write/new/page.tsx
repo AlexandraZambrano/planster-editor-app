@@ -18,7 +18,7 @@ export default async function NewBookPage() {
   return (
     <>
       <SiteNav active="write" />
-      <main className="bg-white min-h-[calc(100vh-4rem)]">
+      <main className="flex-1">
         <div className="container mx-auto py-10 px-4 max-w-2xl">
           <Link
             href="/write"

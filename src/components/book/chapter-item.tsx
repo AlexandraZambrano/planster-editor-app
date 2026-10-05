@@ -157,7 +157,7 @@ export function ChapterItem({ chapter, bookId, onDelete }: ChapterItemProps) {
 
         <Link
           href={`/write/${bookId}/editor/${chapter.id}`}
-          className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors shrink-0"
+          className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shrink-0"
         >
           <PencilLine className="h-3 w-3" />
           {t("edit")}
@@ -166,7 +166,7 @@ export function ChapterItem({ chapter, bookId, onDelete }: ChapterItemProps) {
         <Button
           type="button"
           size="sm"
-          className="h-auto gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-red-500 hover:bg-red-600 text-white shrink-0"
+          className="h-auto gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-destructive hover:bg-destructive/90 text-destructive-foreground shrink-0"
           onClick={handleDelete}
           disabled={isPending}
         >

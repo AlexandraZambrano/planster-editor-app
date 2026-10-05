@@ -240,7 +240,7 @@ export function ReadingView({
             <MessageSquareText className="h-3.5 w-3.5" />
             {t("myComments")}
             {myComments && myComments.length > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white">
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-medium text-destructive-foreground">
                 {myComments.length > 99 ? "99+" : myComments.length}
               </span>
             )}

@@ -55,7 +55,7 @@ export function LibraryBookCard({ entry, shelves, onRemove }: LibraryBookCardPro
             className="object-cover"
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
+          <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback">
             <span className="text-2xl font-bold text-white select-none">
               {entry.book.title[0]?.toUpperCase() ?? <BookOpen />}
             </span>

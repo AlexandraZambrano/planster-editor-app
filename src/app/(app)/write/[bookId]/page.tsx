@@ -75,7 +75,7 @@ export default async function BookPanelPage({ params }: Props) {
   return (
     <>
       <SiteNav active="write" />
-      <main className="bg-white min-h-[calc(100vh-4rem)]">
+      <main className="flex-1">
         <div className="container mx-auto py-8 px-4 max-w-4xl">
           <div className="flex items-center justify-between mb-6">
             <Link
@@ -99,7 +99,7 @@ export default async function BookPanelPage({ params }: Props) {
               {book.coverUrl ? (
                 <Image src={book.coverUrl} alt={book.title} fill className="object-cover" sizes="128px" />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
+                <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback">
                   <span className="text-xl font-bold text-white">{book.title[0]?.toUpperCase()}</span>
                 </div>
               )}

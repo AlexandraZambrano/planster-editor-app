@@ -10,7 +10,14 @@
     "signOut": "Sair",
     "notifications": "Notificações",
     "accountMenu": "Menu da conta",
-    "openMenu": "Abrir menu"
+    "openMenu": "Abrir menu",
+    "skipToContent": "Pular para o conteúdo",
+    "primaryNav": "Principal",
+    "tabExplore": "Explorar",
+    "tabWrite": "Escrever",
+    "tabLibrary": "Biblioteca",
+    "tabMe": "Eu",
+    "settings": "Configurações"
   },
   "Language": {
     "label": "Idioma"
@@ -189,7 +196,8 @@
     "following": "Seguindo",
     "followers": "{count, plural, one {# seguidor} other {# seguidores}}",
     "followingCount": "{count, plural, one {# seguindo} other {# seguindo}}",
-    "message": "Mensagem"
+    "message": "Mensagem",
+    "editProfile": "Editar perfil"
   },
   "Library": {
     "title": "Minha Biblioteca",
@@ -408,7 +416,8 @@
     "currentPassword": "Senha atual",
     "newPassword": "Nova senha",
     "updating": "Atualizando…",
-    "changePassword": "Alterar senha"
+    "changePassword": "Alterar senha",
+    "changePhoto": "Alterar foto de perfil"
   },
   "Beta": {
     "pending": "Pendentes",

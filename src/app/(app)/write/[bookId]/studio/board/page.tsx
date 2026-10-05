@@ -54,7 +54,7 @@ export default async function BoardPage({ params, searchParams }: Props) {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-[calc(100dvh-8rem-env(safe-area-inset-bottom))] md:h-[calc(100dvh-4rem)]">
       <div className="px-6 py-4 border-b flex-shrink-0">
         <Link
           href={`/write/${bookId}/studio`}

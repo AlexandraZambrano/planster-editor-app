@@ -16,7 +16,7 @@ export function BookGridCard({ book }: BookGridCardProps) {
   return (
     <div className="group">
       <Link href={`/books/${book.id}`} className="block">
-        <div className="aspect-[2/3] relative overflow-hidden rounded-lg bg-muted mb-2 border">
+        <div className="aspect-[2/3] relative overflow-hidden rounded-xl bg-muted mb-3 border shadow-soft transition-shadow duration-300 group-hover:shadow-lift">
           {book.coverUrl ? (
             <Image
               src={book.coverUrl}
@@ -26,7 +26,7 @@ export function BookGridCard({ book }: BookGridCardProps) {
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82]">
+            <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback">
               <span className="text-5xl font-bold text-white select-none">
                 {book.title[0]?.toUpperCase() ?? <BookOpen />}
               </span>
@@ -34,12 +34,12 @@ export function BookGridCard({ book }: BookGridCardProps) {
           )}
         </div>
 
-        <p className="font-medium text-sm leading-tight line-clamp-2 mb-0.5">{book.title}</p>
+        <p className="font-semibold text-sm leading-snug line-clamp-2 mb-0.5 group-hover:text-primary transition-colors">{book.title}</p>
       </Link>
 
       <Link
         href={`/@${book.author.username}`}
-        className="text-xs text-muted-foreground hover:text-foreground mb-1 inline-block"
+        className="text-xs text-muted-foreground hover:text-foreground inline-block py-1"
       >
         {t("byAuthor", { name: book.author.displayName })}
       </Link>

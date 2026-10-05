@@ -33,7 +33,7 @@ export function InboxList({ requests, active }: InboxListProps) {
         <TabsTrigger value="requests">
           {t("requestsTab")}
           {reqList.length > 0 && (
-            <span className="ml-1.5 rounded-full bg-red-500 px-1.5 text-[10px] text-white">{reqList.length}</span>
+            <span className="ml-1.5 rounded-full bg-destructive px-1.5 text-[10px] text-destructive-foreground">{reqList.length}</span>
           )}
         </TabsTrigger>
       </TabsList>
@@ -100,7 +100,7 @@ function Avatar({ user }: { user: ConversationSummary["otherUser"] }) {
       {user.avatarUrl ? (
         <Image src={user.avatarUrl} alt={user.displayName} fill className="object-cover" sizes="40px" />
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF8C6B] to-[#7C3F82] text-white text-sm font-bold">
+        <div className="absolute inset-0 flex items-center justify-center bg-cover-fallback text-white text-sm font-bold">
           {user.displayName[0]?.toUpperCase()}
         </div>
       )}
